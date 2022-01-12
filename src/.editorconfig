@@ -1,0 +1,24 @@
+# To learn more about .editorconfig see https://aka.ms/editorconfigdocs
+root = true
+
+# All files
+[*]
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+insert_final_newline = false
+charset = utf-8
+csharp_style_prefer_switch_expression=true:silent
+csharp_style_var_when_type_is_apparent=false:suggestion
+csharp_style_var_elsewhere=true:suggestion
+csharp_style_var_for_built_in_types=true:suggestion
+
+# Xml files
+[*.xml]
+indent_size = 2
+
+[*.csproj]
+ident_size = 2
+
+[*.config]
+ident_size = 2

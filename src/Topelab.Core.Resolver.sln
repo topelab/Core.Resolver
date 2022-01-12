@@ -14,7 +14,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_info", "_info", "{915F27B6-0079-449F-879B-BFF9FFF9FA99}"
 	ProjectSection(SolutionItems) = preProject
 		..\readme.md = ..\readme.md
-		..\version.txt = ..\version.txt
+		version.txt = version.txt
 	EndProjectSection
 EndProject
 Global
