@@ -1,13 +1,12 @@
-﻿using System;
-using System.Linq;
+using System;
 using Topelab.Core.Resolver.Enums;
 
-namespace Topelab.Core.Resolver.DTO
+namespace Topelab.Core.Resolver.Entities
 {
     /// <summary>
-    /// Resolve DTO
+    /// Resolve info
     /// </summary>
-    public class ResolveDTO
+    public class ResolveInfo
     {
         /// <summary>
         /// Type from
@@ -46,7 +45,7 @@ namespace Topelab.Core.Resolver.DTO
         /// <param name="typeTo">Type to</param>
         /// <param name="resolveType">Resolve type</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
-        public ResolveDTO(Type typeFrom, Type typeTo, ResolveTypeEnum resolveType = ResolveTypeEnum.PerResolve, string key = null, Type[] constructorParamTypes = null)
+        public ResolveInfo(Type typeFrom, Type typeTo, ResolveTypeEnum resolveType = ResolveTypeEnum.PerResolve, string key = null, Type[] constructorParamTypes = null)
         {
             TypeFrom = typeFrom;
             TypeTo = typeTo;

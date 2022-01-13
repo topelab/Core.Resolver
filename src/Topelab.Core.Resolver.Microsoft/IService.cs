@@ -7,5 +7,4 @@ namespace Topelab.Core.Resolver.Microsoft
         // Returns mapped type for this I
         Type Type();
     }
-
 }

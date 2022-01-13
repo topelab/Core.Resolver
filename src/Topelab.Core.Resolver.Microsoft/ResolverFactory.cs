@@ -1,39 +1,46 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using Topelab.Core.Resolver.DTO;
 using Topelab.Core.Resolver.Enums;
 using Topelab.Core.Resolver.Interfaces;
 using System.Linq;
+using Topelab.Core.Resolver.Entities;
 
 namespace Topelab.Core.Resolver.Microsoft
 {
+    /// <summary>
+    /// Resolver factory
+    /// </summary>
     public static class ResolverFactory
     {
         private const string DefaultKey = "__NULL__";
 
-        public static IResolver Create(ResolveDTOList resolveDTOs)
+        /// <summary>
+        /// Creates an IResolver based on the specified resolve info collection.
+        /// </summary>
+        /// <param name="resolveInfoCollection">The resolve info collection.</param>
+        public static IResolver Create(ResolveInfoCollection resolveInfoCollection)
         {
-            if (resolveDTOs is null)
+            if (resolveInfoCollection is null)
             {
-                throw new ArgumentNullException(nameof(resolveDTOs));
+                throw new ArgumentNullException(nameof(resolveInfoCollection));
             }
             Dictionary<string, IResolver> globalResolvers = new();
-            var keys = resolveDTOs.Select(r => r.Key ?? DefaultKey).Distinct().ToList();
-            keys.ForEach(key => Create(key, resolveDTOs, globalResolvers));
+            List<string> keys = resolveInfoCollection.Select(r => r.Key ?? DefaultKey).Distinct().ToList();
+            keys.ForEach(key => Create(key, resolveInfoCollection, globalResolvers));
             return globalResolvers.Where(r => r.Key == DefaultKey).Select(r => r.Value).FirstOrDefault() ?? globalResolvers.First().Value;
         }
 
-        private static IResolver Create(string key, ResolveDTOList resolveDTOs, Dictionary<string, IResolver> globalResolvers)
+        private static IResolver Create(string key, ResolveInfoCollection resolveInfoCollection, Dictionary<string, IResolver> globalResolvers)
         {
-            IServiceCollection collection = PrepareCollection(resolveDTOs.Where(r => (r.Key ?? DefaultKey) == key));
+            var collection = PrepareCollection(resolveInfoCollection.Where(r => (r.Key ?? DefaultKey) == key));
             var serviceProvider = collection.BuildServiceProvider();
             var serviceFactory = serviceProvider.GetService<IServiceFactory>();
-            var resolver = new Resolver(serviceProvider, serviceFactory, key, globalResolvers);
+            Resolver resolver = new(serviceProvider, serviceFactory, key, globalResolvers);
             return resolver;
         }
 
-        private static IServiceCollection PrepareCollection(IEnumerable<ResolveDTO> resolveDTOs)
+        private static IServiceCollection PrepareCollection(IEnumerable<ResolveInfo> resolveInfoCollection)
         {
             IServiceCollection collection = new ServiceCollection();
 
@@ -41,31 +48,31 @@ namespace Topelab.Core.Resolver.Microsoft
                 .AddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (T, P) => ActivatorUtilities.CreateInstance(provider, T, P)))
                 .AddScoped<IService<IResolver>, Service<IResolver,Resolver>>();
 
-            resolveDTOs.ToList().ForEach(resolveDTO =>
+            resolveInfoCollection.ToList().ForEach(resolveInfo =>
             {
-                switch (resolveDTO.ResolveType)
+                switch (resolveInfo.ResolveType)
                 {
                     case ResolveTypeEnum.Singleton:
-                        if (resolveDTO.ConstructorParamTypes.Length > 0)
+                        if (resolveInfo.ConstructorParamTypes.Length > 0)
                         {
-                            collection.AddSingleton(typeof(IService<>).MakeGenericType(resolveDTO.TypeFrom), typeof(Service<,>).MakeGenericType(resolveDTO.TypeFrom, resolveDTO.TypeTo));
+                            collection.AddSingleton(typeof(IService<>).MakeGenericType(resolveInfo.TypeFrom), typeof(Service<,>).MakeGenericType(resolveInfo.TypeFrom, resolveInfo.TypeTo));
                         }
                         else
                         {
-                            collection.AddSingleton(resolveDTO.TypeFrom, resolveDTO.TypeTo);
+                            collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.TypeTo);
                         }
                         break;
                     case ResolveTypeEnum.Instance:
-                        collection.AddSingleton(resolveDTO.TypeFrom, resolveDTO.Instance);
+                        collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.Instance);
                         break;
                     default:
-                        if (resolveDTO.ConstructorParamTypes.Length > 0)
+                        if (resolveInfo.ConstructorParamTypes.Length > 0)
                         {
-                            collection.AddScoped(typeof(IService<>).MakeGenericType(resolveDTO.TypeFrom), typeof(Service<,>).MakeGenericType(resolveDTO.TypeFrom, resolveDTO.TypeTo));
+                            collection.AddScoped(typeof(IService<>).MakeGenericType(resolveInfo.TypeFrom), typeof(Service<,>).MakeGenericType(resolveInfo.TypeFrom, resolveInfo.TypeTo));
                         }
                         else
                         {
-                            collection.AddScoped(resolveDTO.TypeFrom, resolveDTO.TypeTo);
+                            collection.AddScoped(resolveInfo.TypeFrom, resolveInfo.TypeTo);
                         }
                         break;
                 }

@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using Topelab.Core.Resolver.DTO;
+using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Interfaces;
 
 namespace Topelab.Core.Resolver.Microsoft
 {
     /// <summary>
-    /// Resover for generic DI using Microsoft.Extensions.DependencyInjection
+    /// Resolver for generic DI using Microsoft.Extensions.DependencyInjection
     /// </summary>
     public class Resolver : IResolver
     {
@@ -20,7 +20,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// </summary>
         /// <param name="serviceProvider">Service provider</param>
         /// <param name="serviceFactory">Service factory</param>
-        /// <param name="key">Key to have differents resolvers</param>
+        /// <param name="key">Key to have different resolvers</param>
         /// <param name="globalResolvers">Global resolvers indexed by key</param>
         /// <exception cref="ArgumentNullException"></exception>
         public Resolver(IServiceProvider serviceProvider, IServiceFactory serviceFactory, string key, Dictionary<string, IResolver> globalResolvers)
@@ -48,12 +48,12 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg1">Param 1 for constructor</param>
         public T Get<T, T1>(T1 arg1)
         {
-            string key = ResolverKeyFactory.Create(typeof(T1));
+            var key = ResolverKeyFactory.Create(typeof(T1));
             return Get<T, T1>(key, arg1);
         }
 
         /// <summary>
-        /// Resolve an instance of type <typeparamref name="T"/> using constructor with params types <typeparamref name="T1"/> and 
+        /// Resolve an instance of type <typeparamref name="T"/> using constructor with param types <typeparamref name="T1"/> and 
         /// <typeparamref name="T2"/>
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
@@ -63,12 +63,12 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg2">Param 2 for constructor</param>
         public T Get<T, T1, T2>(T1 arg1, T2 arg2)
         {
-            string key = ResolverKeyFactory.Create(typeof(T1), typeof(T2));
+            var key = ResolverKeyFactory.Create(typeof(T1), typeof(T2));
             return Get<T, T1, T2>(key, arg1, arg2);
         }
 
         /// <summary>
-        /// Resolve an instance of type <typeparamref name="T"/> using constructor with params types <typeparamref name="T1"/>, 
+        /// Resolve an instance of type <typeparamref name="T"/> using constructor with param types <typeparamref name="T1"/>, 
         /// <typeparamref name="T2"/> and <typeparamref name="T3"/>
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
@@ -80,12 +80,12 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg3">Param 3 for constructor</param>
         public T Get<T, T1, T2, T3>(T1 arg1, T2 arg2, T3 arg3)
         {
-            string key = ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3));
+            var key = ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3));
             return Get<T, T1, T2, T3>(key, arg1, arg2, arg3);
         }
 
         /// <summary>
-        /// Resolve an instance of type <typeparamref name="T"/> using constructor with params types <typeparamref name="T1"/>, 
+        /// Resolve an instance of type <typeparamref name="T"/> using constructor with param types <typeparamref name="T1"/>, 
         /// <typeparamref name="T2"/>, <typeparamref name="T3"/> and <typeparamref name="T4"/>
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
@@ -99,12 +99,12 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg4">Param 4 for constructor</param>
         public T Get<T, T1, T2, T3, T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            string key = ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3), typeof(T4));
+            var key = ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3), typeof(T4));
             return Get<T, T1, T2, T3, T4>(key, arg1, arg2, arg3, arg4);
         }
 
         /// <summary>
-        /// Resolve an instance of type <typeparamref name="T"/> using constructor with params types <typeparamref name="T1"/>, 
+        /// Resolve an instance of type <typeparamref name="T"/> using constructor with param types <typeparamref name="T1"/>, 
         /// <typeparamref name="T2"/>, <typeparamref name="T3"/>, <typeparamref name="T4"/> and <typeparamref name="T5"/>
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
@@ -120,12 +120,12 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg5">Param 5 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
-            string key = ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
+            var key = ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
             return Get<T, T1, T2, T3, T4, T5>(key, arg1, arg2, arg3, arg4, arg5);
         }
 
         /// <summary>
-        /// Resolve an instance of type <typeparamref name="T"/> using constructor with params types <typeparamref name="T1"/>, 
+        /// Resolve an instance of type <typeparamref name="T"/> using constructor with param types <typeparamref name="T1"/>, 
         /// <typeparamref name="T2"/>, <typeparamref name="T3"/>, <typeparamref name="T4"/>, <typeparamref name="T5"/> and <typeparamref name="T6"/>
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
@@ -143,7 +143,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg6">Param 6 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5, T6>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
-            string key = ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
+            var key = ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
             return Get<T, T1, T2, T3, T4, T5, T6>(key, arg1, arg2, arg3, arg4, arg5, arg6);
         }
 
@@ -154,7 +154,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="key">Key name to resolve</param>
         public T Get<T>(string key)
         {
-            var resolver = (Resolver)globalResolvers[key];
+            Resolver resolver = (Resolver)globalResolvers[key];
             return resolver.serviceProvider.GetService<T>();
         }
 
@@ -167,12 +167,12 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg1">Param 1 for constructor</param>
         public T Get<T, T1>(string key, T1 arg1)
         {
-            var resolver = (Resolver)globalResolvers[key];
+            Resolver resolver = (Resolver)globalResolvers[key];
             return resolver.serviceFactory.Create<T>(arg1);
         }
 
         /// <summary>
-        /// Resolve a named instance of type <typeparamref name="T"/> using constructor with params types <typeparamref name="T1"/> and 
+        /// Resolve a named instance of type <typeparamref name="T"/> using constructor with param types <typeparamref name="T1"/> and 
         /// <typeparamref name="T2"/>
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
@@ -183,12 +183,12 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg2">Param 2 for constructor</param>
         public T Get<T, T1, T2>(string key, T1 arg1, T2 arg2)
         {
-            var resolver = (Resolver)globalResolvers[key];
+            Resolver resolver = (Resolver)globalResolvers[key];
             return resolver.serviceFactory.Create<T>(arg1, arg2);
         }
 
         /// <summary>
-        /// Resolve a named instance of type <typeparamref name="T"/> using constructor with params types <typeparamref name="T1"/>, 
+        /// Resolve a named instance of type <typeparamref name="T"/> using constructor with param types <typeparamref name="T1"/>, 
         /// <typeparamref name="T2"/> and <typeparamref name="T3"/>
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
@@ -201,12 +201,12 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg3">Param 3 for constructor</param>
         public T Get<T, T1, T2, T3>(string key, T1 arg1, T2 arg2, T3 arg3)
         {
-            var resolver = (Resolver)globalResolvers[key];
+            Resolver resolver = (Resolver)globalResolvers[key];
             return resolver.serviceFactory.Create<T>(arg1, arg2, arg3);
         }
 
         /// <summary>
-        /// Resolve a named instance of type <typeparamref name="T"/> using constructor with params types <typeparamref name="T1"/>, 
+        /// Resolve a named instance of type <typeparamref name="T"/> using constructor with param types <typeparamref name="T1"/>, 
         /// <typeparamref name="T2"/>, <typeparamref name="T3"/> and <typeparamref name="T4"/>
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
@@ -221,12 +221,12 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg4">Param 4 for constructor</param>
         public T Get<T, T1, T2, T3, T4>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            var resolver = (Resolver)globalResolvers[key];
+            Resolver resolver = (Resolver)globalResolvers[key];
             return resolver.serviceFactory.Create<T>(arg1, arg2, arg3, arg4);
         }
 
         /// <summary>
-        /// Resolve a named instance of type <typeparamref name="T"/> using constructor with params types <typeparamref name="T1"/>, 
+        /// Resolve a named instance of type <typeparamref name="T"/> using constructor with param types <typeparamref name="T1"/>, 
         /// <typeparamref name="T2"/>, <typeparamref name="T3"/>, <typeparamref name="T4"/> and <typeparamref name="T5"/>
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
@@ -243,12 +243,12 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg5">Param 5 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
-            var resolver = (Resolver)globalResolvers[key];
+            Resolver resolver = (Resolver)globalResolvers[key];
             return resolver.serviceFactory.Create<T>(arg1, arg2, arg3, arg4, arg5);
         }
 
         /// <summary>
-        /// Resolve a named instance of type <typeparamref name="T"/> using constructor with params types <typeparamref name="T1"/>, 
+        /// Resolve a named instance of type <typeparamref name="T"/> using constructor with param types <typeparamref name="T1"/>, 
         /// <typeparamref name="T2"/>, <typeparamref name="T3"/>, <typeparamref name="T4"/>, <typeparamref name="T5"/> and <typeparamref name="T6"/>
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
@@ -267,7 +267,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg6">Param 6 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5, T6>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
-            var resolver = (Resolver)globalResolvers[key];
+            Resolver resolver = (Resolver)globalResolvers[key];
             return resolver.serviceFactory.Create<T>(arg1, arg2, arg3, arg4, arg5, arg6);
         }
     }

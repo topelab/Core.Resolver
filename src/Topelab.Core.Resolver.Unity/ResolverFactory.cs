@@ -1,78 +1,90 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Topelab.Core.Resolver.DTO;
+using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Enums;
 using Topelab.Core.Resolver.Interfaces;
 using Unity;
-using Unity.Injection;
 
 namespace Topelab.Core.Resolver.Unity
 {
+    /// <summary>
+    /// Resolver factory
+    /// </summary>
     public static class ResolverFactory
     {
-        public static IResolver Create(ResolveDTOList moduleDependecies)
+        /// <summary>
+        /// Creates an IResolver based on the specified resolve info collection.
+        /// </summary>
+        /// <param name="resolveInfoCollection">The resolve info collection.</param>
+        public static IResolver Create(ResolveInfoCollection resolveInfoCollection)
         {
             Dictionary<string, ConstructorInfo> constructorsByKey = new();
 
-            var container = new UnityContainer();
+            UnityContainer container = new();
             container.RegisterType<IResolver, Resolver>();
-            if (moduleDependecies != null)
+            if (resolveInfoCollection != null)
             {
-                Register(container, moduleDependecies, constructorsByKey);
+                Register(container, resolveInfoCollection, constructorsByKey);
             }
 
             return new Resolver(container, constructorsByKey);
         }
 
-        public static void Register(IUnityContainer container, ResolveDTOList moduleDependecies, Dictionary<string, ConstructorInfo> constructorsByKey)
+        /// <summary>
+        /// Registers within the specified container the specified resolve info collection.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="resolveInfoCollection">The resolve info collection.</param>
+        /// <param name="constructorsByKey">The constructors by key.</param>
+        public static void Register(IUnityContainer container, ResolveInfoCollection resolveInfoCollection, Dictionary<string, ConstructorInfo> constructorsByKey)
         {
-            moduleDependecies.ForEach(resolveDTO =>
+            resolveInfoCollection.ForEach(resolveInfo =>
             {
-                string key = ResolverKeyFactory.Create(resolveDTO);
-                InjectionMember injectionMember = resolveDTO.ConstructorParamTypes.Length > 0 ? Invoke.Constructor(resolveDTO.ConstructorParamTypes) : null;
-                ConstructorInfo constructorInfo = GetConstructorInfo(resolveDTO);
+                var key = ResolverKeyFactory.Create(resolveInfo);
+                var injectionMember = resolveInfo.ConstructorParamTypes.Length > 0 ? Invoke.Constructor(resolveInfo.ConstructorParamTypes) : null;
+                var constructorInfo = GetConstructorInfo(resolveInfo);
 
                 if (constructorInfo != null && key != null)
                 {
                     constructorsByKey[key] = constructorInfo;
                 }
 
-                switch (resolveDTO.ResolveType)
+                switch (resolveInfo.ResolveType)
                 {
                     case ResolveTypeEnum.Singleton:
-                        if (resolveDTO.ConstructorParamTypes.Length > 0)
+                        if (resolveInfo.ConstructorParamTypes.Length > 0)
                         {
-                            container.RegisterSingleton(resolveDTO.TypeFrom, resolveDTO.TypeTo, key, injectionMember);
+                            container.RegisterSingleton(resolveInfo.TypeFrom, resolveInfo.TypeTo, key, injectionMember);
                         }
                         else
                         {
-                            container.RegisterSingleton(resolveDTO.TypeFrom, resolveDTO.TypeTo, key);
+                            container.RegisterSingleton(resolveInfo.TypeFrom, resolveInfo.TypeTo, key);
                         }
                         break;
                     case ResolveTypeEnum.Instance:
-                        container.RegisterInstance(resolveDTO.TypeFrom, resolveDTO.Instance);
+                        container.RegisterInstance(resolveInfo.TypeFrom, resolveInfo.Instance);
                         break;
                     default:
-                        if (resolveDTO.ConstructorParamTypes.Length > 0)
+                        if (resolveInfo.ConstructorParamTypes.Length > 0)
                         {
-                            container.RegisterType(resolveDTO.TypeFrom, resolveDTO.TypeTo, key, injectionMember);
+                            container.RegisterType(resolveInfo.TypeFrom, resolveInfo.TypeTo, key, injectionMember);
                         }
                         else
                         {
-                            container.RegisterType(resolveDTO.TypeFrom, resolveDTO.TypeTo, key);
+                            container.RegisterType(resolveInfo.TypeFrom, resolveInfo.TypeTo, key);
                         }
                         break;
                 }
             });
         }
 
-        private static ConstructorInfo GetConstructorInfo(ResolveDTO resolveDTO)
+        private static ConstructorInfo GetConstructorInfo(ResolveInfo resolveInfo)
         {
-            return resolveDTO.TypeTo.GetConstructors()
-                .Where(c => c.GetParameters().Length == resolveDTO.ConstructorParamTypes.Length)
-                .Where(c => c.GetParameters().Select(p => p.ParameterType).SequenceEqual(resolveDTO.ConstructorParamTypes))
+            return resolveInfo.TypeTo.GetConstructors()
+                .Where(c => c.GetParameters().Length == resolveInfo.ConstructorParamTypes.Length)
+                .Where(c => c.GetParameters().Select(p => p.ParameterType).SequenceEqual(resolveInfo.ConstructorParamTypes))
                 .FirstOrDefault();
         }
 

@@ -1,6 +1,6 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using System;
-using Topelab.Core.Resolver.DTO;
+using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Interfaces;
 using Topelab.Core.Resolver.Test.Entities;
 using Topelab.Core.Resolver.Test.Interfaces;
@@ -9,9 +9,9 @@ namespace Topelab.Core.Resolver.Test
 {
     internal class ResolverTests
     {
-        private readonly Func<ResolveDTOList, IResolver> ResolverFactory;
+        private readonly Func<ResolveInfoCollection, IResolver> ResolverFactory;
 
-        public ResolverTests(Func<ResolveDTOList, IResolver> resolverFactory)
+        public ResolverTests(Func<ResolveInfoCollection, IResolver> resolverFactory)
         {
             ResolverFactory = resolverFactory;
         }
@@ -19,7 +19,7 @@ namespace Topelab.Core.Resolver.Test
         public void GetSimple()
         {
             // Arrange
-            var resolver = ResolverFactory(new ResolveDTOList()
+            var resolver = ResolverFactory(new ResolveInfoCollection()
                 .Add<IClaseTest, SimpleClaseTest>()
                 );
 
@@ -33,7 +33,7 @@ namespace Topelab.Core.Resolver.Test
         public void GetSimpleWithNames()
         {
             // Arrange
-            var resolver = ResolverFactory(new ResolveDTOList()
+            var resolver = ResolverFactory(new ResolveInfoCollection()
                 .Add<IClaseTest, SimpleClaseTest>()
                 .Add<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
                 );
@@ -49,13 +49,13 @@ namespace Topelab.Core.Resolver.Test
         public void GetWithMultipleConstructors()
         {
             // Arrange
-            var resolver = ResolverFactory(new ResolveDTOList()
+            var resolver = ResolverFactory(new ResolveInfoCollection()
                 .Add<IGeremuDbContext, GeremuDbContext>()
                 .Add<IClaseTest, SimpleClaseTest>()
                 .Add<IClaseTest, ClaseTest>(typeof(IGeremuDbContext), typeof(string))
                 .Add<IClaseTest, ClaseTest>(typeof(IGeremuDbContext), typeof(string), typeof(int)));
 
-            string param = "Direc hello";
+            var param = "Direct hello";
 
             // Act
             var result2 = resolver.Get<IClaseTest, IGeremuDbContext, string, int>(resolver.Get<IGeremuDbContext>(), param, 2);
@@ -71,7 +71,7 @@ namespace Topelab.Core.Resolver.Test
         public void GetWithMultipleImplementations()
         {
             // Arrange
-            var resolver = ResolverFactory(new ResolveDTOList()
+            var resolver = ResolverFactory(new ResolveInfoCollection()
                 .Add<IGeremuDbContext, GeremuDbContext>()
                 .Add<IClaseTest, SimpleClaseTest>()
                 .Add<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
@@ -88,13 +88,13 @@ namespace Topelab.Core.Resolver.Test
         public void GetWithMultipleResolvers()
         {
             // Arrange
-            var resolver = ResolverFactory(new ResolveDTOList()
+            var resolver = ResolverFactory(new ResolveInfoCollection()
                 .Add<IGeremuDbContext, GeremuDbContext>()
                 .Add<IClaseTest, SimpleClaseTest>()
                 .Add<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
                 );
 
-            var resolver2 = ResolverFactory(new ResolveDTOList()
+            var resolver2 = ResolverFactory(new ResolveInfoCollection()
                 .Add<IGeremuDbContext, GeremuDbContext>()
                 .Add<IClaseTest, SimpleClaseTest>()
                 .Add<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
@@ -116,7 +116,7 @@ namespace Topelab.Core.Resolver.Test
         public void GetWithDifferentParamsSameType()
         {
             // Arrange
-            var resolver = ResolverFactory(new ResolveDTOList()
+            var resolver = ResolverFactory(new ResolveInfoCollection()
                 .Add<IClaseTest, SimpleClaseTest>(nameof(SimpleClaseTest))
                 .Add<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
                 .Add<IClaseTest, ClassUsingSimple>(typeof(IClaseTest), typeof(IClaseTest))

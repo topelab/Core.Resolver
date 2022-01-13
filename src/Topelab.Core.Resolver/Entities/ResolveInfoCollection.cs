@@ -1,63 +1,63 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Topelab.Core.Resolver.Enums;
 
-namespace Topelab.Core.Resolver.DTO
+namespace Topelab.Core.Resolver.Entities
 {
     /// <summary>
-    /// Resolve DTO list
+    /// Resolve info collection
     /// </summary>
-    public class ResolveDTOList : List<ResolveDTO>
+    public class ResolveInfoCollection : List<ResolveInfo>
     {
         /// <summary>
-        /// Add types from, to, and optionally, contructor params types for type <typeparamref name="TTo"/>
+        /// Add types from, to, and optionally, constructor param types for type <typeparamref name="TTo"/>
         /// </summary>
         /// <typeparam name="TFrom">Type from</typeparam>
         /// <typeparam name="TTo">Type to</typeparam>
         /// <param name="constructorParamTypes">Constructor param types</param>
-        public ResolveDTOList Add<TFrom, TTo>(params Type[] constructorParamTypes)
+        public ResolveInfoCollection Add<TFrom, TTo>(params Type[] constructorParamTypes)
         {
-            Add(new ResolveDTO(typeof(TFrom), typeof(TTo), ResolveTypeEnum.PerResolve, null, constructorParamTypes));
+            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveTypeEnum.PerResolve, null, constructorParamTypes));
             return this;
         }
 
         /// <summary>
-        /// Add types from, to, and optionally, contructor params types for type <typeparamref name="TTo"/>
+        /// Add types from, to, and optionally, constructor param types for type <typeparamref name="TTo"/>
         /// </summary>
         /// <typeparam name="TFrom">Type from</typeparam>
         /// <typeparam name="TTo">Type to</typeparam>
         /// <param name="key">Key to resolve</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
-        public ResolveDTOList Add<TFrom, TTo>(string key, params Type[] constructorParamTypes)
+        public ResolveInfoCollection Add<TFrom, TTo>(string key, params Type[] constructorParamTypes)
         {
-            Add(new ResolveDTO(typeof(TFrom), typeof(TTo), ResolveTypeEnum.PerResolve, key, constructorParamTypes));
+            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveTypeEnum.PerResolve, key, constructorParamTypes));
             return this;
         }
 
         /// <summary>
-        /// Add types from, to with resolve type, and optionally, contructor params types for type <typeparamref name="TTo"/>
+        /// Add types from, to with resolve type, and optionally, constructor param types for type <typeparamref name="TTo"/>
         /// </summary>
         /// <typeparam name="TFrom">Type from</typeparam>
         /// <typeparam name="TTo">Type to</typeparam>
         /// <param name="resolveType">Resolve type</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
-        public ResolveDTOList Add<TFrom, TTo>(ResolveTypeEnum resolveType, params Type[] constructorParamTypes)
+        public ResolveInfoCollection Add<TFrom, TTo>(ResolveTypeEnum resolveType, params Type[] constructorParamTypes)
         {
-            Add(new ResolveDTO(typeof(TFrom), typeof(TTo), resolveType, null, constructorParamTypes));
+            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), resolveType, null, constructorParamTypes));
             return this;
         }
 
         /// <summary>
-        /// Add types from, to with resolve type, and optionally, contructor params types for type <typeparamref name="TTo"/>
+        /// Add types from, to with resolve type, and optionally, constructor param types for type <typeparamref name="TTo"/>
         /// </summary>
         /// <typeparam name="TFrom">Type from</typeparam>
         /// <typeparam name="TTo">Type to</typeparam>
         /// <param name="resolveType">Resolve type</param>
         /// <param name="key">Key to resolve</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
-        public ResolveDTOList Add<TFrom, TTo>(ResolveTypeEnum resolveType, string key, params Type[] constructorParamTypes)
+        public ResolveInfoCollection Add<TFrom, TTo>(ResolveTypeEnum resolveType, string key, params Type[] constructorParamTypes)
         {
-            Add(new ResolveDTO(typeof(TFrom), typeof(TTo), resolveType, key, constructorParamTypes));
+            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), resolveType, key, constructorParamTypes));
             return this;
         }
 
@@ -67,10 +67,10 @@ namespace Topelab.Core.Resolver.DTO
         /// <typeparam name="TFrom">Type from</typeparam>
         /// <typeparam name="TTo">Type to</typeparam>
         /// <param name="instance">Instance</param>
-        public ResolveDTOList Add<TFrom, TTo>(TTo instance)
+        public ResolveInfoCollection Add<TFrom, TTo>(TTo instance)
         {
-            var resolveDTO = new ResolveDTO(typeof(TFrom), typeof(TTo), ResolveTypeEnum.Instance) { Instance = instance };
-            Add(resolveDTO);
+            ResolveInfo resolveInfo = new(typeof(TFrom), typeof(TTo), ResolveTypeEnum.Instance) { Instance = instance };
+            Add(resolveInfo);
             return this;
         }
     }
