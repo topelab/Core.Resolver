@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
-    <Version>1.3.322.111</Version>
+    <Version>1.3.622.115</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NUnit" Version="3.13.2" />

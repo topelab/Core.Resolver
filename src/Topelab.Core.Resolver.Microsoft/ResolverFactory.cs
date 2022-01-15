@@ -1,10 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using Topelab.Core.Resolver.Enums;
-using Topelab.Core.Resolver.Interfaces;
 using System.Linq;
 using Topelab.Core.Resolver.Entities;
+using Topelab.Core.Resolver.Interfaces;
 
 namespace Topelab.Core.Resolver.Microsoft
 {
@@ -14,6 +13,22 @@ namespace Topelab.Core.Resolver.Microsoft
     public static class ResolverFactory
     {
         private const string DefaultKey = "__NULL__";
+
+        /// <summary>
+        /// Adds the resolver to service collection.
+        /// </summary>
+        /// <param name="services">The services.</param>
+        /// <param name="resolveInfoCollection">The resolve information collection.</param>
+        public static IServiceCollection AddResolver(this IServiceCollection services, ResolveInfoCollection resolveInfoCollection)
+        {
+            if (services.Any(s => s.ServiceType == typeof(IResolver)))
+            {
+                resolveInfoCollection.Merge(services);
+            }
+            var resolver = Create(resolveInfoCollection);
+            services.AddSingleton(typeof(IResolver), resolver);
+            return services;
+        }
 
         /// <summary>
         /// Creates an IResolver based on the specified resolve info collection.
@@ -33,52 +48,14 @@ namespace Topelab.Core.Resolver.Microsoft
 
         private static IResolver Create(string key, ResolveInfoCollection resolveInfoCollection, Dictionary<string, IResolver> globalResolvers)
         {
-            var collection = PrepareCollection(resolveInfoCollection.Where(r => (r.Key ?? DefaultKey) == key));
+            var collection = resolveInfoCollection
+                .Where(r => (r.Key ?? DefaultKey) == key)
+                .CreateServiceCollection();
+
             var serviceProvider = collection.BuildServiceProvider();
             var serviceFactory = serviceProvider.GetService<IServiceFactory>();
             Resolver resolver = new(serviceProvider, serviceFactory, key, globalResolvers);
             return resolver;
-        }
-
-        private static IServiceCollection PrepareCollection(IEnumerable<ResolveInfo> resolveInfoCollection)
-        {
-            IServiceCollection collection = new ServiceCollection();
-
-            collection
-                .AddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (T, P) => ActivatorUtilities.CreateInstance(provider, T, P)))
-                .AddScoped<IService<IResolver>, Service<IResolver,Resolver>>();
-
-            resolveInfoCollection.ToList().ForEach(resolveInfo =>
-            {
-                switch (resolveInfo.ResolveType)
-                {
-                    case ResolveTypeEnum.Singleton:
-                        if (resolveInfo.ConstructorParamTypes.Length > 0)
-                        {
-                            collection.AddSingleton(typeof(IService<>).MakeGenericType(resolveInfo.TypeFrom), typeof(Service<,>).MakeGenericType(resolveInfo.TypeFrom, resolveInfo.TypeTo));
-                        }
-                        else
-                        {
-                            collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.TypeTo);
-                        }
-                        break;
-                    case ResolveTypeEnum.Instance:
-                        collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.Instance);
-                        break;
-                    default:
-                        if (resolveInfo.ConstructorParamTypes.Length > 0)
-                        {
-                            collection.AddScoped(typeof(IService<>).MakeGenericType(resolveInfo.TypeFrom), typeof(Service<,>).MakeGenericType(resolveInfo.TypeFrom, resolveInfo.TypeTo));
-                        }
-                        else
-                        {
-                            collection.AddScoped(resolveInfo.TypeFrom, resolveInfo.TypeTo);
-                        }
-                        break;
-                }
-            });
-
-            return collection;
         }
     }
 

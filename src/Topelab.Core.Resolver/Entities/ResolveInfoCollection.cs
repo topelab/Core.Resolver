@@ -73,5 +73,19 @@ namespace Topelab.Core.Resolver.Entities
             Add(resolveInfo);
             return this;
         }
+
+        /// <summary>
+        /// Add types from, to with instance with key
+        /// </summary>
+        /// <typeparam name="TFrom">Type from</typeparam>
+        /// <typeparam name="TTo">Type to</typeparam>
+        /// <param name="key">Key to resolve</param>
+        /// <param name="instance">Instance</param>
+        public ResolveInfoCollection Add<TFrom, TTo>(string key, TTo instance)
+        {
+            ResolveInfo resolveInfo = new(typeof(TFrom), typeof(TTo), ResolveTypeEnum.Instance, key) { Instance = instance };
+            Add(resolveInfo);
+            return this;
+        }
     }
 }

@@ -1,7 +1,7 @@
-﻿namespace Topelab.Core.Resolver.Enums
+namespace Topelab.Core.Resolver.Enums
 {
     /// <summary>
-    /// Life time enum
+    /// Resolve type enumeration
     /// </summary>
     public enum ResolveTypeEnum
     {
@@ -16,6 +16,7 @@
         /// <summary>
         /// Instance
         /// </summary>
-        Instance
+        Instance,
+        Factory
     }
 }
