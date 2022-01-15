@@ -13,7 +13,7 @@ namespace Topelab.Core.Resolver.Microsoft
     {
         private readonly IServiceProvider serviceProvider;
         private readonly IServiceFactory serviceFactory;
-        private readonly Dictionary<string, IResolver> globalResolvers;
+        private readonly IResolverStorage<string> globalResolvers;
 
         /// <summary>
         /// Constructor
@@ -23,7 +23,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="key">Key to have different resolvers</param>
         /// <param name="globalResolvers">Global resolvers indexed by key</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public Resolver(IServiceProvider serviceProvider, IServiceFactory serviceFactory, string key, Dictionary<string, IResolver> globalResolvers)
+        public Resolver(IServiceProvider serviceProvider, IServiceFactory serviceFactory, string key, IResolverStorage<string> globalResolvers)
         {
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             this.serviceFactory = serviceFactory ?? throw new ArgumentNullException(nameof(serviceFactory));

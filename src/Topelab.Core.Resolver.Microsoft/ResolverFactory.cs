@@ -13,6 +13,9 @@ namespace Topelab.Core.Resolver.Microsoft
     public static class ResolverFactory
     {
         private const string DefaultKey = "__NULL__";
+        private static readonly IResolverStorage<IServiceProvider> resolversByService = new ResolverStorage<IServiceProvider>();
+
+        public static IResolverStorage<IServiceProvider> ResolversByService => resolversByService;
 
         /// <summary>
         /// Adds the resolver to service collection.
@@ -21,13 +24,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="resolveInfoCollection">The resolve information collection.</param>
         public static IServiceCollection AddResolver(this IServiceCollection services, ResolveInfoCollection resolveInfoCollection)
         {
-            if (services.Any(s => s.ServiceType == typeof(IResolver)))
-            {
-                resolveInfoCollection.Merge(services);
-            }
-            var resolver = Create(resolveInfoCollection);
-            services.AddSingleton(typeof(IResolver), resolver);
-            return services;
+            return resolveInfoCollection.Where(r => (r.Key ?? DefaultKey) == DefaultKey).CreateServiceCollection(services);
         }
 
         /// <summary>
@@ -40,13 +37,13 @@ namespace Topelab.Core.Resolver.Microsoft
             {
                 throw new ArgumentNullException(nameof(resolveInfoCollection));
             }
-            Dictionary<string, IResolver> globalResolvers = new();
+            IResolverStorage<string> globalResolvers = new ResolverStorage<string>();
             List<string> keys = resolveInfoCollection.Select(r => r.Key ?? DefaultKey).Distinct().ToList();
             keys.ForEach(key => Create(key, resolveInfoCollection, globalResolvers));
             return globalResolvers.Where(r => r.Key == DefaultKey).Select(r => r.Value).FirstOrDefault() ?? globalResolvers.First().Value;
         }
 
-        private static IResolver Create(string key, ResolveInfoCollection resolveInfoCollection, Dictionary<string, IResolver> globalResolvers)
+        private static IResolver Create(string key, ResolveInfoCollection resolveInfoCollection, IResolverStorage<string> globalResolvers)
         {
             var collection = resolveInfoCollection
                 .Where(r => (r.Key ?? DefaultKey) == key)
@@ -55,6 +52,7 @@ namespace Topelab.Core.Resolver.Microsoft
             var serviceProvider = collection.BuildServiceProvider();
             var serviceFactory = serviceProvider.GetService<IServiceFactory>();
             Resolver resolver = new(serviceProvider, serviceFactory, key, globalResolvers);
+            resolversByService[serviceProvider] = resolver;
             return resolver;
         }
     }

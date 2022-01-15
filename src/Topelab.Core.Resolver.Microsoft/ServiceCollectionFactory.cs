@@ -10,13 +10,21 @@ namespace Topelab.Core.Resolver.Microsoft
 {
     internal static class ServiceCollectionFactory
     {
-        public static IServiceCollection CreateServiceCollection(this IEnumerable<ResolveInfo> resolveInfoCollection)
+        public static IServiceCollection CreateServiceCollection(this IEnumerable<ResolveInfo> resolveInfoCollection, IServiceCollection currentServices = null)
         {
-            IServiceCollection collection = new ServiceCollection();
+            IServiceCollection collection = null;
+            if (currentServices == null)
+            {
+                collection = new ServiceCollection();
+                collection
+                    .AddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (T, P) => ActivatorUtilities.CreateInstance(provider, T, P)))
+                    .AddScoped<IService<IResolver>, Service<IResolver, Resolver>>();
+            }
+            else
+            {
+                collection = currentServices;
+            }
 
-            collection
-                .AddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (T, P) => ActivatorUtilities.CreateInstance(provider, T, P)))
-                .AddScoped<IService<IResolver>, Service<IResolver, Resolver>>();
 
             resolveInfoCollection.ToList().ForEach(resolveInfo =>
             {

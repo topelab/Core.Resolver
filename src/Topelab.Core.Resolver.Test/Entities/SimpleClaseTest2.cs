@@ -1,8 +1,8 @@
-﻿using Topelab.Core.Resolver.Test.Interfaces;
+using Topelab.Core.Resolver.Test.Interfaces;
 
 namespace Topelab.Core.Resolver.Test.Entities
 {
-    public class SimpleClaseTest2 : IClaseTest
+    public class SimpleClaseTest2 : IClaseTest, IClaseTest2
     {
         public string GiveMe()
         {
