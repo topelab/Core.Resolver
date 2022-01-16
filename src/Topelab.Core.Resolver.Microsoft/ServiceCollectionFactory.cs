@@ -1,24 +1,30 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Enums;
 using Topelab.Core.Resolver.Interfaces;
 
 namespace Topelab.Core.Resolver.Microsoft
 {
+    /// <summary>
+    /// Internal factory class to create or populate an IServiceCollection
+    /// </summary>
     internal static class ServiceCollectionFactory
     {
-        public static IServiceCollection CreateServiceCollection(this IEnumerable<ResolveInfo> resolveInfoCollection)
+        /// <summary>
+        /// Create or populate an IServiceCollection from a resolve info collection
+        /// </summary>
+        /// <param name="resolveInfoCollection">Resolve info collection</param>
+        /// <param name="currentServices">Optional current service collection</param>
+        public static IServiceCollection Create(IEnumerable<ResolveInfo> resolveInfoCollection, IServiceCollection currentServices = null)
         {
-            IServiceCollection collection = new ServiceCollection();
-
+            var collection = currentServices ?? new ServiceCollection();
             collection
                 .AddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (T, P) => ActivatorUtilities.CreateInstance(provider, T, P)))
                 .AddScoped<IService<IResolver>, Service<IResolver, Resolver>>();
 
-            resolveInfoCollection.ToList().ForEach(resolveInfo =>
+            foreach (var resolveInfo in resolveInfoCollection)
             {
                 switch (resolveInfo.ResolveType)
                 {
@@ -49,7 +55,7 @@ namespace Topelab.Core.Resolver.Microsoft
                         }
                         break;
                 }
-            });
+            }
 
             return collection;
         }

@@ -21,12 +21,22 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="resolveInfoCollection">The resolve information collection.</param>
         public static IServiceCollection AddResolver(this IServiceCollection services, ResolveInfoCollection resolveInfoCollection)
         {
-            if (services.Any(s => s.ServiceType == typeof(IResolver)))
+            if (resolveInfoCollection is null)
             {
-                resolveInfoCollection.Merge(services);
+                throw new ArgumentNullException(nameof(resolveInfoCollection));
             }
-            var resolver = Create(resolveInfoCollection);
-            services.AddSingleton(typeof(IResolver), resolver);
+            IDictionary<string, IResolver> globalResolvers = new Dictionary<string, IResolver>();
+            var resolveInfoCollectionWithDefaultKey = resolveInfoCollection.Where(r => (r.Key ?? DefaultKey) == DefaultKey);
+
+            var collection = ServiceCollectionFactory.Create(resolveInfoCollectionWithDefaultKey, services);
+            collection.AddScoped(s =>
+            {
+                var serviceFactory = s.GetService<IServiceFactory>();
+                var resolver = serviceFactory.Create<IResolver>(s, serviceFactory, DefaultKey, globalResolvers);
+                List<string> otherKeys = resolveInfoCollection.Select(r => r.Key ?? DefaultKey).Where(k => k != DefaultKey).Distinct().ToList();
+                otherKeys.ForEach(key => Create(key, resolveInfoCollection, globalResolvers));
+                return resolver;
+            });
             return services;
         }
 
@@ -40,21 +50,20 @@ namespace Topelab.Core.Resolver.Microsoft
             {
                 throw new ArgumentNullException(nameof(resolveInfoCollection));
             }
-            Dictionary<string, IResolver> globalResolvers = new();
+            IDictionary<string, IResolver> globalResolvers = new Dictionary<string, IResolver>();
             List<string> keys = resolveInfoCollection.Select(r => r.Key ?? DefaultKey).Distinct().ToList();
             keys.ForEach(key => Create(key, resolveInfoCollection, globalResolvers));
             return globalResolvers.Where(r => r.Key == DefaultKey).Select(r => r.Value).FirstOrDefault() ?? globalResolvers.First().Value;
         }
 
-        private static IResolver Create(string key, ResolveInfoCollection resolveInfoCollection, Dictionary<string, IResolver> globalResolvers)
+        private static IResolver Create(string key, ResolveInfoCollection resolveInfoCollection, IDictionary<string, IResolver> globalResolvers)
         {
-            var collection = resolveInfoCollection
-                .Where(r => (r.Key ?? DefaultKey) == key)
-                .CreateServiceCollection();
+            var resolveInfoCollectionWithKey = resolveInfoCollection.Where(r => (r.Key ?? DefaultKey) == key);
+            var collection = ServiceCollectionFactory.Create(resolveInfoCollectionWithKey);
 
             var serviceProvider = collection.BuildServiceProvider();
             var serviceFactory = serviceProvider.GetService<IServiceFactory>();
-            Resolver resolver = new(serviceProvider, serviceFactory, key, globalResolvers);
+            var resolver = serviceFactory.Create<IResolver>(serviceProvider, serviceFactory, key, globalResolvers);
             return resolver;
         }
     }
