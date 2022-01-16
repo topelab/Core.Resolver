@@ -51,9 +51,21 @@ namespace Topelab.Core.Resolver.Microsoft
                 throw new ArgumentNullException(nameof(resolveInfoCollection));
             }
             IDictionary<string, IResolver> globalResolvers = new Dictionary<string, IResolver>();
-            List<string> keys = resolveInfoCollection.Select(r => r.Key ?? DefaultKey).Distinct().ToList();
-            keys.ForEach(key => Create(key, resolveInfoCollection, globalResolvers));
-            return globalResolvers.Where(r => r.Key == DefaultKey).Select(r => r.Value).FirstOrDefault() ?? globalResolvers.First().Value;
+            var resolveInfoCollectionWithDefaultKey = resolveInfoCollection.Where(r => (r.Key ?? DefaultKey) == DefaultKey);
+
+            var collection = ServiceCollectionFactory.Create(resolveInfoCollectionWithDefaultKey);
+            collection.AddScoped(s =>
+            {
+                var serviceFactory = s.GetService<IServiceFactory>();
+                var resolver = serviceFactory.Create<IResolver>(s, serviceFactory, DefaultKey, globalResolvers);
+                List<string> otherKeys = resolveInfoCollection.Select(r => r.Key ?? DefaultKey).Where(k => k != DefaultKey).Distinct().ToList();
+                otherKeys.ForEach(key => Create(key, resolveInfoCollection, globalResolvers));
+                return resolver;
+            });
+
+            var serviceProvider = collection.BuildServiceProvider();
+            var resolver = serviceProvider.GetService<IResolver>();
+            return resolver;
         }
 
         private static IResolver Create(string key, ResolveInfoCollection resolveInfoCollection, IDictionary<string, IResolver> globalResolvers)

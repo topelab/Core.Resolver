@@ -6,8 +6,9 @@ At this first version, Microsoft.Extensions.DependencyInjection and UnityContain
 
 ## Changes
 
-### 1.3.722.116
+### 1.3.822.116
 
+- Fix `ResolverFactory.Create` for `Topelab.Core.Resolver.Microsoft`
 - Added `Add` to ResolverInfoCollection to add others
 - Added possibility to add factories to `ResolveInfoCollection` with new extension `AddFactory`.
 - Fix `AddResolver` because of different instance of IServiceProvider was using. 

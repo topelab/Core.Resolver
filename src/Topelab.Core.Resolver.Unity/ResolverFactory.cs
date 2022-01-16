@@ -23,13 +23,15 @@ namespace Topelab.Core.Resolver.Unity
             Dictionary<string, ConstructorInfo> constructorsByKey = new();
 
             UnityContainer container = new();
-            container.RegisterType<IResolver, Resolver>();
             if (resolveInfoCollection != null)
             {
                 container.Register(resolveInfoCollection, constructorsByKey);
             }
 
-            return new Resolver(container, constructorsByKey);
+            Resolver resolver = new(container, constructorsByKey);
+            container.RegisterInstance<IResolver>(resolver);
+
+            return resolver;
         }
     }
 }
