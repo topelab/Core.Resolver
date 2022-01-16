@@ -87,5 +87,18 @@ namespace Topelab.Core.Resolver.Entities
             Add(resolveInfo);
             return this;
         }
+
+        /// <summary>
+        /// Adds the specified resolve infos.
+        /// </summary>
+        /// <param name="resolveInfos">The resolve infos.</param>
+        public ResolveInfoCollection Add(IEnumerable<ResolveInfo> resolveInfos)
+        {
+            foreach (var resolveInfo in resolveInfos)
+            {
+                Add(resolveInfo);
+            }
+            return this;
+        }
     }
 }
