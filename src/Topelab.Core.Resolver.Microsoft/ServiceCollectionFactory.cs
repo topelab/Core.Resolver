@@ -1,16 +1,22 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Enums;
 using Topelab.Core.Resolver.Interfaces;
 
 namespace Topelab.Core.Resolver.Microsoft
 {
+    /// <summary>
+    /// Internal factory class to create or populate an IServiceCollection
+    /// </summary>
     internal static class ServiceCollectionFactory
     {
+        /// <summary>
+        /// Create or populate an IServiceCollection from a resolve info collection
+        /// </summary>
+        /// <param name="resolveInfoCollection">Resolve info collection</param>
+        /// <param name="currentServices">Optional current service collection</param>
         public static IServiceCollection Create(IEnumerable<ResolveInfo> resolveInfoCollection, IServiceCollection currentServices = null)
         {
             var collection = currentServices ?? new ServiceCollection();

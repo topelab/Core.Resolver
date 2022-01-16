@@ -14,7 +14,7 @@ namespace Topelab.Core.Resolver.Microsoft
     {
         private readonly IServiceProvider serviceProvider;
         private readonly IServiceFactory serviceFactory;
-        private readonly IResolverStorage<string> globalResolvers;
+        private readonly IDictionary<string, IResolver> globalResolvers;
 
         /// <summary>
         /// Constructor
@@ -28,7 +28,7 @@ namespace Topelab.Core.Resolver.Microsoft
         {
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             this.serviceFactory = serviceFactory ?? throw new ArgumentNullException(nameof(serviceFactory));
-            this.globalResolvers = (globalResolvers as IResolverStorage<string>) ?? throw new ArgumentNullException(nameof(globalResolvers));
+            this.globalResolvers = globalResolvers ?? throw new ArgumentNullException(nameof(globalResolvers));
             this.globalResolvers.Add(key, this);
         }
 

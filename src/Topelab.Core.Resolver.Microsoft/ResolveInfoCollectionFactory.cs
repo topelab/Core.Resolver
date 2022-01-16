@@ -11,11 +11,25 @@ namespace Topelab.Core.Resolver.Microsoft
     /// </summary>
     public static class ResolveInfoCollectionFactory
     {
+        /// <summary>
+        /// Adds a factory to resolve info collection.
+        /// </summary>
+        /// <typeparam name="TOut">The out type.</typeparam>
+        /// <param name="resolveInfoCollection">The resolve information collection.</param>
+        /// <param name="factory">The factory.</param>
         public static ResolveInfoCollection AddFactory<TOut>(this ResolveInfoCollection resolveInfoCollection, Func<IServiceProvider, TOut> factory)
         {
             return resolveInfoCollection.AddFactory(null, factory);
         }
 
+        /// <summary>
+        /// Adds a named factory to resolve info collection.
+        /// </summary>
+        /// <typeparam name="TOut">The out type.</typeparam>
+        /// <param name="resolveInfoCollection">The resolve information collection.</param>
+        /// <param name="key">The name for factory resolution</param>
+        /// <param name="factory">The factory.</param>
+        /// <returns></returns>
         public static ResolveInfoCollection AddFactory<TOut>(this ResolveInfoCollection resolveInfoCollection, string key, Func<IServiceProvider, TOut> factory)
         {
             resolveInfoCollection.Add(new ResolveInfo(typeof(TOut), typeof(TOut), ResolveTypeEnum.Factory, key) { Instance = factory });
