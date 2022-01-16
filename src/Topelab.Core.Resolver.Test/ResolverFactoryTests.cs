@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
-using System;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Interfaces;
 using Topelab.Core.Resolver.Microsoft;
@@ -21,19 +20,20 @@ namespace Topelab.Core.Resolver.Test
                 .Add<IGeremuDbContext, GeremuDbContext>(Enums.ResolveTypeEnum.Singleton)
                 .Add<IClaseTest, SimpleClaseTest>();
 
-            // var resolver = ResolverFactory.Create(resolveInfoCollection);
-
             // Act
             var hostBuilder = Host.CreateDefaultBuilder().ConfigureServices(
                 collection => collection
                                     .AddScoped<IClaseTest2, SimpleClaseTest2>()
                                     .AddResolver(resolveInfoCollection)
-                                    .AddScoped<IResolver>(s => new Microsoft.Resolver(s, s.GetService<IServiceFactory>(), null,null)) 
                                     );
             var provider = hostBuilder.Build().Services;
+            var resolver = provider.GetService<IResolver>();
 
             // Assert
-            //Assert.NotNull(resolver);
+            Assert.NotNull(resolver);
+            Assert.AreSame(resolver.Get<IClaseTest>(), provider.GetService<IClaseTest>());
+            Assert.AreEqual(resolver.Get<IGeremuDbContext>().Id, provider.GetService<IGeremuDbContext>().Id);
+            Assert.NotNull(resolver.Get<IClaseTest2>());
         }
     }
 }

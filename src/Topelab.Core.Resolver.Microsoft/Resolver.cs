@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Interfaces;
 
@@ -23,11 +24,11 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="key">Key to have different resolvers</param>
         /// <param name="globalResolvers">Global resolvers indexed by key</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public Resolver(IServiceProvider serviceProvider, IServiceFactory serviceFactory, string key, IResolverStorage<string> globalResolvers)
+        public Resolver(IServiceProvider serviceProvider, IServiceFactory serviceFactory, string key, IDictionary<string, IResolver> globalResolvers)
         {
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             this.serviceFactory = serviceFactory ?? throw new ArgumentNullException(nameof(serviceFactory));
-            this.globalResolvers = globalResolvers ?? throw new ArgumentNullException(nameof(globalResolvers));
+            this.globalResolvers = (globalResolvers as IResolverStorage<string>) ?? throw new ArgumentNullException(nameof(globalResolvers));
             this.globalResolvers.Add(key, this);
         }
 

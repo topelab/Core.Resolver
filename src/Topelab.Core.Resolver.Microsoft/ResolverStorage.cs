@@ -5,9 +5,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Topelab.Core.Resolver.Interfaces;
 
-namespace Topelab.Core.Resolver.Entities
+namespace Topelab.Core.Resolver.Microsoft
 {
-    public class ResolverStorage<T> : IResolverStorage<T>
+    internal class ResolverStorage<T> : IResolverStorage<T>
     {
         private readonly Dictionary<T, IResolver> resolvers = new();
 

@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Enums;
 using Topelab.Core.Resolver.Interfaces;
@@ -10,23 +11,14 @@ namespace Topelab.Core.Resolver.Microsoft
 {
     internal static class ServiceCollectionFactory
     {
-        public static IServiceCollection CreateServiceCollection(this IEnumerable<ResolveInfo> resolveInfoCollection, IServiceCollection currentServices = null)
+        public static IServiceCollection Create(IEnumerable<ResolveInfo> resolveInfoCollection, IServiceCollection currentServices = null)
         {
-            IServiceCollection collection = null;
-            if (currentServices == null)
-            {
-                collection = new ServiceCollection();
-                collection
-                    .AddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (T, P) => ActivatorUtilities.CreateInstance(provider, T, P)))
-                    .AddScoped<IService<IResolver>, Service<IResolver, Resolver>>();
-            }
-            else
-            {
-                collection = currentServices;
-            }
+            var collection = currentServices ?? new ServiceCollection();
+            collection
+                .AddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (T, P) => ActivatorUtilities.CreateInstance(provider, T, P)))
+                .AddScoped<IService<IResolver>, Service<IResolver, Resolver>>();
 
-
-            resolveInfoCollection.ToList().ForEach(resolveInfo =>
+            foreach (var resolveInfo in resolveInfoCollection)
             {
                 switch (resolveInfo.ResolveType)
                 {
@@ -57,7 +49,7 @@ namespace Topelab.Core.Resolver.Microsoft
                         }
                         break;
                 }
-            });
+            }
 
             return collection;
         }
