@@ -21,7 +21,12 @@ namespace Topelab.Core.Resolver.Entities
         /// <summary>
         /// Resolve type
         /// </summary>
-        public ResolveTypeEnum ResolveType { get; set; }
+        public ResolveLifeCycleEnum ResolveLifeCycle { get; set; }
+
+        /// <summary>
+        /// Resolve mode.
+        /// </summary>
+        public ResolveModeEnum ResolveMode { get; set; }
 
         /// <summary>
         /// Instance
@@ -43,13 +48,16 @@ namespace Topelab.Core.Resolver.Entities
         /// </summary>
         /// <param name="typeFrom">Type from</param>
         /// <param name="typeTo">Type to</param>
-        /// <param name="resolveType">Resolve type</param>
+        /// <param name="resolveMode">Resolve mode</param>
+        /// <param name="resolveLifeCycle">Resolve life cycle enumerator</param>
+        /// <param name="key"></param>
         /// <param name="constructorParamTypes">Constructor param types</param>
-        public ResolveInfo(Type typeFrom, Type typeTo, ResolveTypeEnum resolveType = ResolveTypeEnum.PerResolve, string key = null, Type[] constructorParamTypes = null)
+        public ResolveInfo(Type typeFrom, Type typeTo, ResolveModeEnum resolveMode = ResolveModeEnum.None, ResolveLifeCycleEnum resolveLifeCycle = ResolveLifeCycleEnum.Transient, string key = null, Type[] constructorParamTypes = null)
         {
             TypeFrom = typeFrom;
             TypeTo = typeTo;
-            ResolveType = resolveType;
+            ResolveLifeCycle = resolveLifeCycle;
+            ResolveMode = resolveMode;
             Key = key ?? ResolverKeyFactory.Create(constructorParamTypes);
             ConstructorParamTypes = constructorParamTypes;
         }

@@ -17,7 +17,7 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolveInfoCollection = new ResolveInfoCollection()
-                .Add<IGeremuDbContext, GeremuDbContext>(Enums.ResolveTypeEnum.Singleton)
+                .Add<IGeremuDbContext, GeremuDbContext>()
                 .Add<IClaseTest, SimpleClaseTest>();
 
             // Act

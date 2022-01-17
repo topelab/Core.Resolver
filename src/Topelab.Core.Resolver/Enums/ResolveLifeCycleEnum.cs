@@ -3,20 +3,21 @@ namespace Topelab.Core.Resolver.Enums
     /// <summary>
     /// Resolve type enumeration
     /// </summary>
-    public enum ResolveTypeEnum
+    public enum ResolveLifeCycleEnum
     {
         /// <summary>
         /// Per resolve
         /// </summary>
-        PerResolve,
+        Transient,
+
+        /// <summary>
+        /// Scoped
+        /// </summary>
+        Scoped,
+
         /// <summary>
         /// Singleton life time
         /// </summary>
         Singleton,
-        /// <summary>
-        /// Instance
-        /// </summary>
-        Instance,
-        Factory
     }
 }

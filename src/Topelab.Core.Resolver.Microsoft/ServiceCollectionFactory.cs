@@ -26,35 +26,51 @@ namespace Topelab.Core.Resolver.Microsoft
 
             foreach (var resolveInfo in resolveInfoCollection)
             {
-                switch (resolveInfo.ResolveType)
+                switch (resolveInfo.ResolveMode)
                 {
-                    case ResolveTypeEnum.Factory:
-                        collection.AddSingleton(resolveInfo.TypeTo, (Func<IServiceProvider, object>)resolveInfo.Instance);
-                        break;
-                    case ResolveTypeEnum.Singleton:
-                        if (resolveInfo.ConstructorParamTypes.Length > 0)
-                        {
-                            collection.AddSingleton(typeof(IService<>).MakeGenericType(resolveInfo.TypeFrom), typeof(Service<,>).MakeGenericType(resolveInfo.TypeFrom, resolveInfo.TypeTo));
-                        }
-                        else
-                        {
-                            collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.TypeTo);
-                        }
-                        break;
-                    case ResolveTypeEnum.Instance:
+                    case ResolveModeEnum.Instance:
                         collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.Instance);
                         break;
+                    case ResolveModeEnum.Factory:
+                        collection.AddSingleton(resolveInfo.TypeTo, (Func<IServiceProvider, object>)resolveInfo.Instance);
+                        break;
                     default:
-                        if (resolveInfo.ConstructorParamTypes.Length > 0)
+                        switch (resolveInfo.ResolveLifeCycle)
                         {
-                            collection.AddScoped(typeof(IService<>).MakeGenericType(resolveInfo.TypeFrom), typeof(Service<,>).MakeGenericType(resolveInfo.TypeFrom, resolveInfo.TypeTo));
-                        }
-                        else
-                        {
-                            collection.AddScoped(resolveInfo.TypeFrom, resolveInfo.TypeTo);
+                            case ResolveLifeCycleEnum.Singleton:
+                                if (resolveInfo.ConstructorParamTypes.Length > 0)
+                                {
+                                    collection.AddSingleton(typeof(IService<>).MakeGenericType(resolveInfo.TypeFrom), typeof(Service<,>).MakeGenericType(resolveInfo.TypeFrom, resolveInfo.TypeTo));
+                                }
+                                else
+                                {
+                                    collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.TypeTo);
+                                }
+                                break;
+                            case ResolveLifeCycleEnum.Scoped:
+                                if (resolveInfo.ConstructorParamTypes.Length > 0)
+                                {
+                                    collection.AddScoped(typeof(IService<>).MakeGenericType(resolveInfo.TypeFrom), typeof(Service<,>).MakeGenericType(resolveInfo.TypeFrom, resolveInfo.TypeTo));
+                                }
+                                else
+                                {
+                                    collection.AddScoped(resolveInfo.TypeFrom, resolveInfo.TypeTo);
+                                }
+                                break;
+                            default:
+                                if (resolveInfo.ConstructorParamTypes.Length > 0)
+                                {
+                                    collection.AddTransient(typeof(IService<>).MakeGenericType(resolveInfo.TypeFrom), typeof(Service<,>).MakeGenericType(resolveInfo.TypeFrom, resolveInfo.TypeTo));
+                                }
+                                else
+                                {
+                                    collection.AddTransient(resolveInfo.TypeFrom, resolveInfo.TypeTo);
+                                }
+                                break;
                         }
                         break;
                 }
+
             }
 
             return collection;

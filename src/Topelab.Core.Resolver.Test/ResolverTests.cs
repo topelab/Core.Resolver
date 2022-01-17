@@ -132,5 +132,21 @@ namespace Topelab.Core.Resolver.Test
             Assert.AreEqual($"{simpleClaseTest.GiveMe()} - {simpleClaseTest2.GiveMe()}", claseTest.GiveMe());
         }
 
+        public void GetWithConstructorResolvedByParam()
+        {
+            // Arrange
+            var resolver = ResolverFactory(new ResolveInfoCollection()
+                .Add<IClaseTest, SimpleClaseTest>()
+                .Add<IGeremuDbContext, GeremuDbContext>()
+                );
+
+            // Act
+            var simpleClaseTest = resolver.Get<IClaseTest>();
+            var geremuDbContext = resolver.Get<IGeremuDbContext>();
+
+            // Assert
+            Assert.AreEqual($"Hello, I'm instance {geremuDbContext.Id} with claseTest: {simpleClaseTest.GiveMe()}", ((IClaseTest)geremuDbContext).GiveMe());
+        }
+
     }
 }

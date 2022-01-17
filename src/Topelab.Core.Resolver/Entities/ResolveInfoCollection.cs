@@ -17,7 +17,7 @@ namespace Topelab.Core.Resolver.Entities
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection Add<TFrom, TTo>(params Type[] constructorParamTypes)
         {
-            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveTypeEnum.PerResolve, null, constructorParamTypes));
+            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveModeEnum.None, ResolveLifeCycleEnum.Transient, null, constructorParamTypes));
             return this;
         }
 
@@ -30,7 +30,7 @@ namespace Topelab.Core.Resolver.Entities
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection Add<TFrom, TTo>(string key, params Type[] constructorParamTypes)
         {
-            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveTypeEnum.PerResolve, key, constructorParamTypes));
+            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveModeEnum.None, ResolveLifeCycleEnum.Transient, key, constructorParamTypes));
             return this;
         }
 
@@ -41,9 +41,9 @@ namespace Topelab.Core.Resolver.Entities
         /// <typeparam name="TTo">Type to</typeparam>
         /// <param name="resolveType">Resolve type</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
-        public ResolveInfoCollection Add<TFrom, TTo>(ResolveTypeEnum resolveType, params Type[] constructorParamTypes)
+        public ResolveInfoCollection Add<TFrom, TTo>(ResolveLifeCycleEnum resolveType, params Type[] constructorParamTypes)
         {
-            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), resolveType, null, constructorParamTypes));
+            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveModeEnum.None, resolveType, null, constructorParamTypes));
             return this;
         }
 
@@ -55,9 +55,9 @@ namespace Topelab.Core.Resolver.Entities
         /// <param name="resolveType">Resolve type</param>
         /// <param name="key">Key to resolve</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
-        public ResolveInfoCollection Add<TFrom, TTo>(ResolveTypeEnum resolveType, string key, params Type[] constructorParamTypes)
+        public ResolveInfoCollection Add<TFrom, TTo>(ResolveLifeCycleEnum resolveType, string key, params Type[] constructorParamTypes)
         {
-            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), resolveType, key, constructorParamTypes));
+            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveModeEnum.None, resolveType, key, constructorParamTypes));
             return this;
         }
 
@@ -69,7 +69,7 @@ namespace Topelab.Core.Resolver.Entities
         /// <param name="instance">Instance</param>
         public ResolveInfoCollection Add<TFrom, TTo>(TTo instance)
         {
-            ResolveInfo resolveInfo = new(typeof(TFrom), typeof(TTo), ResolveTypeEnum.Instance) { Instance = instance };
+            ResolveInfo resolveInfo = new(typeof(TFrom), typeof(TTo), ResolveModeEnum.Instance, ResolveLifeCycleEnum.Singleton) { Instance = instance };
             Add(resolveInfo);
             return this;
         }
@@ -83,7 +83,7 @@ namespace Topelab.Core.Resolver.Entities
         /// <param name="instance">Instance</param>
         public ResolveInfoCollection Add<TFrom, TTo>(string key, TTo instance)
         {
-            ResolveInfo resolveInfo = new(typeof(TFrom), typeof(TTo), ResolveTypeEnum.Instance, key) { Instance = instance };
+            ResolveInfo resolveInfo = new(typeof(TFrom), typeof(TTo), ResolveModeEnum.Instance, ResolveLifeCycleEnum.Singleton, key) { Instance = instance };
             Add(resolveInfo);
             return this;
         }

@@ -32,7 +32,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <returns></returns>
         public static ResolveInfoCollection AddFactory<TOut>(this ResolveInfoCollection resolveInfoCollection, string key, Func<IServiceProvider, TOut> factory)
         {
-            resolveInfoCollection.Add(new ResolveInfo(typeof(TOut), typeof(TOut), ResolveTypeEnum.Factory, key) { Instance = factory });
+            resolveInfoCollection.Add(new ResolveInfo(typeof(TOut), typeof(TOut), ResolveModeEnum.Factory, ResolveLifeCycleEnum.Singleton, key) { Instance = factory });
             return resolveInfoCollection;
         }
 
@@ -66,13 +66,15 @@ namespace Topelab.Core.Resolver.Microsoft
 
         private static ResolveInfo ToResolveInfo(ServiceDescriptor service)
         {
-            ResolveTypeEnum resolveType;
+            ResolveLifeCycleEnum resolveType;
+            var resolveMode = ResolveModeEnum.None;
             Type typeTo;
             object instance;
 
             if (service.ImplementationFactory != null)
             {
-                resolveType = ResolveTypeEnum.Instance;
+                resolveType = ResolveLifeCycleEnum.Singleton;
+                resolveMode = ResolveModeEnum.Instance;
                 typeTo = service.ImplementationFactory.GetType();
                 instance = service.ImplementationFactory;
             }
@@ -81,10 +83,13 @@ namespace Topelab.Core.Resolver.Microsoft
                 switch (service.Lifetime)
                 {
                     case ServiceLifetime.Singleton:
-                        resolveType = service.ImplementationInstance != null ? ResolveTypeEnum.Instance : ResolveTypeEnum.Singleton;
+                        resolveType = ResolveLifeCycleEnum.Singleton;
+                        break;
+                    case ServiceLifetime.Scoped:
+                        resolveType = ResolveLifeCycleEnum.Scoped;
                         break;
                     default:
-                        resolveType = ResolveTypeEnum.PerResolve;
+                        resolveType = ResolveLifeCycleEnum.Transient;
                         break;
                 }
 
@@ -92,7 +97,7 @@ namespace Topelab.Core.Resolver.Microsoft
                 instance = service.ImplementationInstance;
             }
 
-            return new ResolveInfo(service.ServiceType, typeTo, resolveType) { Instance = instance };
+            return new ResolveInfo(service.ServiceType, typeTo, resolveMode, resolveType) { Instance = instance };
         }
     }
 }
