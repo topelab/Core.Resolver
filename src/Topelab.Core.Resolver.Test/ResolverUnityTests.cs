@@ -57,6 +57,12 @@ namespace Topelab.Core.Resolver.Test
         }
 
         [Test]
+        public void GetWithConstructorResolvedByParam()
+        {
+            resolverTests.GetWithConstructorResolvedByParam();
+        }
+
+        [Test]
         public void GetFactory()
         {
             // Arrange

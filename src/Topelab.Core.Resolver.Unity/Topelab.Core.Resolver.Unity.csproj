@@ -1,10 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Version>1.3.822.116</Version>
+    <Version>1.3.922.118</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Joan López</Authors>
     <Description>Core Resolver Unity is a simple wrapper for use under a Clean Architecture solution, to resolve DI references using Unity</Description>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>IoC DI UnityContainer dependency resolver</PackageTags>
+    <RepositoryUrl>https://github.com/topelab/Core.Resolver</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/topelab/Core.Resolver</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Unity" Version="5.11.10" />

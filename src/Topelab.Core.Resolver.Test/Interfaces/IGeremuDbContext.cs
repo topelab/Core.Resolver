@@ -1,4 +1,4 @@
-﻿namespace Topelab.Core.Resolver.Test.Interfaces
+namespace Topelab.Core.Resolver.Test.Interfaces
 {
     /// <summary>
     /// Interface for Geremu DbContext

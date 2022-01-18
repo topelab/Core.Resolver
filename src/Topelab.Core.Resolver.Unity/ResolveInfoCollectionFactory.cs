@@ -30,7 +30,7 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="factory">The factory.</param>
         public static ResolveInfoCollection AddFactory<TOut>(this ResolveInfoCollection resolveInfoCollection, string key, Func<IUnityContainer, TOut> factory)
         {
-            resolveInfoCollection.Add(new ResolveInfo(typeof(TOut), typeof(TOut), ResolveTypeEnum.Factory, key) { Instance = factory });
+            resolveInfoCollection.Add(new ResolveInfo(typeof(TOut), typeof(TOut), ResolveModeEnum.Factory, ResolveLifeCycleEnum.Singleton, key) { Instance = factory });
             return resolveInfoCollection;
         }
 
@@ -53,35 +53,51 @@ namespace Topelab.Core.Resolver.Unity
                     constructorsByKey[key] = constructorInfo;
                 }
 
-                switch (resolveInfo.ResolveType)
+                switch (resolveInfo.ResolveMode)
                 {
-                    case ResolveTypeEnum.Factory:
-                        container.RegisterFactory(resolveInfo.TypeTo, key, (Func<IUnityContainer, object>)resolveInfo.Instance);
-                        break;
-                    case ResolveTypeEnum.Singleton:
-                        if (resolveInfo.ConstructorParamTypes.Length > 0)
-                        {
-                            container.RegisterSingleton(resolveInfo.TypeFrom, resolveInfo.TypeTo, key, injectionMember);
-                        }
-                        else
-                        {
-                            container.RegisterSingleton(resolveInfo.TypeFrom, resolveInfo.TypeTo, key);
-                        }
-                        break;
-                    case ResolveTypeEnum.Instance:
+                    case ResolveModeEnum.Instance:
                         container.RegisterInstance(resolveInfo.TypeFrom, resolveInfo.Instance);
                         break;
+                    case ResolveModeEnum.Factory:
+                        container.RegisterFactory(resolveInfo.TypeTo, key, (Func<IUnityContainer, object>)resolveInfo.Instance);
+                        break;
                     default:
-                        if (resolveInfo.ConstructorParamTypes.Length > 0)
+                        switch (resolveInfo.ResolveLifeCycle)
                         {
-                            container.RegisterType(resolveInfo.TypeFrom, resolveInfo.TypeTo, key, injectionMember);
-                        }
-                        else
-                        {
-                            container.RegisterType(resolveInfo.TypeFrom, resolveInfo.TypeTo, key);
+                            case ResolveLifeCycleEnum.Singleton:
+                                if (resolveInfo.ConstructorParamTypes.Length > 0)
+                                {
+                                    container.RegisterSingleton(resolveInfo.TypeFrom, resolveInfo.TypeTo, key, injectionMember);
+                                }
+                                else
+                                {
+                                    container.RegisterSingleton(resolveInfo.TypeFrom, resolveInfo.TypeTo, key);
+                                }
+                                break;
+                            case ResolveLifeCycleEnum.Scoped:
+                                if (resolveInfo.ConstructorParamTypes.Length > 0)
+                                {
+                                    container.RegisterType(resolveInfo.TypeFrom, resolveInfo.TypeTo, key, TypeLifetime.PerContainer, injectionMember);
+                                }
+                                else
+                                {
+                                    container.RegisterType(resolveInfo.TypeFrom, resolveInfo.TypeTo, key, TypeLifetime.PerContainer);
+                                }
+                                break;
+                            default:
+                                if (resolveInfo.ConstructorParamTypes.Length > 0)
+                                {
+                                    container.RegisterType(resolveInfo.TypeFrom, resolveInfo.TypeTo, key, injectionMember);
+                                }
+                                else
+                                {
+                                    container.RegisterType(resolveInfo.TypeFrom, resolveInfo.TypeTo, key);
+                                }
+                                break;
                         }
                         break;
                 }
+
             });
         }
 

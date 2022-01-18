@@ -17,8 +17,8 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolveInfoCollection = new ResolveInfoCollection()
-                .Add<IGeremuDbContext, GeremuDbContext>(Enums.ResolveTypeEnum.Singleton)
-                .Add<IClaseTest, SimpleClaseTest>();
+                .Add<IGeremuDbContext, GeremuDbContext>(Enums.ResolveLifeCycleEnum.Scoped)
+                .Add<IClaseTest, SimpleClaseTest>(Enums.ResolveLifeCycleEnum.Scoped);
 
             // Act
             var hostBuilder = Host.CreateDefaultBuilder().ConfigureServices(
