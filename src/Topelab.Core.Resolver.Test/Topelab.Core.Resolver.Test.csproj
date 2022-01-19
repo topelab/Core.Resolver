@@ -11,6 +11,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Topelab.Core.Resolver.Autofac\Topelab.Core.Resolver.Autofac.csproj" />
     <ProjectReference Include="..\Topelab.Core.Resolver.Microsoft\Topelab.Core.Resolver.Microsoft.csproj" />
     <ProjectReference Include="..\Topelab.Core.Resolver.Unity\Topelab.Core.Resolver.Unity.csproj" />
   </ItemGroup>
