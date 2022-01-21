@@ -1,9 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
+using System;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Interfaces;
-using Topelab.Core.Resolver.Microsoft;
+using Topelab.Core.Resolver.Test.Cases;
 using Topelab.Core.Resolver.Test.Entities;
 using Topelab.Core.Resolver.Test.Interfaces;
 
@@ -12,28 +11,22 @@ namespace Topelab.Core.Resolver.Test
     [TestFixture]
     public class ResolverFactoryTests
     {
-        [Test]
-        public void AddResolver_IntialitzingServiceCollection_ResolverCollectionOK()
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactories))]
+        public void Get_UsingGetInFactory(Func<ResolveInfoCollection, IResolver> ResolverFactory)
         {
             // Arrange
-            var resolveInfoCollection = new ResolveInfoCollection()
-                .Add<IGeremuDbContext, GeremuDbContext>(Enums.ResolveLifeCycleEnum.Scoped)
-                .Add<IClaseTest, SimpleClaseTest>(Enums.ResolveLifeCycleEnum.Scoped);
+            var resolver = ResolverFactory(new ResolveInfoCollection()
+                .AddSelf<SimpleClaseTest>()
+                .AddSelf<SimpleClaseTest>("named")
+                .AddFactory<IClaseTest>(r => r.Get<SimpleClaseTest>("named"))
+                );
 
             // Act
-            var hostBuilder = Host.CreateDefaultBuilder().ConfigureServices(
-                collection => collection
-                                    .AddScoped<IClaseTest2, SimpleClaseTest2>()
-                                    .AddResolver(resolveInfoCollection)
-                                    );
-            var provider = hostBuilder.Build().Services;
-            var resolver = provider.GetService<IResolver>();
+            var result = resolver.Get<IClaseTest>();
 
             // Assert
-            Assert.NotNull(resolver);
-            Assert.AreSame(resolver.Get<IClaseTest>(), provider.GetService<IClaseTest>());
-            Assert.AreEqual(resolver.Get<IGeremuDbContext>().Id, provider.GetService<IGeremuDbContext>().Id);
-            Assert.NotNull(resolver.Get<IClaseTest2>());
+            Assert.AreEqual(new SimpleClaseTest().GiveMe(), result.GiveMe());
         }
+
     }
 }
