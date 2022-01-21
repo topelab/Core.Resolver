@@ -24,7 +24,7 @@ namespace Topelab.Core.Resolver.Test
                 .Add<IClaseTest, ClaseTest>("5");
 
             // Act
-            var result = resolveInfoCollection.Add(resolveInfoCollection2);
+            var result = resolveInfoCollection.AddCollection(resolveInfoCollection2);
 
             // Assert
             Assert.IsTrue(result.Count == 6);

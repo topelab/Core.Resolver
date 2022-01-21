@@ -6,6 +6,17 @@ At this first version, Microsoft.Extensions.DependencyInjection and UnityContain
 
 ## Changes
 
+### 1.3.1022.121
+
+- Added new methods to `ResolveInfoCollection` to clarify usage:
+  - AddSingleton
+  - AddScoped
+  - AddInstance
+  - AddFactory
+  - AddCollection
+- Split `ResolveTypeEnum` into `ResolveLifeCycleEnum (Transient, Scoped Singleton)` and `ResolveModeEnum (None, Instance, Factory)`
+- Set license to MIT License
+
 ### 1.3.822.116
 
 - Fix `ResolverFactory.Create` for `Topelab.Core.Resolver.Microsoft`

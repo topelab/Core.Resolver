@@ -18,11 +18,6 @@ namespace Topelab.Core.Resolver.Enums
         /// <summary>
         /// Factory
         /// </summary>
-        Factory,
-
-        /// <summary>
-        /// The specific factory
-        /// </summary>
-        SpecificFactory,
+        Factory
     }
 }
