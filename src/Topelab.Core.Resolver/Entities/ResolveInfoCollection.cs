@@ -90,31 +90,6 @@ namespace Topelab.Core.Resolver.Entities
         }
 
         /// <summary>
-        /// Add types from, to with instance
-        /// </summary>
-        /// <typeparam name="TFrom">Type from</typeparam>
-        /// <param name="instance">Instance</param>
-        public ResolveInfoCollection Add<TFrom>(TFrom instance)
-        {
-            ResolveInfo resolveInfo = new(typeof(TFrom), typeof(TFrom), ResolveModeEnum.Instance, ResolveLifeCycleEnum.Singleton) { Instance = instance };
-            Add(resolveInfo);
-            return this;
-        }
-
-        /// <summary>
-        /// Add types from, to with instance with key
-        /// </summary>
-        /// <typeparam name="TFrom">Type from</typeparam>
-        /// <param name="key">Key to resolve</param>
-        /// <param name="instance">Instance</param>
-        public ResolveInfoCollection Add<TFrom>(string key, TFrom instance)
-        {
-            ResolveInfo resolveInfo = new(typeof(TFrom), typeof(TFrom), ResolveModeEnum.Instance, ResolveLifeCycleEnum.Singleton, key) { Instance = instance };
-            Add(resolveInfo);
-            return this;
-        }
-
-        /// <summary>
         /// Adds the specified resolve infos.
         /// </summary>
         /// <param name="resolveInfos">The resolve infos.</param>

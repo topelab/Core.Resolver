@@ -32,7 +32,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <returns></returns>
         public static ResolveInfoCollection AddFactory<TOut>(this ResolveInfoCollection resolveInfoCollection, string key, Func<IServiceProvider, TOut> factory)
         {
-            resolveInfoCollection.Add(new ResolveInfo(typeof(TOut), typeof(TOut), ResolveModeEnum.Factory, ResolveLifeCycleEnum.Singleton, key) { Instance = factory });
+            resolveInfoCollection.Add(new ResolveInfo(typeof(TOut), typeof(TOut), ResolveModeEnum.SpecificFactory, ResolveLifeCycleEnum.Singleton, key) { Instance = factory });
             return resolveInfoCollection;
         }
 
