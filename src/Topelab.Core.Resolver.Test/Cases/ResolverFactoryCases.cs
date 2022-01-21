@@ -9,7 +9,8 @@ namespace Topelab.Core.Resolver.Test.Cases
         public static readonly Func<ResolveInfoCollection, IResolver>[] ResolverFactories =
         {
             Microsoft.ResolverFactory.Create,
-            Unity.ResolverFactory.Create
+            Unity.ResolverFactory.Create,
+            Autofac.ResolverFactory.Create,
         };
     }
 }

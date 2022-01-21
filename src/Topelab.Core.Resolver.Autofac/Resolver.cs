@@ -13,20 +13,14 @@ namespace Topelab.Core.Resolver.Autofac
     /// </summary>
     public class Resolver : IResolver
     {
-        private readonly IContainer container;
-        private readonly Dictionary<string, ConstructorInfo> constructorsByKey;
+        private IContainer container;
+        private Dictionary<string, ConstructorInfo> constructorsByKey;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="container">Autofac container</param>
-        /// <param name="constructorsByKey">Constructors dictionary by key</param>
-        public Resolver(IContainer container, Dictionary<string, ConstructorInfo> constructorsByKey)
+        public void Initialize(IContainer container, Dictionary<string, ConstructorInfo> constructorsByKey)
         {
             this.container = container ?? throw new ArgumentNullException(nameof(container));
             this.constructorsByKey = constructorsByKey ?? throw new ArgumentNullException(nameof(constructorsByKey));
         }
-
         /// <summary>
         /// Resolve an instance of type <typeparamref name="T"/>
         /// </summary>

@@ -5,35 +5,13 @@ using System.Reflection;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Enums;
 using Autofac;
+using Autofac.Builder;
+using Topelab.Core.Resolver.Interfaces;
 
 namespace Topelab.Core.Resolver.Autofac
 {
     public static class ResolveInfoCollectionFactory
     {
-        /// <summary>
-        /// Adds the factory to resolve info collection.
-        /// </summary>
-        /// <typeparam name="TOut">The out type.</typeparam>
-        /// <param name="resolveInfoCollection">The resolve information collection.</param>
-        /// <param name="factory">The factory.</param>
-        public static ResolveInfoCollection AddFactory<TOut>(this ResolveInfoCollection resolveInfoCollection, Func<IComponentContext, TOut> factory)
-        {
-            return resolveInfoCollection.AddFactory(null, factory);
-        }
-
-        /// <summary>
-        /// Adds the named factory to resolve info collection.
-        /// </summary>
-        /// <typeparam name="TOut">The out type.</typeparam>
-        /// <param name="resolveInfoCollection">The resolve information collection.</param>
-        /// <param name="key">The name for factory resolution</param>
-        /// <param name="factory">The factory.</param>
-        public static ResolveInfoCollection AddFactory<TOut>(this ResolveInfoCollection resolveInfoCollection, string key, Func<IComponentContext, TOut> factory)
-        {
-            resolveInfoCollection.Add(new ResolveInfo(typeof(TOut), typeof(TOut), ResolveModeEnum.Factory, ResolveLifeCycleEnum.Singleton, key) { Instance = factory });
-            return resolveInfoCollection;
-        }
-
         /// <summary>
         /// Registers within the specified container the specified resolve info collection.
         /// </summary>
@@ -58,38 +36,39 @@ namespace Topelab.Core.Resolver.Autofac
                         builder.RegisterInstance(resolveInfo.Instance).As(resolveInfo.TypeFrom);
                         break;
                     case ResolveModeEnum.Factory:
-                        throw new NotSupportedException();
+                        builder.Register(c => resolveInfo.Factory.Invoke(c.Resolve<IResolver>())).WithName(resolveInfo.Key, resolveInfo.TypeFrom);
+                        break;
                     default:
                         switch (resolveInfo.ResolveLifeCycle)
                         {
                             case ResolveLifeCycleEnum.Singleton:
                                 if (resolveInfo.ConstructorParamTypes.Length > 0)
                                 {
-                                    builder.RegisterType(resolveInfo.TypeTo).As(resolveInfo.TypeFrom).UsingConstructor(resolveInfo.ConstructorParamTypes).SingleInstance();
+                                    builder.RegisterType(resolveInfo.TypeTo).WithName(resolveInfo.Key, resolveInfo.TypeFrom).UsingConstructor(resolveInfo.ConstructorParamTypes).SingleInstance();
                                 }
                                 else
                                 {
-                                    builder.RegisterType(resolveInfo.TypeTo).As(resolveInfo.TypeFrom).SingleInstance();
+                                    builder.RegisterType(resolveInfo.TypeTo).WithName(resolveInfo.Key, resolveInfo.TypeFrom).SingleInstance();
                                 }
                                 break;
                             case ResolveLifeCycleEnum.Scoped:
                                 if (resolveInfo.ConstructorParamTypes.Length > 0)
                                 {
-                                    builder.RegisterType(resolveInfo.TypeTo).As(resolveInfo.TypeFrom).UsingConstructor(resolveInfo.ConstructorParamTypes).InstancePerLifetimeScope();
+                                    builder.RegisterType(resolveInfo.TypeTo).WithName(resolveInfo.Key, resolveInfo.TypeFrom).UsingConstructor(resolveInfo.ConstructorParamTypes).InstancePerLifetimeScope();
                                 }
                                 else
                                 {
-                                    builder.RegisterType(resolveInfo.TypeTo).As(resolveInfo.TypeFrom).InstancePerLifetimeScope();
+                                    builder.RegisterType(resolveInfo.TypeTo).WithName(resolveInfo.Key, resolveInfo.TypeFrom).InstancePerLifetimeScope();
                                 }
                                 break;
                             default:
                                 if (resolveInfo.ConstructorParamTypes.Length > 0)
                                 {
-                                    builder.RegisterType(resolveInfo.TypeTo).As(resolveInfo.TypeFrom).UsingConstructor(resolveInfo.ConstructorParamTypes).InstancePerDependency();
+                                    builder.RegisterType(resolveInfo.TypeTo).WithName(resolveInfo.Key, resolveInfo.TypeFrom).UsingConstructor(resolveInfo.ConstructorParamTypes).InstancePerDependency();
                                 }
                                 else
                                 {
-                                    builder.RegisterType(resolveInfo.TypeTo).As(resolveInfo.TypeFrom).InstancePerDependency();
+                                    builder.RegisterType(resolveInfo.TypeTo).WithName(resolveInfo.Key, resolveInfo.TypeFrom).InstancePerDependency();
                                 }
                                 break;
                         }
@@ -97,6 +76,16 @@ namespace Topelab.Core.Resolver.Autofac
                 }
 
             });
+        }
+
+        private static IRegistrationBuilder<object, SimpleActivatorData, SingleRegistrationStyle> WithName(this IRegistrationBuilder<object, SimpleActivatorData, SingleRegistrationStyle> builder, string key, Type type)
+        {
+            return key == null ? builder.As(type) : builder.Named(key, type);
+        }
+
+        private static IRegistrationBuilder<object, ConcreteReflectionActivatorData, SingleRegistrationStyle> WithName(this IRegistrationBuilder<object, ConcreteReflectionActivatorData, SingleRegistrationStyle> builder, string key, Type type)
+        {
+            return key == null ? builder.As(type) : builder.Named(key, type);
         }
 
         private static ConstructorInfo GetConstructorInfo(ResolveInfo resolveInfo)

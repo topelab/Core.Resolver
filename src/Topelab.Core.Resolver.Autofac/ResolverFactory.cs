@@ -28,8 +28,10 @@ namespace Topelab.Core.Resolver.Autofac
                 builder.RegisterAutofac(resolveInfoCollection, constructorsByKey);
             }
 
+            IResolver resolver = new Resolver();
+            builder.RegisterInstance(resolver);
             var container = builder.Build();
-            Resolver resolver = new(container, constructorsByKey);
+            ((Resolver)resolver).Initialize(container, constructorsByKey);
             return resolver;
         }
     }

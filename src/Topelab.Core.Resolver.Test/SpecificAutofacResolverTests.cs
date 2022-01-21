@@ -9,58 +9,8 @@ using Topelab.Core.Resolver.Test.Interfaces;
 namespace Topelab.Core.Resolver.Test
 {
     [TestFixture]
-    public class ResolverAutofacTests
+    public class SpecificAutofacResolverTests
     {
-        private ResolverTests resolverTests;
-
-        [OneTimeSetUp]
-        public void Setup()
-        {
-            resolverTests = new(ResolverFactory.Create);
-        }
-
-        [Test]
-        public void Get_Simple()
-        {
-            resolverTests.GetSimple();
-        }
-
-        [Test]
-        public void Get_SimpleWithNames()
-        {
-            resolverTests.GetSimpleWithNames();
-        }
-
-        [Test]
-        public void Get_MultipleConstructors_AreOK()
-        {
-            resolverTests.GetWithMultipleConstructors();
-        }
-
-        [Test]
-        public void Get_MultipleImplementations_AreOK()
-        {
-            resolverTests.GetWithMultipleImplementations();
-        }
-
-        [Test]
-        public void Get_WithMultipleResolvers()
-        {
-            resolverTests.GetWithMultipleResolvers();
-        }
-
-        [Test]
-        public void GetWithDifferentParamsSameType()
-        {
-            resolverTests.GetWithDifferentParamsSameType();
-        }
-
-        [Test]
-        public void GetWithConstructorResolvedByParam()
-        {
-            resolverTests.GetWithConstructorResolvedByParam();
-        }
-
         [Test]
         public void GetFactory()
         {
