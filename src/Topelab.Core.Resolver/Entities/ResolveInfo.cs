@@ -1,5 +1,6 @@
 using System;
 using Topelab.Core.Resolver.Enums;
+using Topelab.Core.Resolver.Interfaces;
 
 namespace Topelab.Core.Resolver.Entities
 {
@@ -32,6 +33,11 @@ namespace Topelab.Core.Resolver.Entities
         /// Instance
         /// </summary>
         public object Instance { get; set; }
+
+        /// <summary>
+        /// Factory representation for instance
+        /// </summary>
+        public Func<IResolver, object> Factory => (Func<IResolver, object>)Instance; 
 
         /// <summary>
         /// Key
