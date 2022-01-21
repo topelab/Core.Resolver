@@ -32,6 +32,9 @@ namespace Topelab.Core.Resolver.Microsoft
                         collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.Instance);
                         break;
                     case ResolveModeEnum.Factory:
+                        collection.AddSingleton(resolveInfo.TypeFrom, s => resolveInfo.Factory.Invoke(s.GetService<IResolver>()));
+                        break;
+                    case ResolveModeEnum.SpecificFactory:
                         collection.AddSingleton(resolveInfo.TypeTo, (Func<IServiceProvider, object>)resolveInfo.Instance);
                         break;
                     default:

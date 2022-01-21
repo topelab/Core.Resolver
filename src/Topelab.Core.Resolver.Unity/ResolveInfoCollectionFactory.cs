@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Enums;
+using Topelab.Core.Resolver.Interfaces;
 using Unity;
 
 namespace Topelab.Core.Resolver.Unity
@@ -30,7 +31,7 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="factory">The factory.</param>
         public static ResolveInfoCollection AddFactory<TOut>(this ResolveInfoCollection resolveInfoCollection, string key, Func<IUnityContainer, TOut> factory)
         {
-            resolveInfoCollection.Add(new ResolveInfo(typeof(TOut), typeof(TOut), ResolveModeEnum.Factory, ResolveLifeCycleEnum.Singleton, key) { Instance = factory });
+            resolveInfoCollection.Add(new ResolveInfo(typeof(TOut), typeof(TOut), ResolveModeEnum.SpecificFactory, ResolveLifeCycleEnum.Singleton, key) { Instance = factory });
             return resolveInfoCollection;
         }
 
@@ -59,6 +60,9 @@ namespace Topelab.Core.Resolver.Unity
                         container.RegisterInstance(resolveInfo.TypeFrom, resolveInfo.Instance);
                         break;
                     case ResolveModeEnum.Factory:
+                        container.RegisterFactory(resolveInfo.TypeFrom, key, c => resolveInfo.Factory.Invoke(c.Resolve<IResolver>()));
+                        break;
+                    case ResolveModeEnum.SpecificFactory:
                         container.RegisterFactory(resolveInfo.TypeTo, key, (Func<IUnityContainer, object>)resolveInfo.Instance);
                         break;
                     default:

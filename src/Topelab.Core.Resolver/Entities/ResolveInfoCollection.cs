@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Topelab.Core.Resolver.Enums;
+using Topelab.Core.Resolver.Interfaces;
 
 namespace Topelab.Core.Resolver.Entities
 {
@@ -89,6 +90,31 @@ namespace Topelab.Core.Resolver.Entities
         }
 
         /// <summary>
+        /// Add types from, to with instance
+        /// </summary>
+        /// <typeparam name="TFrom">Type from</typeparam>
+        /// <param name="instance">Instance</param>
+        public ResolveInfoCollection Add<TFrom>(TFrom instance)
+        {
+            ResolveInfo resolveInfo = new(typeof(TFrom), typeof(TFrom), ResolveModeEnum.Instance, ResolveLifeCycleEnum.Singleton) { Instance = instance };
+            Add(resolveInfo);
+            return this;
+        }
+
+        /// <summary>
+        /// Add types from, to with instance with key
+        /// </summary>
+        /// <typeparam name="TFrom">Type from</typeparam>
+        /// <param name="key">Key to resolve</param>
+        /// <param name="instance">Instance</param>
+        public ResolveInfoCollection Add<TFrom>(string key, TFrom instance)
+        {
+            ResolveInfo resolveInfo = new(typeof(TFrom), typeof(TFrom), ResolveModeEnum.Instance, ResolveLifeCycleEnum.Singleton, key) { Instance = instance };
+            Add(resolveInfo);
+            return this;
+        }
+
+        /// <summary>
         /// Adds the specified resolve infos.
         /// </summary>
         /// <param name="resolveInfos">The resolve infos.</param>
@@ -98,6 +124,19 @@ namespace Topelab.Core.Resolver.Entities
             {
                 Add(resolveInfo);
             }
+            return this;
+        }
+
+        /// <summary>
+        /// Add a factory
+        /// </summary>
+        /// <typeparam name="TFrom"></typeparam>
+        /// <param name="factory"></param>
+        /// <returns></returns>
+        public ResolveInfoCollection Add<TFrom>(Func<IResolver, TFrom> factory)
+        {
+            ResolveInfo resolveInfo = new(typeof(TFrom), typeof(TFrom), ResolveModeEnum.Factory, ResolveLifeCycleEnum.Singleton) { Instance = factory };
+            Add(resolveInfo);
             return this;
         }
     }
