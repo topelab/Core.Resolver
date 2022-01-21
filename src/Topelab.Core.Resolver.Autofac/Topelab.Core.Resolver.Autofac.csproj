@@ -4,10 +4,16 @@
     <Version>1.3.1122.121</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Joan López</Authors>
-    <Description>Core Resolver is a simple wrapper for use under a Clean Architecture solution, to resolve DI references</Description>
+    <Description>Core Resolver Autofac is a simple wrapper for use under a Clean Architecture solution, to resolve DI references using Autofac</Description>
     <RepositoryType>git</RepositoryType>
     <PackageTags>IoC DI UnityContainer dependency resolver</PackageTags>
     <RepositoryUrl>https://github.com/topelab/Core.Resolver</RepositoryUrl>
     <PackageProjectUrl>https://github.com/topelab/Core.Resolver</PackageProjectUrl>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Topelab.Core.Resolver\Topelab.Core.Resolver.csproj" />
+  </ItemGroup>
 </Project>

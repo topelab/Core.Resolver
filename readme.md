@@ -2,9 +2,13 @@
 
 Unified layer resolver to different DI services.
 
-At this first version, Microsoft.Extensions.DependencyInjection and UnityContainer are unified with this layer.
+At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and Autofac are unified with this layer.
 
 ## Changes
+
+### 1.3.1122.121
+
+- Added support for Autofac
 
 ### 1.3.1022.121
 
