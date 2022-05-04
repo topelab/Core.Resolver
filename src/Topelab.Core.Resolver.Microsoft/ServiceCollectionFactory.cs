@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Collections.Generic;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Enums;

@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Topelab.Core.Resolver.Entities;
-using Topelab.Core.Resolver.Enums;
 using Topelab.Core.Resolver.Interfaces;
 using Unity;
 
@@ -14,6 +11,8 @@ namespace Topelab.Core.Resolver.Unity
     /// </summary>
     public static class ResolverFactory
     {
+        private static Resolver resolver;
+
         /// <summary>
         /// Creates an IResolver based on the specified resolve info collection.
         /// </summary>
@@ -28,10 +27,15 @@ namespace Topelab.Core.Resolver.Unity
                 container.Register(resolveInfoCollection, constructorsByKey);
             }
 
-            Resolver resolver = new(container, constructorsByKey);
+            resolver = new(container, constructorsByKey);
             container.RegisterInstance<IResolver>(resolver);
 
             return resolver;
         }
+
+        /// <summary>
+        /// Get current resolver
+        /// </summary>
+        public static IResolver GetResolver() => resolver;
     }
 }

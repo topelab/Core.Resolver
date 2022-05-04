@@ -13,6 +13,7 @@ namespace Topelab.Core.Resolver.Microsoft
     public static class ResolverFactory
     {
         private const string DefaultKey = "__NULL__";
+        private static Resolver resolver;
 
         /// <summary>
         /// Adds the resolver to service collection.
@@ -64,9 +65,14 @@ namespace Topelab.Core.Resolver.Microsoft
             });
 
             var serviceProvider = collection.BuildServiceProvider();
-            var resolver = serviceProvider.GetService<IResolver>();
+            resolver = (Resolver)serviceProvider.GetService<IResolver>();
             return resolver;
         }
+
+        /// <summary>
+        /// Get current resolver
+        /// </summary>
+        public static IResolver GetResolver() => resolver;
 
         private static IResolver Create(string key, ResolveInfoCollection resolveInfoCollection, IDictionary<string, IResolver> globalResolvers)
         {

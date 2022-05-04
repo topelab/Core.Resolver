@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using System;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Test.Entities;
 using Topelab.Core.Resolver.Test.Interfaces;

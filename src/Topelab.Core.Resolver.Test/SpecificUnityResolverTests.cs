@@ -1,7 +1,6 @@
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using System;
-using System.Threading;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Test.Entities;
 using Topelab.Core.Resolver.Test.Interfaces;

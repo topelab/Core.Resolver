@@ -1,7 +1,5 @@
 using NUnit.Framework;
-using System;
 using Topelab.Core.Resolver.Entities;
-using Topelab.Core.Resolver.Interfaces;
 using Topelab.Core.Resolver.Test.Cases;
 using Topelab.Core.Resolver.Test.Entities;
 using Topelab.Core.Resolver.Test.Interfaces;
@@ -11,11 +9,11 @@ namespace Topelab.Core.Resolver.Test
     [TestFixture]
     internal class ResolverTests
     {
-        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactories))]
-        public void GetSimple(Func<ResolveInfoCollection, IResolver> ResolverFactory)
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void GetSimple(ResolverFactoryCase ResolverFactory)
         {
             // Arrange
-            var resolver = ResolverFactory(new ResolveInfoCollection()
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
                 .Add<IClaseTest, SimpleClaseTest>()
                 );
 
@@ -26,11 +24,11 @@ namespace Topelab.Core.Resolver.Test
             Assert.AreEqual(new SimpleClaseTest().GiveMe(), result.GiveMe());
         }
 
-        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactories))]
-        public void GetSimpleWithNames(Func<ResolveInfoCollection, IResolver> ResolverFactory)
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void GetSimpleWithNames(ResolverFactoryCase ResolverFactory)
         {
             // Arrange
-            var resolver = ResolverFactory(new ResolveInfoCollection()
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
                 .Add<IClaseTest, SimpleClaseTest>()
                 .Add<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
                 );
@@ -43,11 +41,11 @@ namespace Topelab.Core.Resolver.Test
             Assert.AreNotEqual(result, result2);
         }
 
-        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactories))]
-        public void GetWithMultipleConstructors(Func<ResolveInfoCollection, IResolver> ResolverFactory)
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void GetWithMultipleConstructors(ResolverFactoryCase ResolverFactory)
         {
             // Arrange
-            var resolver = ResolverFactory(new ResolveInfoCollection()
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
                 .Add<IGeremuDbContext, GeremuDbContext>()
                 .Add<IClaseTest, SimpleClaseTest>()
                 .Add<IClaseTest, ClaseTest>(typeof(IGeremuDbContext), typeof(string))
@@ -66,11 +64,11 @@ namespace Topelab.Core.Resolver.Test
             Assert.IsTrue(simple.GiveMe().Equals("Simple class"));
         }
 
-        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactories))]
-        public void GetWithMultipleImplementations(Func<ResolveInfoCollection, IResolver> ResolverFactory)
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void GetWithMultipleImplementations(ResolverFactoryCase ResolverFactory)
         {
             // Arrange
-            var resolver = ResolverFactory(new ResolveInfoCollection()
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
                 .Add<IGeremuDbContext, GeremuDbContext>()
                 .Add<IClaseTest, SimpleClaseTest>()
                 .Add<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
@@ -84,17 +82,17 @@ namespace Topelab.Core.Resolver.Test
             Assert.AreNotSame(result, result2);
         }
 
-        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactories))]
-        public void GetWithMultipleResolvers(Func<ResolveInfoCollection, IResolver> ResolverFactory)
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void GetWithMultipleResolvers(ResolverFactoryCase ResolverFactory)
         {
             // Arrange
-            var resolver = ResolverFactory(new ResolveInfoCollection()
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
                 .Add<IGeremuDbContext, GeremuDbContext>()
                 .Add<IClaseTest, SimpleClaseTest>()
                 .Add<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
                 );
 
-            var resolver2 = ResolverFactory(new ResolveInfoCollection()
+            var resolver2 = ResolverFactory.Create(new ResolveInfoCollection()
                 .Add<IGeremuDbContext, GeremuDbContext>()
                 .Add<IClaseTest, SimpleClaseTest>()
                 .Add<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
@@ -113,11 +111,11 @@ namespace Topelab.Core.Resolver.Test
             Assert.AreNotSame(result2, result202);
         }
 
-        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactories))]
-        public void GetWithDifferentParamsSameType(Func<ResolveInfoCollection, IResolver> ResolverFactory)
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void GetWithDifferentParamsSameType(ResolverFactoryCase ResolverFactory)
         {
             // Arrange
-            var resolver = ResolverFactory(new ResolveInfoCollection()
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
                 .Add<IClaseTest, SimpleClaseTest>(nameof(SimpleClaseTest))
                 .Add<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
                 .Add<IClaseTest, ClassUsingSimple>(typeof(IClaseTest), typeof(IClaseTest))
@@ -133,11 +131,11 @@ namespace Topelab.Core.Resolver.Test
             Assert.AreEqual($"{simpleClaseTest.GiveMe()} - {simpleClaseTest2.GiveMe()}", claseTest.GiveMe());
         }
 
-        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactories))]
-        public void GetWithConstructorResolvedByParam(Func<ResolveInfoCollection, IResolver> ResolverFactory)
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void GetWithConstructorResolvedByParam(ResolverFactoryCase ResolverFactory)
         {
             // Arrange
-            var resolver = ResolverFactory(new ResolveInfoCollection()
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
                 .Add<IClaseTest, SimpleClaseTest>()
                 .Add<IGeremuDbContext, GeremuDbContext>()
                 );

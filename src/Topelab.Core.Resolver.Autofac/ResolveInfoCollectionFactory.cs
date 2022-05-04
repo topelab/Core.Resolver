@@ -1,11 +1,11 @@
+using Autofac;
+using Autofac.Builder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Enums;
-using Autofac;
-using Autofac.Builder;
 using Topelab.Core.Resolver.Interfaces;
 
 namespace Topelab.Core.Resolver.Autofac

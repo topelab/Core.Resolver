@@ -23,7 +23,7 @@ namespace Topelab.Core.Resolver.Test.Entities
         public ClaseTest(int number, DateTime dateTime)
         {
             this.number = number;
-            this.test = dateTime.ToString("G");
+            test = dateTime.ToString("G");
         }
 
         public string GiveMe()

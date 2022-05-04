@@ -1,11 +1,8 @@
-using System;
+using Autofac;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Topelab.Core.Resolver.Entities;
-using Topelab.Core.Resolver.Enums;
 using Topelab.Core.Resolver.Interfaces;
-using Autofac;
 
 namespace Topelab.Core.Resolver.Autofac
 {
@@ -14,6 +11,8 @@ namespace Topelab.Core.Resolver.Autofac
     /// </summary>
     public static class ResolverFactory
     {
+        private static Resolver resolver;
+
         /// <summary>
         /// Creates an IResolver based on the specified resolve info collection.
         /// </summary>
@@ -28,11 +27,16 @@ namespace Topelab.Core.Resolver.Autofac
                 builder.RegisterAutofac(resolveInfoCollection, constructorsByKey);
             }
 
-            IResolver resolver = new Resolver();
-            builder.RegisterInstance(resolver);
+            resolver = new Resolver();
+            builder.RegisterInstance((IResolver)resolver);
             var container = builder.Build();
-            ((Resolver)resolver).Initialize(container, constructorsByKey);
+            resolver.Initialize(container, constructorsByKey);
             return resolver;
         }
+
+        /// <summary>
+        /// Get current resolver
+        /// </summary>
+        public static IResolver GetResolver() => resolver;
     }
 }

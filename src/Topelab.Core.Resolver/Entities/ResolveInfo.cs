@@ -37,7 +37,7 @@ namespace Topelab.Core.Resolver.Entities
         /// <summary>
         /// Factory representation for instance
         /// </summary>
-        public Func<IResolver, object> Factory => (Func<IResolver, object>)Instance; 
+        public Func<IResolver, object> Factory => (Func<IResolver, object>)Instance;
 
         /// <summary>
         /// Key
