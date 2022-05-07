@@ -21,7 +21,7 @@ namespace Topelab.Core.Resolver.Microsoft
             var collection = currentServices ?? new ServiceCollection();
             collection
                 .AddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (T, P) => ActivatorUtilities.CreateInstance(provider, T, P)))
-                .AddScoped<IService<IResolver>, Service<IResolver, Resolver>>();
+                .AddSingleton<IService<IResolver>, Service<IResolver, Resolver>>();
 
             foreach (var resolveInfo in resolveInfoCollection)
             {
@@ -31,7 +31,20 @@ namespace Topelab.Core.Resolver.Microsoft
                         collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.Instance);
                         break;
                     case ResolveModeEnum.Factory:
-                        collection.AddSingleton(resolveInfo.TypeFrom, s => resolveInfo.Factory.Invoke(s.GetService<IResolver>()));
+                        switch (resolveInfo.ResolveLifeCycle)
+                        {
+                            case ResolveLifeCycleEnum.Transient:
+                                collection.AddTransient(resolveInfo.TypeFrom, s => resolveInfo.Factory.Invoke(s.GetService<IResolver>()));
+                                break;
+                            case ResolveLifeCycleEnum.Scoped:
+                                collection.AddScoped(resolveInfo.TypeFrom, s => resolveInfo.Factory.Invoke(s.GetService<IResolver>()));
+                                break;
+                            case ResolveLifeCycleEnum.Singleton:
+                                collection.AddSingleton(resolveInfo.TypeFrom, s => resolveInfo.Factory.Invoke(s.GetService<IResolver>()));
+                                break;
+                            default:
+                                break;
+                        }
                         break;
                     default:
                         switch (resolveInfo.ResolveLifeCycle)

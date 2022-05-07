@@ -36,7 +36,20 @@ namespace Topelab.Core.Resolver.Unity
                         container.RegisterInstance(resolveInfo.TypeFrom, resolveInfo.Instance);
                         break;
                     case ResolveModeEnum.Factory:
-                        container.RegisterFactory(resolveInfo.TypeFrom, key, c => resolveInfo.Factory.Invoke(c.Resolve<IResolver>()));
+                        switch (resolveInfo.ResolveLifeCycle)
+                        {
+                            case ResolveLifeCycleEnum.Transient:
+                                container.RegisterFactory(resolveInfo.TypeFrom, key, c => resolveInfo.Factory.Invoke(c.Resolve<IResolver>()), FactoryLifetime.PerResolve);
+                                break;
+                            case ResolveLifeCycleEnum.Scoped:
+                                container.RegisterFactory(resolveInfo.TypeFrom, key, c => resolveInfo.Factory.Invoke(c.Resolve<IResolver>()), FactoryLifetime.PerContainer);
+                                break;
+                            case ResolveLifeCycleEnum.Singleton:
+                                container.RegisterFactory(resolveInfo.TypeFrom, key, c => resolveInfo.Factory.Invoke(c.Resolve<IResolver>()), FactoryLifetime.Singleton);
+                                break;
+                            default:
+                                break;
+                        }
                         break;
                     default:
                         switch (resolveInfo.ResolveLifeCycle)

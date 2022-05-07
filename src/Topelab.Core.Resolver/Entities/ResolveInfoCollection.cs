@@ -107,9 +107,9 @@ namespace Topelab.Core.Resolver.Entities
         /// <typeparam name="TFrom">Type from (Interface)</typeparam>
         /// <param name="factory">Factory</param>
         /// <returns></returns>
-        public ResolveInfoCollection AddFactory<TFrom>(Func<IResolver, TFrom> factory)
+        public ResolveInfoCollection AddFactory<TFrom>(Func<IResolver, TFrom> factory, ResolveLifeCycleEnum resolveLifeCycle = ResolveLifeCycleEnum.Singleton)
         {
-            ResolveInfo resolveInfo = new(typeof(TFrom), typeof(TFrom), ResolveModeEnum.Factory, ResolveLifeCycleEnum.Singleton) { Instance = factory };
+            ResolveInfo resolveInfo = new(typeof(TFrom), typeof(TFrom), ResolveModeEnum.Factory, resolveLifeCycle) { Instance = factory };
             Add(resolveInfo);
             return this;
         }
@@ -120,9 +120,9 @@ namespace Topelab.Core.Resolver.Entities
         /// <typeparam name="TFrom">Type from (Interface)</typeparam>
         /// <param name="key">Key to resolve</param>
         /// <param name="factory">Factory</param>
-        public ResolveInfoCollection AddFactory<TFrom>(string key, Func<IResolver, TFrom> factory)
+        public ResolveInfoCollection AddFactory<TFrom>(string key, Func<IResolver, TFrom> factory, ResolveLifeCycleEnum resolveLifeCycle = ResolveLifeCycleEnum.Singleton)
         {
-            ResolveInfo resolveInfo = new(typeof(TFrom), typeof(TFrom), ResolveModeEnum.Factory, ResolveLifeCycleEnum.Singleton, key) { Instance = factory };
+            ResolveInfo resolveInfo = new(typeof(TFrom), typeof(TFrom), ResolveModeEnum.Factory, resolveLifeCycle, key) { Instance = factory };
             Add(resolveInfo);
             return this;
         }
