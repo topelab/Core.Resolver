@@ -6,6 +6,12 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.3.1522.507
+
+- Upgrade some nugets
+- Fix AddFactory to support other cycle life time
+- Added static *GetResolver* to *ResolverFactory*
+
 ### 1.3.1122.121
 
 - Added support for Autofac

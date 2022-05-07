@@ -30,7 +30,7 @@ namespace Topelab.Core.Resolver.Microsoft
             var resolveInfoCollectionWithDefaultKey = resolveInfoCollection.Where(r => (r.Key ?? DefaultKey) == DefaultKey);
 
             var collection = ServiceCollectionFactory.Create(resolveInfoCollectionWithDefaultKey, services);
-            collection.AddScoped(s =>
+            collection.AddSingleton(s =>
             {
                 var serviceFactory = s.GetService<IServiceFactory>();
                 var resolver = serviceFactory.Create<IResolver>(s, serviceFactory, DefaultKey, globalResolvers);
@@ -55,7 +55,7 @@ namespace Topelab.Core.Resolver.Microsoft
             var resolveInfoCollectionWithDefaultKey = resolveInfoCollection.Where(r => (r.Key ?? DefaultKey) == DefaultKey);
 
             var collection = ServiceCollectionFactory.Create(resolveInfoCollectionWithDefaultKey);
-            collection.AddScoped(s =>
+            collection.AddSingleton(s =>
             {
                 var serviceFactory = s.GetService<IServiceFactory>();
                 var resolver = serviceFactory.Create<IResolver>(s, serviceFactory, DefaultKey, globalResolvers);
