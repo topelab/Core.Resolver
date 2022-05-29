@@ -6,6 +6,10 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.3.522.529
+
+- Upgrade some nugets
+
 ### 1.3.1522.507
 
 - Upgrade some nugets
