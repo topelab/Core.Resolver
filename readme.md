@@ -6,6 +6,10 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.4.1
+
+- Upgrade some nugets
+
 ### 1.4.0
 
 - Version numbering change
