@@ -11,45 +11,31 @@ namespace Topelab.Core.Resolver.Entities
     public class ResolveInfoCollection : List<ResolveInfo>
     {
         /// <summary>
-        /// Add types from, to, and optionally, constructor param types for type <typeparamref name="TTo"/>
+        /// Add type from, type to with resolve type, key, and optionally, constructor param types for type <paramref name="typeFrom"/>
         /// </summary>
-        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
-        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
-        /// <param name="constructorParamTypes">Constructor param types</param>
-        public ResolveInfoCollection Add<TFrom, TTo>(params Type[] constructorParamTypes)
-        {
-            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveModeEnum.None, ResolveLifeCycleEnum.Transient, null, constructorParamTypes));
-            return this;
-        }
-
-        /// <summary>
-        /// Add types from, to, and optionally, constructor param types for type <typeparamref name="TTo"/>
-        /// </summary>
-        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
-        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
+        /// <param name="resolveType">Resolve type</param>
+        /// <param name="typeFrom">Type from (Interface)</param>
+        /// <param name="typeTo">Type to (Implementation)</param>
         /// <param name="key">Key to resolve</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
-        public ResolveInfoCollection Add<TFrom, TTo>(string key, params Type[] constructorParamTypes)
+        public ResolveInfoCollection Add(Type typeFrom, Type typeTo, ResolveLifeCycleEnum resolveType, string key, params Type[] constructorParamTypes)
         {
-            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveModeEnum.None, ResolveLifeCycleEnum.Transient, key, constructorParamTypes));
+            Add(new ResolveInfo(typeFrom, typeTo, ResolveModeEnum.None, resolveType, key, constructorParamTypes));
             return this;
         }
 
         /// <summary>
-        /// Add types from, to with resolve type, and optionally, constructor param types for type <typeparamref name="TTo"/>
+        /// Add type from, type to with resolve type, and optionally, constructor param types for type <typeparamref name="TTo"/>
         /// </summary>
         /// <typeparam name="TFrom">Type from (Interface)</typeparam>
         /// <typeparam name="TTo">Type to (Implementation)</typeparam>
         /// <param name="resolveType">Resolve type</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection Add<TFrom, TTo>(ResolveLifeCycleEnum resolveType, params Type[] constructorParamTypes)
-        {
-            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveModeEnum.None, resolveType, null, constructorParamTypes));
-            return this;
-        }
+            => Add(typeof(TFrom), typeof(TTo), resolveType, null, constructorParamTypes);
 
         /// <summary>
-        /// Add types from, to with resolve type, and optionally, constructor param types for type <typeparamref name="TTo"/>
+        /// Add type from, type to with resolve type, key, and optionally, constructor param types for type <typeparamref name="TTo"/>
         /// </summary>
         /// <typeparam name="TFrom">Type from (Interface)</typeparam>
         /// <typeparam name="TTo">Type to (Implementation)</typeparam>
@@ -57,10 +43,66 @@ namespace Topelab.Core.Resolver.Entities
         /// <param name="key">Key to resolve</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection Add<TFrom, TTo>(ResolveLifeCycleEnum resolveType, string key, params Type[] constructorParamTypes)
-        {
-            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveModeEnum.None, resolveType, key, constructorParamTypes));
-            return this;
-        }
+            => Add(typeof(TFrom), typeof(TTo), resolveType, key, constructorParamTypes);
+
+        /// <summary>
+        /// Add type from, type to, and optionally, constructor param types for type <typeparamref name="TTo"/>
+        /// </summary>
+        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
+        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        [Obsolete("This method is deprecated, please use AddTransient instead")]
+        public ResolveInfoCollection Add<TFrom, TTo>(params Type[] constructorParamTypes)
+            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Transient, null, constructorParamTypes);
+
+        /// <summary>
+        /// Add type from, type to, and optionally, constructor param types for type <typeparamref name="TTo"/>
+        /// </summary>
+        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
+        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
+        /// <param name="key">Key to resolve</param>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        [Obsolete("This method is deprecated, please use AddTransient instead")]
+        public ResolveInfoCollection Add<TFrom, TTo>(string key, params Type[] constructorParamTypes)
+            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Transient, key, constructorParamTypes);
+
+        /// <summary>
+        /// Add transient type from, type to, and optionally, constructor param types for type <paramref name="typeFrom"/>
+        /// </summary>
+        /// <param name="typeFrom">Type from (Interface)</param>
+        /// <param name="typeTo">Type to (Implementation)</param>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        public ResolveInfoCollection AddTransient(Type typeFrom, Type typeTo, params Type[] constructorParamTypes)
+            => Add(typeFrom, typeTo, ResolveLifeCycleEnum.Transient, null, constructorParamTypes);
+
+        /// <summary>
+        /// Add transient type from, type to, key, and optionally, constructor param types for type <paramref name="typeFrom"/>
+        /// </summary>
+        /// <param name="typeFrom">Type from (Interface)</param>
+        /// <param name="typeTo">Type to (Implementation)</param>
+        /// <param name="key">Key to resolve</param>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        public ResolveInfoCollection AddTransient(Type typeFrom, Type typeTo, string key, params Type[] constructorParamTypes)
+            => Add(typeFrom, typeTo, ResolveLifeCycleEnum.Transient, key, constructorParamTypes);
+
+        /// <summary>
+        /// Add type from, type to, and optionally, constructor param types for type <typeparamref name="TTo"/>
+        /// </summary>
+        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
+        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        public ResolveInfoCollection AddTransient<TFrom, TTo>(params Type[] constructorParamTypes)
+            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Transient, null, constructorParamTypes);
+
+        /// <summary>
+        /// Add type from, type to, and optionally, constructor param types for type <typeparamref name="TTo"/>
+        /// </summary>
+        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
+        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
+        /// <param name="key">Key to resolve</param>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        public ResolveInfoCollection AddTransient<TFrom, TTo>(string key, params Type[] constructorParamTypes)
+            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Transient, key, constructorParamTypes);
 
         /// <summary>
         /// Add types from with instance
@@ -128,54 +170,107 @@ namespace Topelab.Core.Resolver.Entities
         }
 
         /// <summary>
-        /// Add scoped types from, to, and optionally, constructor param types for type <typeparamref name="TTo"/>
+        /// Add scoped type from, type to, and optionally, constructor param types for type <paramref name="typeFrom"/>
+        /// </summary>
+        /// <param name="typeFrom">Type from (Interface)</param>
+        /// <param name="typeTo">Type to (Implementation)</param>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        public ResolveInfoCollection AddScoped(Type typeFrom, Type typeTo, params Type[] constructorParamTypes)
+            => Add(typeFrom, typeTo, ResolveLifeCycleEnum.Scoped, null, constructorParamTypes);
+
+        /// <summary>
+        /// Add scoped type from, type to, key, and optionally, constructor param types for type <paramref name="typeFrom"/>
+        /// </summary>
+        /// <param name="typeFrom">Type from (Interface)</param>
+        /// <param name="typeTo">Type to (Implementation)</param>
+        /// <param name="key">Key to resolve</param>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        public ResolveInfoCollection AddScoped(Type typeFrom, Type typeTo, string key, params Type[] constructorParamTypes)
+            => Add(typeFrom, typeTo, ResolveLifeCycleEnum.Scoped, key, constructorParamTypes);
+
+        /// <summary>
+        /// Add scoped type from, type to, and optionally, constructor param types for type <typeparamref name="TTo"/>
         /// </summary>
         /// <typeparam name="TFrom">Type from (Interface)</typeparam>
         /// <typeparam name="TTo">Type to (Implementation)</typeparam>
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection AddScoped<TFrom, TTo>(params Type[] constructorParamTypes)
-        {
-            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveModeEnum.None, ResolveLifeCycleEnum.Scoped, null, constructorParamTypes));
-            return this;
-        }
+            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Scoped, null, constructorParamTypes);
 
         /// <summary>
-        /// Add scoped types from, to, and optionally, constructor param types for type <typeparamref name="TTo"/>
+        /// Add scoped type from, type to, key, and optionally, constructor param types for type <typeparamref name="TTo"/>
         /// </summary>
         /// <typeparam name="TFrom">Type from (Interface)</typeparam>
         /// <typeparam name="TTo">Type to (Implementation)</typeparam>
         /// <param name="key">Key to resolve</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection AddScoped<TFrom, TTo>(string key, params Type[] constructorParamTypes)
-        {
-            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveModeEnum.None, ResolveLifeCycleEnum.Scoped, key, constructorParamTypes));
-            return this;
-        }
+            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Scoped, key, constructorParamTypes);
 
         /// <summary>
-        /// Add Singleton types from, to, and optionally, constructor param types for type <typeparamref name="TTo"/>
+        /// Add Singleton type from, type to, and optionally, constructor param types for type <paramref name="typeFrom"/>
+        /// </summary>
+        /// <param name="typeFrom">Type from (Interface)</param>
+        /// <param name="typeTo">Type to (Implementation)</param>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        public ResolveInfoCollection AddSingleton(Type typeFrom, Type typeTo, params Type[] constructorParamTypes)
+            => Add(typeFrom, typeTo, ResolveLifeCycleEnum.Singleton, null, constructorParamTypes);
+
+        /// <summary>
+        /// Add Singleton type from, type to, key, and optionally, constructor param types for type <paramref name="typeFrom"/>
+        /// </summary>
+        /// <param name="typeFrom">Type from (Interface)</param>
+        /// <param name="typeTo">Type to (Implementation)</param>
+        /// <param name="key">Key to resolve</param>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        public ResolveInfoCollection AddSingleton(Type typeFrom, Type typeTo, string key, params Type[] constructorParamTypes)
+            => Add(typeFrom, typeTo, ResolveLifeCycleEnum.Singleton, key, constructorParamTypes);
+
+        /// <summary>
+        /// Add Singleton type from, type to, and optionally, constructor param types for type <typeparamref name="TTo"/>
         /// </summary>
         /// <typeparam name="TFrom">Type from (Interface)</typeparam>
         /// <typeparam name="TTo">Type to (Implementation)</typeparam>
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection AddSingleton<TFrom, TTo>(params Type[] constructorParamTypes)
-        {
-            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveModeEnum.None, ResolveLifeCycleEnum.Singleton, null, constructorParamTypes));
-            return this;
-        }
+            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Singleton, null, constructorParamTypes);
 
         /// <summary>
-        /// Add Singleton types from, to, and optionally, constructor param types for type <typeparamref name="TTo"/>
+        /// Add Singleton type from, type to, and optionally, constructor param types for type <typeparamref name="TTo"/>
         /// </summary>
         /// <typeparam name="TFrom">Type from (Interface)</typeparam>
         /// <typeparam name="TTo">Type to (Implementation)</typeparam>
         /// <param name="key">Key to resolve</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection AddSingleton<TFrom, TTo>(string key, params Type[] constructorParamTypes)
-        {
-            Add(new ResolveInfo(typeof(TFrom), typeof(TTo), ResolveModeEnum.None, ResolveLifeCycleEnum.Singleton, key, constructorParamTypes));
-            return this;
-        }
+            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Singleton, key, constructorParamTypes);
+
+        /// <summary>
+        /// Add Self types to, and optionally, constructor param types for type <paramref name="typeTo"/>
+        /// </summary>
+        /// <param name="typeTo">Type to (Implementation)</param>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        public ResolveInfoCollection AddSelf(Type typeTo, params Type[] constructorParamTypes)
+            => Add(typeTo, typeTo, ResolveLifeCycleEnum.Transient, null, constructorParamTypes);
+
+        /// <summary>
+        /// Add Self types to, key, and optionally, constructor param types for type <paramref name="typeTo"/>
+        /// </summary>
+        /// <param name="typeTo">Type to (Implementation)</param>
+        /// <param name="key">Key to resolve</param>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        public ResolveInfoCollection AddSelf(Type typeTo, string key, params Type[] constructorParamTypes)
+            => Add(typeTo, typeTo, ResolveLifeCycleEnum.Transient, key, constructorParamTypes);
+
+        /// <summary>
+        /// Add Self types to, key, and optionally, constructor param types for type <paramref name="typeTo"/>
+        /// </summary>
+        /// <param name="typeTo">Type to (Implementation)</param>
+        /// <param name="resolveType">Resolve type</param>
+        /// <param name="key">Key to resolve</param>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        public ResolveInfoCollection AddSelf(Type typeTo, ResolveLifeCycleEnum resolveType, string key, params Type[] constructorParamTypes)
+            => Add(typeTo, typeTo, resolveType, key, constructorParamTypes);
 
         /// <summary>
         /// Add Self types to, and optionally, constructor param types for type <typeparamref name="TTo"/>
@@ -183,10 +278,7 @@ namespace Topelab.Core.Resolver.Entities
         /// <typeparam name="TTo">Type to (Implementation)</typeparam>
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection AddSelf<TTo>(params Type[] constructorParamTypes)
-        {
-            Add(new ResolveInfo(typeof(TTo), typeof(TTo), ResolveModeEnum.None, ResolveLifeCycleEnum.Transient, null, constructorParamTypes));
-            return this;
-        }
+            => Add(typeof(TTo), typeof(TTo), ResolveLifeCycleEnum.Transient, null, constructorParamTypes);
 
         /// <summary>
         /// Add Self types to, and optionally, constructor param types for type <typeparamref name="TTo"/>
@@ -195,10 +287,16 @@ namespace Topelab.Core.Resolver.Entities
         /// <param name="key">Key to resolve</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection AddSelf<TTo>(string key, params Type[] constructorParamTypes)
-        {
-            Add(new ResolveInfo(typeof(TTo), typeof(TTo), ResolveModeEnum.None, ResolveLifeCycleEnum.Transient, key, constructorParamTypes));
-            return this;
-        }
+            => Add(typeof(TTo), typeof(TTo), ResolveLifeCycleEnum.Transient, key, constructorParamTypes);
 
+        /// <summary>
+        /// Add Self types to, and optionally, constructor param types for type <typeparamref name="TTo"/>
+        /// </summary>
+        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
+        /// <param name="resolveType">Resolve type</param>
+        /// <param name="key">Key to resolve</param>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        public ResolveInfoCollection AddSelf<TTo>(ResolveLifeCycleEnum resolveType, string key, params Type[] constructorParamTypes)
+            => Add(typeof(TTo), typeof(TTo), resolveType, key, constructorParamTypes);
     }
 }

@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System.Collections;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Test.Cases;
 using Topelab.Core.Resolver.Test.Entities;
@@ -14,7 +15,7 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
-                .Add<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
                 );
 
             // Act
@@ -29,8 +30,8 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
-                .Add<IClaseTest, SimpleClaseTest>()
-                .Add<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
                 );
 
             // Act
@@ -46,10 +47,10 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
-                .Add<IGeremuDbContext, GeremuDbContext>()
-                .Add<IClaseTest, SimpleClaseTest>()
-                .Add<IClaseTest, ClaseTest>(typeof(IGeremuDbContext), typeof(string))
-                .Add<IClaseTest, ClaseTest>(typeof(IGeremuDbContext), typeof(string), typeof(int)));
+                .AddTransient<IGeremuDbContext, GeremuDbContext>()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IClaseTest, ClaseTest>(typeof(IGeremuDbContext), typeof(string))
+                .AddTransient<IClaseTest, ClaseTest>(typeof(IGeremuDbContext), typeof(string), typeof(int)));
 
             var param = "Direct hello";
 
@@ -69,9 +70,9 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
-                .Add<IGeremuDbContext, GeremuDbContext>()
-                .Add<IClaseTest, SimpleClaseTest>()
-                .Add<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
+                .AddTransient<IGeremuDbContext, GeremuDbContext>()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
                 );
 
             // Act
@@ -87,15 +88,15 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
-                .Add<IGeremuDbContext, GeremuDbContext>()
-                .Add<IClaseTest, SimpleClaseTest>()
-                .Add<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
+                .AddTransient<IGeremuDbContext, GeremuDbContext>()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
                 );
 
             var resolver2 = ResolverFactory.Create(new ResolveInfoCollection()
-                .Add<IGeremuDbContext, GeremuDbContext>()
-                .Add<IClaseTest, SimpleClaseTest>()
-                .Add<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
+                .AddTransient<IGeremuDbContext, GeremuDbContext>()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
                 );
 
             // Act
@@ -116,9 +117,9 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
-                .Add<IClaseTest, SimpleClaseTest>(nameof(SimpleClaseTest))
-                .Add<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
-                .Add<IClaseTest, ClassUsingSimple>(typeof(IClaseTest), typeof(IClaseTest))
+                .AddTransient<IClaseTest, SimpleClaseTest>(nameof(SimpleClaseTest))
+                .AddTransient<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
+                .AddTransient<IClaseTest, ClassUsingSimple>(typeof(IClaseTest), typeof(IClaseTest))
                 );
 
             // Act
@@ -136,8 +137,8 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
-                .Add<IClaseTest, SimpleClaseTest>()
-                .Add<IGeremuDbContext, GeremuDbContext>()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IGeremuDbContext, GeremuDbContext>()
                 );
 
             // Act
@@ -148,5 +149,19 @@ namespace Topelab.Core.Resolver.Test
             Assert.AreEqual($"Hello, I'm instance {geremuDbContext.Id} with claseTest: {simpleClaseTest.GiveMe()}", ((IClaseTest)geremuDbContext).GiveMe());
         }
 
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void GetGenerics(ResolverFactoryCase ResolverFactory)
+        {
+            // Arrange
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
+                .AddTransient(typeof(IFactoryTest<>), typeof(FactoryTest<>))
+                );
+
+            // Act
+            var result = resolver.Get<IFactoryTest<SimpleClaseTest>>();
+
+            // Assert
+            Assert.AreEqual(new SimpleClaseTest().GiveMe(), result.Create().GiveMe());
+        }
     }
 }

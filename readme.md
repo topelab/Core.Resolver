@@ -6,6 +6,17 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.4.2
+
+- New methods for `ResolveInfoCollection`:
+  - `AddTransient(Type typeFrom, Type typeTo, params Type[] constructorParamTypes)`
+  - `AddScoped(Type typeFrom, Type typeTo, params Type[] constructorParamTypes)`
+  - `AddSingleton(Type typeFrom, Type typeTo, params Type[] constructorParamTypes)`
+- Deprecated `Add<TFrom, TTo>(params Type[] constructorParamTypes)`
+  - **Use** `AddTransient<TFrom, TTo>(params Type[] constructorParamTypes)`
+- Deprecated `Add<TFrom, TTo>(string key, params Type[] constructorParamTypes)`
+  - **Use** `AddTransient<TFrom, TTo>(string key, params Type[] constructorParamTypes)`
+
 ### 1.4.1
 
 - Upgrade some nugets
