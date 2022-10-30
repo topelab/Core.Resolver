@@ -13,14 +13,14 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolveInfoCollection = new ResolveInfoCollection()
-                .Add<IClaseTest, ClaseTest>()
-                .Add<IClaseTest, ClaseTest>("1")
-                .Add<IClaseTest, ClaseTest>("2");
+                .AddTransient<IClaseTest, ClaseTest>()
+                .AddTransient<IClaseTest, ClaseTest>("1")
+                .AddTransient<IClaseTest, ClaseTest>("2");
 
             var resolveInfoCollection2 = new ResolveInfoCollection()
-                .Add<IClaseTest, ClaseTest>("3")
-                .Add<IClaseTest, ClaseTest>("4")
-                .Add<IClaseTest, ClaseTest>("5");
+                .AddTransient<IClaseTest, ClaseTest>("3")
+                .AddTransient<IClaseTest, ClaseTest>("4")
+                .AddTransient<IClaseTest, ClaseTest>("5");
 
             // Act
             var result = resolveInfoCollection.AddCollection(resolveInfoCollection2);
