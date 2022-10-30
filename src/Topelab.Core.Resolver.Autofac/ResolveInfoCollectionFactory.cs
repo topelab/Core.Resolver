@@ -39,38 +39,80 @@ namespace Topelab.Core.Resolver.Autofac
                         builder.Register(c => resolveInfo.Factory.Invoke(c.Resolve<IResolver>())).WithName(resolveInfo.Key, resolveInfo.TypeFrom);
                         break;
                     default:
-                        switch (resolveInfo.ResolveLifeCycle)
+                        if (resolveInfo.TypeTo.IsGenericTypeDefinition)
                         {
-                            case ResolveLifeCycleEnum.Singleton:
-                                if (resolveInfo.ConstructorParamTypes.Length > 0)
-                                {
-                                    builder.RegisterType(resolveInfo.TypeTo).WithName(resolveInfo.Key, resolveInfo.TypeFrom).UsingConstructor(resolveInfo.ConstructorParamTypes).SingleInstance();
-                                }
-                                else
-                                {
-                                    builder.RegisterType(resolveInfo.TypeTo).WithName(resolveInfo.Key, resolveInfo.TypeFrom).SingleInstance();
-                                }
-                                break;
-                            case ResolveLifeCycleEnum.Scoped:
-                                if (resolveInfo.ConstructorParamTypes.Length > 0)
-                                {
-                                    builder.RegisterType(resolveInfo.TypeTo).WithName(resolveInfo.Key, resolveInfo.TypeFrom).UsingConstructor(resolveInfo.ConstructorParamTypes).InstancePerLifetimeScope();
-                                }
-                                else
-                                {
-                                    builder.RegisterType(resolveInfo.TypeTo).WithName(resolveInfo.Key, resolveInfo.TypeFrom).InstancePerLifetimeScope();
-                                }
-                                break;
-                            default:
-                                if (resolveInfo.ConstructorParamTypes.Length > 0)
-                                {
-                                    builder.RegisterType(resolveInfo.TypeTo).WithName(resolveInfo.Key, resolveInfo.TypeFrom).UsingConstructor(resolveInfo.ConstructorParamTypes).InstancePerDependency();
-                                }
-                                else
-                                {
-                                    builder.RegisterType(resolveInfo.TypeTo).WithName(resolveInfo.Key, resolveInfo.TypeFrom).InstancePerDependency();
-                                }
-                                break;
+                            var registrationShared = builder.RegisterGeneric(resolveInfo.TypeTo).WithName(resolveInfo.Key, resolveInfo.TypeFrom);
+                            switch (resolveInfo.ResolveLifeCycle)
+                            {
+                                case ResolveLifeCycleEnum.Singleton:
+                                    if (resolveInfo.ConstructorParamTypes.Length > 0)
+                                    {
+                                        registrationShared.UsingConstructor(resolveInfo.ConstructorParamTypes).SingleInstance();
+                                    }
+                                    else
+                                    {
+                                        registrationShared.SingleInstance();
+                                    }
+                                    break;
+                                case ResolveLifeCycleEnum.Scoped:
+                                    if (resolveInfo.ConstructorParamTypes.Length > 0)
+                                    {
+                                        registrationShared.UsingConstructor(resolveInfo.ConstructorParamTypes).InstancePerLifetimeScope();
+                                    }
+                                    else
+                                    {
+                                        registrationShared.InstancePerLifetimeScope();
+                                    }
+                                    break;
+                                default:
+                                    if (resolveInfo.ConstructorParamTypes.Length > 0)
+                                    {
+                                        registrationShared.UsingConstructor(resolveInfo.ConstructorParamTypes).InstancePerDependency();
+                                    }
+                                    else
+                                    {
+                                        registrationShared.InstancePerDependency();
+                                    }
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            var registrationShared = builder.RegisterType(resolveInfo.TypeTo).WithName(resolveInfo.Key, resolveInfo.TypeFrom);
+                            switch (resolveInfo.ResolveLifeCycle)
+                            {
+                                case ResolveLifeCycleEnum.Singleton:
+                                    if (resolveInfo.ConstructorParamTypes.Length > 0)
+                                    {
+                                        registrationShared.UsingConstructor(resolveInfo.ConstructorParamTypes).SingleInstance();
+                                    }
+                                    else
+                                    {
+                                        registrationShared.SingleInstance();
+                                    }
+                                    break;
+                                case ResolveLifeCycleEnum.Scoped:
+                                    if (resolveInfo.ConstructorParamTypes.Length > 0)
+                                    {
+                                        registrationShared.UsingConstructor(resolveInfo.ConstructorParamTypes).InstancePerLifetimeScope();
+                                    }
+                                    else
+                                    {
+                                        registrationShared.InstancePerLifetimeScope();
+                                    }
+                                    break;
+                                default:
+                                    if (resolveInfo.ConstructorParamTypes.Length > 0)
+                                    {
+                                        registrationShared.UsingConstructor(resolveInfo.ConstructorParamTypes).InstancePerDependency();
+                                    }
+                                    else
+                                    {
+                                        registrationShared.InstancePerDependency();
+                                    }
+                                    break;
+                            }
+
                         }
                         break;
                 }
@@ -84,6 +126,11 @@ namespace Topelab.Core.Resolver.Autofac
         }
 
         private static IRegistrationBuilder<object, ConcreteReflectionActivatorData, SingleRegistrationStyle> WithName(this IRegistrationBuilder<object, ConcreteReflectionActivatorData, SingleRegistrationStyle> builder, string key, Type type)
+        {
+            return key == null ? builder.As(type) : builder.Named(key, type);
+        }
+
+        private static IRegistrationBuilder<object, ReflectionActivatorData, DynamicRegistrationStyle> WithName(this IRegistrationBuilder<object, ReflectionActivatorData, DynamicRegistrationStyle> builder, string key, Type type)
         {
             return key == null ? builder.As(type) : builder.Named(key, type);
         }

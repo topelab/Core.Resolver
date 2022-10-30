@@ -6,7 +6,7 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
-### 1.4.2
+### 1.4.3
 
 - New methods for `ResolveInfoCollection`:
   - `AddTransient(Type typeFrom, Type typeTo, params Type[] constructorParamTypes)`
