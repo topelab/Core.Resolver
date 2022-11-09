@@ -6,6 +6,10 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.4.4
+
+- Upgrade to .NET 7.0
+
 ### 1.4.3
 
 - New methods for `ResolveInfoCollection`:
