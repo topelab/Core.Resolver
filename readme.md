@@ -6,6 +6,11 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.4.5
+
+- `ResolverFactory.GetResolver()` will always return first resolver.
+- When creating multiples resolvers, any `Get<T>()` will resolve self registered or the last registered on other resolvers. This functionality opens the door to register everywhere on application and resolve using resolver given with `ResolverFactory.GetResolver()`
+
 ### 1.4.4
 
 - Upgrade to .NET 7.0

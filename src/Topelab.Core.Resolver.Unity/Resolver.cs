@@ -36,13 +36,31 @@ namespace Topelab.Core.Resolver.Unity
         /// <typeparam name="T">Type to resolve</typeparam>
         public T Get<T>()
         {
-            if (container.IsRegistered<T>())
+            if (IsRegistered(typeof(T), container))
             {
                 return container.Resolve<T>();
             }
 
-            var resolver = resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.container.IsRegistered<T>()).FirstOrDefault();
+            var resolver = resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && IsRegistered(typeof(T), r.container)).FirstOrDefault();
             return resolver == null ? default : resolver.container.Resolve<T>();
+        }
+
+        private bool IsRegistered(Type type, IUnityContainer container, string key = null)
+        {
+            bool result;
+
+            result = container.IsRegistered(type, key);
+
+            if (!result)
+            {
+                if (type.IsGenericType)
+                {
+                    var genericType = type.GetGenericTypeDefinition();
+                    result = container.Registrations.Where(r => r.RegisteredType.IsGenericTypeDefinition && r.RegisteredType == genericType).Any();
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -294,7 +312,7 @@ namespace Topelab.Core.Resolver.Unity
         {
             var result = container.IsRegistered(type, key)
                 ? container
-                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.container.IsRegistered(type, key)).Select(r => r.container).FirstOrDefault() ??
+                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && IsRegistered(type, r.container, key)).Select(r => r.container).FirstOrDefault() ??
                     throw new InvalidOperationException($"Registered name {key} not found in any container");
             return result;
         }

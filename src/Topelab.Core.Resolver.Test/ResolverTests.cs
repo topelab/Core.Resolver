@@ -97,6 +97,7 @@ namespace Topelab.Core.Resolver.Test
                 .AddTransient<IGeremuDbContext, GeremuDbContext>()
                 .AddTransient<IClaseTest, SimpleClaseTest>()
                 .AddTransient<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
+                .AddTransient<IClaseTest2, SimpleClaseTest2>()
                 );
 
             // Act
@@ -104,12 +105,14 @@ namespace Topelab.Core.Resolver.Test
             var result2 = resolver.Get<IClaseTest>(nameof(SimpleClaseTest2));
             var result20 = resolver2.Get<IClaseTest>();
             var result202 = resolver2.Get<IClaseTest>(nameof(SimpleClaseTest2));
+            var result3 = resolver.Get<IClaseTest2>();
 
             // Assert
             Assert.AreNotSame(result, result2);
             Assert.AreNotSame(result20, result202);
             Assert.AreNotSame(result, result20);
             Assert.AreNotSame(result2, result202);
+            Assert.IsNotNull(result3);
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
