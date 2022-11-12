@@ -11,7 +11,7 @@ namespace Topelab.Core.Resolver.Unity
     /// </summary>
     public static class ResolverFactory
     {
-        private static Resolver resolver;
+        private static Resolver rootResolver;
 
         /// <summary>
         /// Creates an IResolver based on the specified resolve info collection.
@@ -27,7 +27,8 @@ namespace Topelab.Core.Resolver.Unity
                 container.Register(resolveInfoCollection, constructorsByKey);
             }
 
-            resolver = new(container, constructorsByKey);
+            Resolver resolver = new(container, constructorsByKey);
+            rootResolver ??= resolver;
             container.RegisterInstance<IResolver>(resolver);
 
             return resolver;
@@ -36,6 +37,6 @@ namespace Topelab.Core.Resolver.Unity
         /// <summary>
         /// Get current resolver
         /// </summary>
-        public static IResolver GetResolver() => resolver;
+        public static IResolver GetResolver() => rootResolver;
     }
 }

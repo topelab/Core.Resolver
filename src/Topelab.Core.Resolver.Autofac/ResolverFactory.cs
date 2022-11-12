@@ -11,7 +11,7 @@ namespace Topelab.Core.Resolver.Autofac
     /// </summary>
     public static class ResolverFactory
     {
-        private static Resolver resolver;
+        private static Resolver rootResolver;
 
         /// <summary>
         /// Creates an IResolver based on the specified resolve info collection.
@@ -27,16 +27,17 @@ namespace Topelab.Core.Resolver.Autofac
                 builder.RegisterAutofac(resolveInfoCollection, constructorsByKey);
             }
 
-            resolver = new Resolver();
+            var resolver = new Resolver();
             builder.RegisterInstance((IResolver)resolver);
             var container = builder.Build();
             resolver.Initialize(container, constructorsByKey);
+            rootResolver ??= resolver;
             return resolver;
         }
 
         /// <summary>
         /// Get current resolver
         /// </summary>
-        public static IResolver GetResolver() => resolver;
+        public static IResolver GetResolver() => rootResolver;
     }
 }

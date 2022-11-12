@@ -16,6 +16,7 @@ namespace Topelab.Core.Resolver.Unity
     {
         private readonly IUnityContainer container;
         private readonly Dictionary<string, ConstructorInfo> constructorsByKey;
+        private static readonly List<Resolver> resolvers = new();
 
         /// <summary>
         /// Constructor
@@ -26,6 +27,7 @@ namespace Topelab.Core.Resolver.Unity
         {
             this.container = container ?? throw new ArgumentNullException(nameof(container));
             this.constructorsByKey = constructorsByKey ?? throw new ArgumentNullException(nameof(constructorsByKey));
+            resolvers.Add(this);
         }
 
         /// <summary>
@@ -34,7 +36,31 @@ namespace Topelab.Core.Resolver.Unity
         /// <typeparam name="T">Type to resolve</typeparam>
         public T Get<T>()
         {
-            return container.Resolve<T>();
+            if (IsRegistered(typeof(T), container))
+            {
+                return container.Resolve<T>();
+            }
+
+            var resolver = resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && IsRegistered(typeof(T), r.container)).FirstOrDefault();
+            return resolver == null ? default : resolver.container.Resolve<T>();
+        }
+
+        private bool IsRegistered(Type type, IUnityContainer container, string key = null)
+        {
+            bool result;
+
+            result = container.IsRegistered(type, key);
+
+            if (!result)
+            {
+                if (type.IsGenericType)
+                {
+                    var genericType = type.GetGenericTypeDefinition();
+                    result = container.Registrations.Where(r => r.RegisteredType.IsGenericTypeDefinition && r.RegisteredType == genericType).Any();
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -133,6 +159,7 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="key">Key name to resolve</param>
         public T Get<T>(string key)
         {
+            var container = FindContainerWithKey(typeof(T), key);
             return container.Resolve<T>(key);
         }
 
@@ -145,6 +172,7 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="arg1">Param 1 for constructor</param>
         public T Get<T, T1>(string key, T1 arg1)
         {
+            var container = FindContainerWithKey(typeof(T), key);
             return container.Resolve<T>(key,
                                         new ParameterOverride(typeof(T1), arg1)
                                         );
@@ -162,6 +190,7 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="arg2">Param 2 for constructor</param>
         public T Get<T, T1, T2>(string key, T1 arg1, T2 arg2)
         {
+            var container = FindContainerWithKey(typeof(T), key);
             var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
             return container.Resolve<T>(key,
                                         new ParameterOverride(typeof(T1), parameters[0], arg1),
@@ -183,6 +212,7 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="arg3">Param 3 for constructor</param>
         public T Get<T, T1, T2, T3>(string key, T1 arg1, T2 arg2, T3 arg3)
         {
+            var container = FindContainerWithKey(typeof(T), key);
             var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
             return container.Resolve<T>(key,
                                         new ParameterOverride(typeof(T1), parameters[0], arg1),
@@ -207,6 +237,7 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="arg4">Param 4 for constructor</param>
         public T Get<T, T1, T2, T3, T4>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
+            var container = FindContainerWithKey(typeof(T), key);
             var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
             return container.Resolve<T>(key,
                                         new ParameterOverride(typeof(T1), parameters[0], arg1),
@@ -234,6 +265,7 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="arg5">Param 5 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
+            var container = FindContainerWithKey(typeof(T), key);
             var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
             return container.Resolve<T>(key,
                                         new ParameterOverride(typeof(T1), parameters[0], arg1),
@@ -264,6 +296,7 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="arg6">Param 6 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5, T6>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
+            var container = FindContainerWithKey(typeof(T), key);
             var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
             return container.Resolve<T>(key,
                                         new ParameterOverride(typeof(T1), parameters[0], arg1),
@@ -275,5 +308,13 @@ namespace Topelab.Core.Resolver.Unity
                                         );
         }
 
+        private IUnityContainer FindContainerWithKey(Type type, string key)
+        {
+            var result = container.IsRegistered(type, key)
+                ? container
+                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && IsRegistered(type, r.container, key)).Select(r => r.container).FirstOrDefault() ??
+                    throw new InvalidOperationException($"Registered name {key} not found in any container");
+            return result;
+        }
     }
 }

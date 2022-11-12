@@ -15,17 +15,29 @@ namespace Topelab.Core.Resolver.Autofac
     {
         private IContainer container;
         private Dictionary<string, ConstructorInfo> constructorsByKey;
+        private static readonly List<Resolver> resolvers = new();
 
         public void Initialize(IContainer container, Dictionary<string, ConstructorInfo> constructorsByKey)
         {
             this.container = container ?? throw new ArgumentNullException(nameof(container));
             this.constructorsByKey = constructorsByKey ?? throw new ArgumentNullException(nameof(constructorsByKey));
+            resolvers.Add(this);
         }
         /// <summary>
         /// Resolve an instance of type <typeparamref name="T"/>
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
         public T Get<T>()
+        {
+            if (container.IsRegistered<T>())
+            {
+                return Resolve<T>(container);
+            }
+            var resolver = resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.container.IsRegistered(typeof(T))).FirstOrDefault();
+            return resolver == null ? default : Resolve<T>(resolver.container);
+        }
+
+        private T Resolve<T>(IContainer container)
         {
             using var scope = container.BeginLifetimeScope();
             return scope.Resolve<T>();
@@ -127,7 +139,7 @@ namespace Topelab.Core.Resolver.Autofac
         /// <param name="key">Key name to resolve</param>
         public T Get<T>(string key)
         {
-            using var scope = container.BeginLifetimeScope();
+            using var scope = FindContainerWithKey(typeof(T), key).BeginLifetimeScope();
             return scope.ResolveNamed<T>(key);
         }
 
@@ -140,7 +152,7 @@ namespace Topelab.Core.Resolver.Autofac
         /// <param name="arg1">Param 1 for constructor</param>
         public T Get<T, T1>(string key, T1 arg1)
         {
-            using var scope = container.BeginLifetimeScope();
+            using var scope = FindContainerWithKey(typeof(T), key).BeginLifetimeScope();
             return scope.ResolveNamed<T>(key,
                                         new TypedParameter(typeof(T1), arg1)
                                         );
@@ -159,7 +171,7 @@ namespace Topelab.Core.Resolver.Autofac
         public T Get<T, T1, T2>(string key, T1 arg1, T2 arg2)
         {
             var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
-            using var scope = container.BeginLifetimeScope();
+            using var scope = FindContainerWithKey(typeof(T), key).BeginLifetimeScope();
             return scope.ResolveNamed<T>(key,
                                         new NamedParameter(parameters[0], arg1),
                                         new NamedParameter(parameters[1], arg2)
@@ -181,7 +193,7 @@ namespace Topelab.Core.Resolver.Autofac
         public T Get<T, T1, T2, T3>(string key, T1 arg1, T2 arg2, T3 arg3)
         {
             var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
-            using var scope = container.BeginLifetimeScope();
+            using var scope = FindContainerWithKey(typeof(T), key).BeginLifetimeScope();
             return scope.ResolveNamed<T>(key,
                                         new NamedParameter(parameters[0], arg1),
                                         new NamedParameter(parameters[1], arg2),
@@ -206,7 +218,7 @@ namespace Topelab.Core.Resolver.Autofac
         public T Get<T, T1, T2, T3, T4>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
             var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
-            using var scope = container.BeginLifetimeScope();
+            using var scope = FindContainerWithKey(typeof(T), key).BeginLifetimeScope();
             return scope.ResolveNamed<T>(key,
                                         new NamedParameter(parameters[0], arg1),
                                         new NamedParameter(parameters[1], arg2),
@@ -234,7 +246,7 @@ namespace Topelab.Core.Resolver.Autofac
         public T Get<T, T1, T2, T3, T4, T5>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
             var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
-            using var scope = container.BeginLifetimeScope();
+            using var scope = FindContainerWithKey(typeof(T), key).BeginLifetimeScope();
             return scope.ResolveNamed<T>(key,
                                         new NamedParameter(parameters[0], arg1),
                                         new NamedParameter(parameters[1], arg2),
@@ -265,7 +277,7 @@ namespace Topelab.Core.Resolver.Autofac
         public T Get<T, T1, T2, T3, T4, T5, T6>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
             var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
-            using var scope = container.BeginLifetimeScope();
+            using var scope = FindContainerWithKey(typeof(T), key).BeginLifetimeScope();
             return scope.ResolveNamed<T>(key,
                                         new NamedParameter(parameters[0], arg1),
                                         new NamedParameter(parameters[1], arg2),
@@ -274,6 +286,15 @@ namespace Topelab.Core.Resolver.Autofac
                                         new NamedParameter(parameters[4], arg5),
                                         new NamedParameter(parameters[5], arg6)
                                         );
+        }
+
+        private IContainer FindContainerWithKey(Type type, string key)
+        {
+            var result = container.IsRegisteredWithName(key, type)
+                ? container
+                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.container.IsRegisteredWithName(key, type)).Select(r => r.container).FirstOrDefault() ??
+                    throw new InvalidOperationException($"Registered name {key} not found in any container");
+            return result;
         }
 
     }
