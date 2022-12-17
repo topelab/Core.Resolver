@@ -166,5 +166,23 @@ namespace Topelab.Core.Resolver.Test
             // Assert
             Assert.AreEqual(new SimpleClaseTest().GiveMe(), result.Create().GiveMe());
         }
+
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void GetWithKey(ResolverFactoryCase ResolverFactory)
+        {
+            // Arrange
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IGeremuDbContext, GeremuDbContext>()
+                .AddTransient<IClaseTest, ClaseTest1>("1")
+                .AddTransient<IClaseTest, ClaseTest2>("2")
+                );
+
+            // Act
+            var result = resolver.Get<IClaseTest>("2");
+
+            // Assert
+            Assert.IsTrue(result.GiveMe().StartsWith("ClaseTest2 with"));
+        }
     }
 }
