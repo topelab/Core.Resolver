@@ -6,9 +6,12 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
-### 1.4.6
+### 1.4.7
 
 - Fix an error on Topelab.Core.Resolver.Microsoft with a trouble in resolving named registration that has to resolve normal registered interfaces
+- Upgrade Autofac to 6.5.0
+- Upgrade NUnit3TestAdapter to 4.3.1
+- Upgrade Microsoft.NET.Test.Sdk to 17.4.1
 
 ### 1.4.5
 
