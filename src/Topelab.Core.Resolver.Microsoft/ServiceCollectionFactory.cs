@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Collections.Generic;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Enums;
@@ -19,9 +20,9 @@ namespace Topelab.Core.Resolver.Microsoft
         public static IServiceCollection Create(IEnumerable<ResolveInfo> resolveInfoCollection, IServiceCollection currentServices = null)
         {
             var collection = currentServices ?? new ServiceCollection();
-            collection
-                .AddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (T, P) => ActivatorUtilities.CreateInstance(provider, T, P)))
-                .AddSingleton<IService<IResolver>, Service<IResolver, Resolver>>();
+
+            collection.TryAddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (T, P) => ActivatorUtilities.CreateInstance(provider, T, P)));
+            collection.TryAddSingleton<IService<IResolver>, Service<IResolver, Resolver>>();
 
             foreach (var resolveInfo in resolveInfoCollection)
             {
@@ -56,7 +57,14 @@ namespace Topelab.Core.Resolver.Microsoft
                                 }
                                 else
                                 {
-                                    collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.TypeTo);
+                                    if (resolveInfo.Key != null)
+                                    {
+                                        collection.AddSingleton(resolveInfo.TypeTo);
+                                    }
+                                    else
+                                    {
+                                        collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.TypeTo);
+                                    }
                                 }
                                 break;
                             case ResolveLifeCycleEnum.Scoped:
@@ -66,7 +74,14 @@ namespace Topelab.Core.Resolver.Microsoft
                                 }
                                 else
                                 {
-                                    collection.AddScoped(resolveInfo.TypeFrom, resolveInfo.TypeTo);
+                                    if (resolveInfo.Key != null)
+                                    {
+                                        collection.AddScoped(resolveInfo.TypeTo);
+                                    }
+                                    else
+                                    {
+                                        collection.AddScoped(resolveInfo.TypeFrom, resolveInfo.TypeTo);
+                                    }
                                 }
                                 break;
                             default:
@@ -76,7 +91,14 @@ namespace Topelab.Core.Resolver.Microsoft
                                 }
                                 else
                                 {
-                                    collection.AddTransient(resolveInfo.TypeFrom, resolveInfo.TypeTo);
+                                    if (resolveInfo.Key != null)
+                                    {
+                                        collection.AddTransient(resolveInfo.TypeTo);
+                                    }
+                                    else
+                                    {
+                                        collection.AddTransient(resolveInfo.TypeFrom, resolveInfo.TypeTo);
+                                    }
                                 }
                                 break;
                         }

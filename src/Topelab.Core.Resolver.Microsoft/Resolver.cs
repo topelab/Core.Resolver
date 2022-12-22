@@ -15,6 +15,8 @@ namespace Topelab.Core.Resolver.Microsoft
         private readonly IServiceProvider serviceProvider;
         private readonly IServiceFactory serviceFactory;
         private readonly IDictionary<string, IResolver> globalResolvers;
+        private readonly Dictionary<Type, Dictionary<string, Type>> namedResolutions;
+
         private static readonly List<Resolver> resolvers = new();
 
         /// <summary>
@@ -25,12 +27,13 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="key">Key to have different resolvers</param>
         /// <param name="globalResolvers">Global resolvers indexed by key</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public Resolver(IServiceProvider serviceProvider, IServiceFactory serviceFactory, string key, IDictionary<string, IResolver> globalResolvers)
+        public Resolver(IServiceProvider serviceProvider, IServiceFactory serviceFactory, string key, IDictionary<string, IResolver> globalResolvers, Dictionary<Type, Dictionary<string, Type>> namedResolutions)
         {
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             this.serviceFactory = serviceFactory ?? throw new ArgumentNullException(nameof(serviceFactory));
             this.globalResolvers = globalResolvers ?? throw new ArgumentNullException(nameof(globalResolvers));
-            this.globalResolvers.Add(key, this);
+            this.namedResolutions = namedResolutions ?? throw new ArgumentNullException(nameof(namedResolutions));
+            this.globalResolvers[key] = this;
             resolvers.Add(this);
         }
 
@@ -169,8 +172,18 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="key">Key name to resolve</param>
         public T Get<T>(string key)
         {
-            Resolver resolver = FindResolverWithKey(key);
-            return resolver.serviceProvider.GetService<T>();
+            T result;
+            Type type = FindTypeWithKey(typeof(T), key);
+            if (type == null)
+            {
+                Resolver resolver = FindResolverWithKey(key);
+                result = resolver.serviceProvider.GetService<T>();
+            }
+            else
+            {
+                result = (T)serviceProvider.GetService(type);
+            }
+            return result;
         }
 
         /// <summary>
@@ -286,11 +299,24 @@ namespace Topelab.Core.Resolver.Microsoft
             return resolver.serviceFactory.Create<T>(arg1, arg2, arg3, arg4, arg5, arg6);
         }
 
+        private Type FindTypeWithKey(Type typeFrom, string key)
+        {
+            Type result = null;
+            if (namedResolutions.TryGetValue(typeFrom, out var types))
+            {
+                if (types.TryGetValue(key, out var type))
+                {
+                    result = type;
+                }
+            }
+            return result;
+        }
+
         private Resolver FindResolverWithKey(string key)
         {
             var resolver = globalResolvers.ContainsKey(key)
                 ? (Resolver)globalResolvers[key]
-                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.globalResolvers.ContainsKey(key)).FirstOrDefault() ?? 
+                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.globalResolvers.ContainsKey(key)).FirstOrDefault() ??
                     throw new InvalidOperationException($"Registered name {key} not found in any container");
             return resolver;
         }

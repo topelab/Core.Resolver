@@ -6,6 +6,10 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.4.6
+
+- Fix an error on Topelab.Core.Resolver.Microsoft with a trouble in resolving named registration that has to resolve normal registered interfaces
+
 ### 1.4.5
 
 - `ResolverFactory.GetResolver()` will always return first resolver.
