@@ -173,16 +173,16 @@ namespace Topelab.Core.Resolver.Test
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
                 .AddTransient<IClaseTest, SimpleClaseTest>()
-                .AddTransient<IGeremuDbContext, GeremuDbContext>()
+                .AddScoped<IGeremuDbContext, GeremuDbContext>()
                 .AddTransient<IClaseTest, ClaseTest1>("1")
                 .AddTransient<IClaseTest, ClaseTest2>("2")
                 );
 
             // Act
-            var result = resolver.Get<IClaseTest>("2");
+            var result = resolver.Get<IClaseTest>("1");
 
             // Assert
-            Assert.IsTrue(result.GiveMe().StartsWith("ClaseTest2 with"));
+            Assert.IsTrue(result.GiveMe().StartsWith("ClaseTest1 with"));
         }
     }
 }
