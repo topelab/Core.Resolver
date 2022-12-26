@@ -28,6 +28,7 @@ namespace Topelab.Core.Resolver.Unity
             }
 
             Resolver resolver = new(container, constructorsByKey);
+            resolveInfoCollection.InitializeIntializers(resolver);
             rootResolver ??= resolver;
             container.RegisterInstance<IResolver>(resolver);
 

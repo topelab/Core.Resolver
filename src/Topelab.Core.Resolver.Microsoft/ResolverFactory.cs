@@ -63,6 +63,7 @@ namespace Topelab.Core.Resolver.Microsoft
 
             var serviceProvider = collection.BuildServiceProvider();
             Resolver resolver = (Resolver)serviceProvider.GetService<IResolver>();
+            resolveInfoCollection.InitializeIntializers(resolver);
             rootResolver ??= resolver;
             return resolver;
         }

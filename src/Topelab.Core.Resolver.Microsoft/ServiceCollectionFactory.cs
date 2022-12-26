@@ -28,6 +28,8 @@ namespace Topelab.Core.Resolver.Microsoft
             {
                 switch (resolveInfo.ResolveMode)
                 {
+                    case ResolveModeEnum.Initializer:
+                        break;
                     case ResolveModeEnum.Instance:
                         collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.Instance);
                         break;

@@ -184,5 +184,23 @@ namespace Topelab.Core.Resolver.Test
             // Assert
             Assert.IsTrue(result.GiveMe().StartsWith("ClaseTest1 with"));
         }
+
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void InitializeExtensionClasses(ResolverFactoryCase ResolverFactory)
+        {
+            // Arrange
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                .AddInitializer(r => ExtensionsTest.Initialize(r))
+                );
+            var expectedResult = new SimpleClaseTest().GiveMe();
+
+            // Act
+            var result = "tets_".GetInfo();
+
+            // Assert
+            Assert.AreEqual(expectedResult, result);
+
+        }
     }
 }

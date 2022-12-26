@@ -1,5 +1,7 @@
 using Autofac;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Interfaces;
@@ -31,6 +33,7 @@ namespace Topelab.Core.Resolver.Autofac
             builder.RegisterInstance((IResolver)resolver);
             var container = builder.Build();
             resolver.Initialize(container, constructorsByKey);
+            resolveInfoCollection.InitializeIntializers(resolver);
             rootResolver ??= resolver;
             return resolver;
         }

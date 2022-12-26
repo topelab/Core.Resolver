@@ -32,6 +32,8 @@ namespace Topelab.Core.Resolver.Autofac
 
                 switch (resolveInfo.ResolveMode)
                 {
+                    case ResolveModeEnum.Initializer:
+                        break;
                     case ResolveModeEnum.Instance:
                         builder.RegisterInstance(resolveInfo.Instance).As(resolveInfo.TypeFrom);
                         break;
@@ -137,10 +139,12 @@ namespace Topelab.Core.Resolver.Autofac
 
         private static ConstructorInfo GetConstructorInfo(ResolveInfo resolveInfo)
         {
-            return resolveInfo.TypeTo.GetConstructors()
-                .Where(c => c.GetParameters().Length == resolveInfo.ConstructorParamTypes.Length)
-                .Where(c => c.GetParameters().Select(p => p.ParameterType).SequenceEqual(resolveInfo.ConstructorParamTypes))
-                .FirstOrDefault();
+            return resolveInfo.ConstructorParamTypes == null
+                ? null
+                : resolveInfo.TypeTo.GetConstructors()
+                    .Where(c => c.GetParameters().Length == resolveInfo.ConstructorParamTypes.Length)
+                    .Where(c => c.GetParameters().Select(p => p.ParameterType).SequenceEqual(resolveInfo.ConstructorParamTypes))
+                    .FirstOrDefault();
         }
 
     }

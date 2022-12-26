@@ -32,6 +32,8 @@ namespace Topelab.Core.Resolver.Unity
 
                 switch (resolveInfo.ResolveMode)
                 {
+                    case ResolveModeEnum.Initializer:
+                        break;
                     case ResolveModeEnum.Instance:
                         container.RegisterInstance(resolveInfo.TypeFrom, resolveInfo.Instance);
                         break;
@@ -93,10 +95,12 @@ namespace Topelab.Core.Resolver.Unity
 
         private static ConstructorInfo GetConstructorInfo(ResolveInfo resolveInfo)
         {
-            return resolveInfo.TypeTo.GetConstructors()
-                .Where(c => c.GetParameters().Length == resolveInfo.ConstructorParamTypes.Length)
-                .Where(c => c.GetParameters().Select(p => p.ParameterType).SequenceEqual(resolveInfo.ConstructorParamTypes))
-                .FirstOrDefault();
+            return resolveInfo.ConstructorParamTypes == null
+                ? null
+                : resolveInfo.TypeTo.GetConstructors()
+                    .Where(c => c.GetParameters().Length == resolveInfo.ConstructorParamTypes.Length)
+                    .Where(c => c.GetParameters().Select(p => p.ParameterType).SequenceEqual(resolveInfo.ConstructorParamTypes))
+                    .FirstOrDefault();
         }
 
     }

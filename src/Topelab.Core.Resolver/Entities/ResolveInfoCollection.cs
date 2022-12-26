@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Topelab.Core.Resolver.Enums;
 using Topelab.Core.Resolver.Interfaces;
 
@@ -298,5 +299,32 @@ namespace Topelab.Core.Resolver.Entities
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection AddSelf<TTo>(ResolveLifeCycleEnum resolveType, string key, params Type[] constructorParamTypes)
             => Add(typeof(TTo), typeof(TTo), resolveType, key, constructorParamTypes);
+
+        /// <summary>
+        /// Add initializer that will be called when a resolver instance is created
+        /// </summary>
+        /// <typeparam name="TFrom">Type implementation (like an extension)</typeparam>
+        /// <param name="initializer">Initializer action with resolver as  param</param>
+        public ResolveInfoCollection AddInitializer(Action<IResolver> initializer)
+        {
+            ResolveInfo resolveInfo = new(typeof(object), typeof(object), ResolveModeEnum.Initializer, ResolveLifeCycleEnum.Singleton) { Instance = initializer };
+            Add(resolveInfo);
+            return this;
+        }
+
+        /// <summary>
+        /// Initialize all registered initializers
+        /// </summary>
+        /// <param name="resolver">Resolver</param>
+        public void InitializeIntializers(IResolver resolver)
+        {
+            foreach (var resolveInfo in this.Where(r => r.ResolveMode == ResolveModeEnum.Initializer))
+            {
+                if (resolveInfo.Instance is Action<IResolver> initializer)
+                {
+                    initializer(resolver);
+                }
+            }
+        }
     }
 }

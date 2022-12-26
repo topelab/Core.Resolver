@@ -6,6 +6,10 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.4.8
+
+- New method for `ResolveInfoCollection`: `AddInitializer(Action<IResolver> initializer)`, can be used to initialize some extensions with the recently created `IResolver` so it can be used to resolve needed services.
+
 ### 1.4.7
 
 - Fix an error on Topelab.Core.Resolver.Microsoft with a trouble in resolving named registration that has to resolve normal registered interfaces
