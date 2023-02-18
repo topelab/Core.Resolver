@@ -73,10 +73,9 @@ namespace Topelab.Core.Resolver.Microsoft
         /// </summary>
         public static IResolver GetResolver() => rootResolver;
 
-        private static IResolver GetResolverImpl(IServiceProvider s, IEnumerable<ResolveInfo> resolveInfoCollection, IDictionary<string, IResolver> globalResolvers, Dictionary<Type, Dictionary<string, Type>> namedResolutions)
+        private static IResolver GetResolverImpl(IServiceProvider serviceProvider, IEnumerable<ResolveInfo> resolveInfoCollection, IDictionary<string, IResolver> globalResolvers, Dictionary<Type, Dictionary<string, Type>> namedResolutions)
         {
-            var serviceFactory = s.GetService<IServiceFactory>();
-            var resolver = serviceFactory.Create<IResolver>(s, serviceFactory, DefaultKey, globalResolvers, namedResolutions);
+            var resolver = new Resolver(serviceProvider, DefaultKey, globalResolvers, namedResolutions);
             List<string> otherKeys = resolveInfoCollection.Select(r => r.Key ?? DefaultKey).Where(k => k != DefaultKey).Distinct().ToList();
             otherKeys.ForEach(key => Create(key, resolveInfoCollection, globalResolvers, namedResolutions));
             return resolver;
@@ -88,8 +87,7 @@ namespace Topelab.Core.Resolver.Microsoft
             var collection = ServiceCollectionFactory.Create(resolveInfoCollectionWithKey);
 
             var serviceProvider = collection.BuildServiceProvider();
-            var serviceFactory = serviceProvider.GetService<IServiceFactory>();
-            var resolver = serviceFactory.Create<IResolver>(serviceProvider, serviceFactory, key, globalResolvers, namedResolutions);
+            var resolver = new Resolver(serviceProvider, key, globalResolvers, namedResolutions);
             return resolver;
         }
 

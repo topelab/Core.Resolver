@@ -21,11 +21,12 @@ namespace Topelab.Core.Resolver.Microsoft
         {
             var collection = currentServices ?? new ServiceCollection();
 
-            collection.TryAddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (T, P) => ActivatorUtilities.CreateInstance(provider, T, P)));
             collection.TryAddSingleton<IService<IResolver>, Service<IResolver, Resolver>>();
 
             foreach (var resolveInfo in resolveInfoCollection)
             {
+                collection.AddSingleton(typeof(IService<>).MakeGenericType(resolveInfo.TypeFrom), typeof(Service<,>).MakeGenericType(resolveInfo.TypeFrom, resolveInfo.TypeTo));
+
                 switch (resolveInfo.ResolveMode)
                 {
                     case ResolveModeEnum.Initializer:
@@ -53,11 +54,7 @@ namespace Topelab.Core.Resolver.Microsoft
                         switch (resolveInfo.ResolveLifeCycle)
                         {
                             case ResolveLifeCycleEnum.Singleton:
-                                if (resolveInfo.ConstructorParamTypes.Length > 0)
-                                {
-                                    collection.AddSingleton(typeof(IService<>).MakeGenericType(resolveInfo.TypeFrom), typeof(Service<,>).MakeGenericType(resolveInfo.TypeFrom, resolveInfo.TypeTo));
-                                }
-                                else
+                                if (resolveInfo.ConstructorParamTypes.Length == 0)
                                 {
                                     if (resolveInfo.Key != null)
                                     {
@@ -70,11 +67,7 @@ namespace Topelab.Core.Resolver.Microsoft
                                 }
                                 break;
                             case ResolveLifeCycleEnum.Scoped:
-                                if (resolveInfo.ConstructorParamTypes.Length > 0)
-                                {
-                                    collection.AddScoped(typeof(IService<>).MakeGenericType(resolveInfo.TypeFrom), typeof(Service<,>).MakeGenericType(resolveInfo.TypeFrom, resolveInfo.TypeTo));
-                                }
-                                else
+                                if (resolveInfo.ConstructorParamTypes.Length == 0)
                                 {
                                     if (resolveInfo.Key != null)
                                     {
@@ -87,11 +80,7 @@ namespace Topelab.Core.Resolver.Microsoft
                                 }
                                 break;
                             default:
-                                if (resolveInfo.ConstructorParamTypes.Length > 0)
-                                {
-                                    collection.AddTransient(typeof(IService<>).MakeGenericType(resolveInfo.TypeFrom), typeof(Service<,>).MakeGenericType(resolveInfo.TypeFrom, resolveInfo.TypeTo));
-                                }
-                                else
+                                if (resolveInfo.ConstructorParamTypes.Length == 0)
                                 {
                                     if (resolveInfo.Key != null)
                                     {
