@@ -287,9 +287,9 @@ namespace Topelab.Core.Resolver.Microsoft
 
         private T GetImpl<T>(string key, params object[] args)
         {
-            Resolver resolver = FindResolverWithKey(key);
+            Resolver resolver = FindResolverWithKey(key) ?? FindResolverWithPartialKey(key);
             var lookup = resolver.serviceProvider.GetService<IService<T>>();
-            return (T)ActivatorUtilities.CreateInstance(resolver.serviceProvider, lookup.Type(), args);
+            return (T)ActivatorUtilities.CreateInstance(serviceProvider, lookup.Type(), args);
         }
 
         private Type FindTypeWithKey(Type typeFrom, string key)
@@ -309,9 +309,21 @@ namespace Topelab.Core.Resolver.Microsoft
         {
             var resolver = globalResolvers.ContainsKey(key)
                 ? (Resolver)globalResolvers[key]
-                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.globalResolvers.ContainsKey(key)).FirstOrDefault() ??
-                    throw new InvalidOperationException($"Registered name {key} not found in any container");
+                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.globalResolvers.ContainsKey(key)).FirstOrDefault();
+
             return resolver;
+        }
+
+        private Resolver FindResolverWithPartialKey(string key)
+        {
+            return resolvers
+                .Reverse<Resolver>()
+                .SelectMany(r => r.globalResolvers)
+                .Where(gr => gr.Key.Split('|').Contains(key))
+                .Select(gr => new { Index = gr.Key.Split('|').Length, Value = (Resolver)gr.Value })
+                .OrderBy(k => k.Index)
+                .Select(k => k.Value)
+                .FirstOrDefault();
         }
     }
 }
