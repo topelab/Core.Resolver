@@ -207,15 +207,16 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
-                .AddTransient<IClaseTest, ClaseTest>(typeof(IGeremuDbContext), typeof(string))
+                .AddTransient<IClaseTest, ClaseTest>(typeof(IGeremuDbContext), typeof(string), typeof(int))
                 .AddTransient<IGeremuDbContext, GeremuDbContext>()
                 );
             var text = "hello";
+            int num = 1;
             var context = resolver.Get<IGeremuDbContext>();
-            var expected = new ClaseTest(context, text).GiveMe();
+            var expected = new ClaseTest(context, text, num).GiveMe();
 
             // Act
-            var result = resolver.Get<IClaseTest, string>(text).GiveMe();
+            var result = resolver.Get<IClaseTest, string, int>(text, num).GiveMe();
 
             // Assert 
             Assert.AreEqual(expected, result);

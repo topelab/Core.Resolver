@@ -319,7 +319,7 @@ namespace Topelab.Core.Resolver.Microsoft
             return resolvers
                 .Reverse<Resolver>()
                 .SelectMany(r => r.globalResolvers)
-                .Where(gr => gr.Key.Split('|').Contains(key))
+                .Where(gr => $"|{gr.Key}|".Contains(key))
                 .Select(gr => new { Index = gr.Key.Split('|').Length, Value = (Resolver)gr.Value })
                 .OrderBy(k => k.Index)
                 .Select(k => k.Value)

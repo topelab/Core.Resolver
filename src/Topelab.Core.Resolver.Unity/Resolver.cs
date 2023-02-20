@@ -172,26 +172,10 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="arg1">Param 1 for constructor</param>
         public T Get<T, T1>(string key, T1 arg1)
         {
-            Resolver resolver;
-            string[] parameters = new string[0];
+            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T), key);
 
-            var container = FindContainerWithKey(typeof(T), key);
-            if (container == null)
-            {
-                var resolverDTO = GetParametersWithThisSubKey(key);
-                resolver = resolverDTO.Resolver;
-                container = resolver.container;
-                key = resolverDTO.Key;
-                parameters = resolverDTO.Parameters;
-            }
-            else
-            {
-                parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
-            }
-
-            return container.Resolve<T>(key,
-                                        new ParameterOverride(typeof(T1), arg1)
-                                        );
+            return resolver.container.Resolve<T>(key,
+                                                 new ParameterOverride(typeof(T1), arg1));
         }
 
         /// <summary>
@@ -206,12 +190,11 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="arg2">Param 2 for constructor</param>
         public T Get<T, T1, T2>(string key, T1 arg1, T2 arg2)
         {
-            var container = FindContainerWithKey(typeof(T), key);
-            var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
-            return container.Resolve<T>(key,
-                                        new ParameterOverride(typeof(T1), parameters[0], arg1),
-                                        new ParameterOverride(typeof(T2), parameters[1], arg2)
-                                        );
+            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T), key);
+
+            return resolver.container.Resolve<T>(key,
+                                                 new ParameterOverride(typeof(T1), parameters[0], arg1),
+                                                 new ParameterOverride(typeof(T2), parameters[1], arg2));
         }
 
         /// <summary>
@@ -228,13 +211,12 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="arg3">Param 3 for constructor</param>
         public T Get<T, T1, T2, T3>(string key, T1 arg1, T2 arg2, T3 arg3)
         {
-            var container = FindContainerWithKey(typeof(T), key);
-            var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
-            return container.Resolve<T>(key,
-                                        new ParameterOverride(typeof(T1), parameters[0], arg1),
-                                        new ParameterOverride(typeof(T2), parameters[1], arg2),
-                                        new ParameterOverride(typeof(T3), parameters[2], arg3)
-                                        );
+            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T), key);
+
+            return resolver.container.Resolve<T>(key,
+                                                 new ParameterOverride(typeof(T1), parameters[0], arg1),
+                                                 new ParameterOverride(typeof(T2), parameters[1], arg2),
+                                                 new ParameterOverride(typeof(T3), parameters[2], arg3));
         }
 
         /// <summary>
@@ -253,14 +235,13 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="arg4">Param 4 for constructor</param>
         public T Get<T, T1, T2, T3, T4>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            var container = FindContainerWithKey(typeof(T), key);
-            var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
-            return container.Resolve<T>(key,
-                                        new ParameterOverride(typeof(T1), parameters[0], arg1),
-                                        new ParameterOverride(typeof(T2), parameters[1], arg2),
-                                        new ParameterOverride(typeof(T3), parameters[2], arg3),
-                                        new ParameterOverride(typeof(T4), parameters[3], arg4)
-                                        );
+            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T), key);
+
+            return resolver.container.Resolve<T>(key,
+                                                 new ParameterOverride(typeof(T1), parameters[0], arg1),
+                                                 new ParameterOverride(typeof(T2), parameters[1], arg2),
+                                                 new ParameterOverride(typeof(T3), parameters[2], arg3),
+                                                 new ParameterOverride(typeof(T4), parameters[3], arg4));
         }
 
         /// <summary>
@@ -281,15 +262,14 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="arg5">Param 5 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
-            var container = FindContainerWithKey(typeof(T), key);
-            var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
-            return container.Resolve<T>(key,
-                                        new ParameterOverride(typeof(T1), parameters[0], arg1),
-                                        new ParameterOverride(typeof(T2), parameters[1], arg2),
-                                        new ParameterOverride(typeof(T3), parameters[2], arg3),
-                                        new ParameterOverride(typeof(T4), parameters[3], arg4),
-                                        new ParameterOverride(typeof(T5), parameters[4], arg5)
-                                        );
+            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T), key);
+
+            return resolver.container.Resolve<T>(key,
+                                                 new ParameterOverride(typeof(T1), parameters[0], arg1),
+                                                 new ParameterOverride(typeof(T2), parameters[1], arg2),
+                                                 new ParameterOverride(typeof(T3), parameters[2], arg3),
+                                                 new ParameterOverride(typeof(T4), parameters[3], arg4),
+                                                 new ParameterOverride(typeof(T5), parameters[4], arg5));
         }
 
         /// <summary>
@@ -312,50 +292,46 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="arg6">Param 6 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5, T6>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
-            Resolver resolver;
-            string[] parameters = new string[0];
+            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T),key);
 
-            var container = FindContainerWithKey(typeof(T), key);
+            return resolver.container.Resolve<T>(key,
+                                                 new ParameterOverride(typeof(T1), parameters[0], arg1),
+                                                 new ParameterOverride(typeof(T2), parameters[1], arg2),
+                                                 new ParameterOverride(typeof(T3), parameters[2], arg3),
+                                                 new ParameterOverride(typeof(T4), parameters[3], arg4),
+                                                 new ParameterOverride(typeof(T5), parameters[4], arg5),
+                                                 new ParameterOverride(typeof(T6), parameters[5], arg6));
+        }
+
+        private (Resolver Resolver, string[] Parameters, string Key) GetParametersWithThisSubKey(Type type, string key)
+        {
+            var resultKey = key;
+            var resultResolver = this;
+            var resultParameters = Array.Empty<string>();
+
+            var container = FindContainerWithKey(type, key);
+
             if (container == null)
             {
-                var resolverDTO = GetParametersWithThisSubKey(key);
-                resolver = resolverDTO.Resolver;
-                container = resolver.container;
-                key = resolverDTO.Key;
-                parameters = resolverDTO.Parameters;
+                foreach (var resolver in resolvers.Reverse<Resolver>())
+                {
+                    var keys = resolver.constructorsByKey.Keys.Where(k => $"|{k}|".Contains(key));
+                    if (keys.Any())
+                    {
+                        resultKey = keys.OrderBy(k => k.Split('|').Length).First();
+                        resultResolver = resolver;
+                        break;
+                    }
+                }
+                var originalKeys = $"|{key}|";
+                resultParameters = resultResolver.constructorsByKey[resultKey].GetParameters().Where(p => originalKeys.Contains(p.ParameterType.Name)).Select(p => p.Name).ToArray();
             }
             else
             {
-                parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
+                resultParameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
             }
 
-            return container.Resolve<T>(key,
-                                        new ParameterOverride(typeof(T1), parameters[0], arg1),
-                                        new ParameterOverride(typeof(T2), parameters[1], arg2),
-                                        new ParameterOverride(typeof(T3), parameters[2], arg3),
-                                        new ParameterOverride(typeof(T4), parameters[3], arg4),
-                                        new ParameterOverride(typeof(T5), parameters[4], arg5),
-                                        new ParameterOverride(typeof(T6), parameters[5], arg6)
-                                        );
-        }
-
-        private ResolverDTO GetParametersWithThisSubKey(string key)
-        {
-            string result = null;
-            Resolver resolver = null;
-            foreach (var r in resolvers)
-            {
-                var keys = r.constructorsByKey.Keys.Where(k => k.Split('|').Contains(key));
-                if (keys.Any())
-                {
-                    result = keys.OrderBy(k => k.Split('|').Length).First();
-                    resolver = r;
-                    break;
-                }
-            }
-            var originalKeys = key.Split('|');
-            var parameters = resolver.constructorsByKey[result].GetParameters().Where(p => originalKeys.Contains(p.ParameterType.Name)).Select(p => p.Name).ToArray();
-            return new ResolverDTO(resolver, parameters, result);
+            return (resultResolver, resultParameters, resultKey);
         }
 
         private IUnityContainer FindContainerWithKey(Type type, string key)
