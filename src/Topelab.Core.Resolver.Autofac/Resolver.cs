@@ -292,8 +292,8 @@ namespace Topelab.Core.Resolver.Autofac
         {
             var result = container.IsRegisteredWithName(key, type)
                 ? container
-                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.container.IsRegisteredWithName(key, type)).Select(r => r.container).FirstOrDefault() ??
-                    throw new InvalidOperationException($"Registered name {key} not found in any container");
+                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.container.IsRegisteredWithName(key, type)).Select(r => r.container).FirstOrDefault();
+
             return result;
         }
 

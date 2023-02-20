@@ -191,7 +191,7 @@ namespace Topelab.Core.Resolver.Test
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
                 .AddTransient<IClaseTest, SimpleClaseTest>()
-                .AddInitializer(r => ExtensionsTest.Initialize(r))
+                .AddInitializer(ExtensionsTest.Initialize)
                 );
             var expectedResult = new SimpleClaseTest().GiveMe();
 
