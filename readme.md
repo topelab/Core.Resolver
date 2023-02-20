@@ -6,6 +6,24 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.4.9
+
+- Unified Resolver.Get<> with parameters. Fixed getting instance with constructor parameters not passed that are resolved on the fly.
+
+    ```cs
+    // Register with witch constructor you want to resolve instance
+    // IClasTest will resolve instance using constructor ClaseTest(IGeremuDbContext context, string text, int number)
+
+    var resolver = ResolverFactory.Create(new ResolveInfoCollection()
+        .AddTransient<IClaseTest, ClaseTest>(typeof(IGeremuDbContext), typeof(string), typeof(int))
+        .AddTransient<IGeremuDbContext, GeremuDbContext>()
+        );
+
+    // And with this version you can resolve only passing certain parameters
+
+    var claseTest = resolver.Get<IClaseTest, string, int>("hello", 1);
+    ```
+
 ### 1.4.8
 
 - New method for `ResolveInfoCollection`: `AddInitializer(Action<IResolver> initializer)`, can be used to initialize some extensions with the recently created `IResolver` so it can be used to resolve needed services.

@@ -13,7 +13,6 @@ namespace Topelab.Core.Resolver.Microsoft
     public class Resolver : IResolver
     {
         private readonly IServiceProvider serviceProvider;
-        private readonly IServiceFactory serviceFactory;
         private readonly IDictionary<string, IResolver> globalResolvers;
         private readonly Dictionary<Type, Dictionary<string, Type>> namedResolutions;
 
@@ -23,14 +22,12 @@ namespace Topelab.Core.Resolver.Microsoft
         /// Constructor
         /// </summary>
         /// <param name="serviceProvider">Service provider</param>
-        /// <param name="serviceFactory">Service factory</param>
         /// <param name="key">Key to have different resolvers</param>
         /// <param name="globalResolvers">Global resolvers indexed by key</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public Resolver(IServiceProvider serviceProvider, IServiceFactory serviceFactory, string key, IDictionary<string, IResolver> globalResolvers, Dictionary<Type, Dictionary<string, Type>> namedResolutions)
+        public Resolver(IServiceProvider serviceProvider, string key, IDictionary<string, IResolver> globalResolvers, Dictionary<Type, Dictionary<string, Type>> namedResolutions)
         {
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-            this.serviceFactory = serviceFactory ?? throw new ArgumentNullException(nameof(serviceFactory));
             this.globalResolvers = globalResolvers ?? throw new ArgumentNullException(nameof(globalResolvers));
             this.namedResolutions = namedResolutions ?? throw new ArgumentNullException(nameof(namedResolutions));
             this.globalResolvers[key] = this;
@@ -43,18 +40,13 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <typeparam name="T">Type to resolve</typeparam>
         public T Get<T>()
         {
-            var result = serviceProvider.GetService<T>();
-            if (result == null)
-            {
-                foreach (var resolver in resolvers.Reverse<Resolver>().Where(r => !r.Equals(this)))
-                {
-                    result = resolver.serviceProvider.GetService<T>();
-                    if (result != null)
-                    {
-                        break;
-                    }
-                }
-            }
+            var result = serviceProvider.GetService<T>() ??
+                resolvers
+                    .Where(r => !r.Equals(this))
+                    .Reverse()
+                    .Select(r => r.serviceProvider.GetService<T>())
+                    .FirstOrDefault(r => r != null);
+
             return result;
         }
 
@@ -195,8 +187,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg1">Param 1 for constructor</param>
         public T Get<T, T1>(string key, T1 arg1)
         {
-            Resolver resolver = FindResolverWithKey(key);
-            return resolver.serviceFactory.Create<T>(arg1);
+            return GetImpl<T>(key, arg1);
         }
 
         /// <summary>
@@ -211,8 +202,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg2">Param 2 for constructor</param>
         public T Get<T, T1, T2>(string key, T1 arg1, T2 arg2)
         {
-            Resolver resolver = FindResolverWithKey(key);
-            return resolver.serviceFactory.Create<T>(arg1, arg2);
+            return GetImpl<T>(key, arg1, arg2);
         }
 
         /// <summary>
@@ -229,8 +219,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg3">Param 3 for constructor</param>
         public T Get<T, T1, T2, T3>(string key, T1 arg1, T2 arg2, T3 arg3)
         {
-            Resolver resolver = FindResolverWithKey(key);
-            return resolver.serviceFactory.Create<T>(arg1, arg2, arg3);
+            return GetImpl<T>(key, arg1, arg2, arg3);
         }
 
         /// <summary>
@@ -249,8 +238,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg4">Param 4 for constructor</param>
         public T Get<T, T1, T2, T3, T4>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            Resolver resolver = FindResolverWithKey(key);
-            return resolver.serviceFactory.Create<T>(arg1, arg2, arg3, arg4);
+            return GetImpl<T>(key, arg1, arg2, arg3, arg4);
         }
 
         /// <summary>
@@ -271,8 +259,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg5">Param 5 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
-            Resolver resolver = FindResolverWithKey(key);
-            return resolver.serviceFactory.Create<T>(arg1, arg2, arg3, arg4, arg5);
+            return GetImpl<T>(key, arg1, arg2, arg3, arg4, arg5);
         }
 
         /// <summary>
@@ -295,8 +282,14 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg6">Param 6 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5, T6>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
-            Resolver resolver = FindResolverWithKey(key);
-            return resolver.serviceFactory.Create<T>(arg1, arg2, arg3, arg4, arg5, arg6);
+            return GetImpl<T>(key, arg1, arg2, arg3, arg4, arg5, arg6);
+        }
+
+        private T GetImpl<T>(string key, params object[] args)
+        {
+            Resolver resolver = FindResolverWithKey(key) ?? FindResolverWithPartialKey(key);
+            var lookup = resolver.serviceProvider.GetService<IService<T>>();
+            return (T)ActivatorUtilities.CreateInstance(serviceProvider, lookup.Type(), args);
         }
 
         private Type FindTypeWithKey(Type typeFrom, string key)
@@ -316,9 +309,21 @@ namespace Topelab.Core.Resolver.Microsoft
         {
             var resolver = globalResolvers.ContainsKey(key)
                 ? (Resolver)globalResolvers[key]
-                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.globalResolvers.ContainsKey(key)).FirstOrDefault() ??
-                    throw new InvalidOperationException($"Registered name {key} not found in any container");
+                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.globalResolvers.ContainsKey(key)).FirstOrDefault();
+
             return resolver;
+        }
+
+        private Resolver FindResolverWithPartialKey(string key)
+        {
+            return resolvers
+                .Reverse<Resolver>()
+                .SelectMany(r => r.globalResolvers)
+                .Where(gr => $"|{gr.Key}|".Contains(key))
+                .Select(gr => new { Index = gr.Key.Split('|').Length, Value = (Resolver)gr.Value })
+                .OrderBy(k => k.Index)
+                .Select(k => k.Value)
+                .FirstOrDefault();
         }
     }
 }

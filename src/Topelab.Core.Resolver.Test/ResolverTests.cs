@@ -191,7 +191,7 @@ namespace Topelab.Core.Resolver.Test
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
                 .AddTransient<IClaseTest, SimpleClaseTest>()
-                .AddInitializer(r => ExtensionsTest.Initialize(r))
+                .AddInitializer(ExtensionsTest.Initialize)
                 );
             var expectedResult = new SimpleClaseTest().GiveMe();
 
@@ -200,7 +200,26 @@ namespace Topelab.Core.Resolver.Test
 
             // Assert
             Assert.AreEqual(expectedResult, result);
+        }
 
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void ResolveNotPassedParameters(ResolverFactoryCase ResolverFactory)
+        {
+            // Arrange
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
+                .AddTransient<IClaseTest, ClaseTest>(typeof(IGeremuDbContext), typeof(string), typeof(int))
+                .AddTransient<IGeremuDbContext, GeremuDbContext>()
+                );
+            var text = "hello";
+            int num = 1;
+            var context = resolver.Get<IGeremuDbContext>();
+            var expected = new ClaseTest(context, text, num).GiveMe();
+
+            // Act
+            var result = resolver.Get<IClaseTest, string, int>(text, num).GiveMe();
+
+            // Assert 
+            Assert.AreEqual(expected, result);
         }
     }
 }

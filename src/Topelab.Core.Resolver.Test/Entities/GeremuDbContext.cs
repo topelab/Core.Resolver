@@ -9,6 +9,11 @@ namespace Topelab.Core.Resolver.Test.Entities
         private readonly IClaseTest claseTest;
         public int Id { get; }
 
+        public GeremuDbContext()
+        {
+
+        }
+
         public GeremuDbContext(IClaseTest claseTest)
         {
             Id = ++id;
@@ -17,7 +22,7 @@ namespace Topelab.Core.Resolver.Test.Entities
 
         public string GiveMe()
         {
-            return $"Hello, I'm instance {Id} with claseTest: {claseTest.GiveMe()}";
+            return $"Hello, I'm instance {Id} with claseTest: {claseTest?.GiveMe()}";
         }
     }
 }

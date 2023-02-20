@@ -152,7 +152,8 @@ namespace Topelab.Core.Resolver.Autofac
         /// <param name="arg1">Param 1 for constructor</param>
         public T Get<T, T1>(string key, T1 arg1)
         {
-            using var scope = FindContainerWithKey(typeof(T), key).BeginLifetimeScope();
+            (var resolver, _, key) = GetParametersWithThisSubKey(typeof(T), key);
+            using var scope = resolver.container.BeginLifetimeScope();
             return scope.ResolveNamed<T>(key,
                                         new TypedParameter(typeof(T1), arg1)
                                         );
@@ -170,8 +171,8 @@ namespace Topelab.Core.Resolver.Autofac
         /// <param name="arg2">Param 2 for constructor</param>
         public T Get<T, T1, T2>(string key, T1 arg1, T2 arg2)
         {
-            var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
-            using var scope = FindContainerWithKey(typeof(T), key).BeginLifetimeScope();
+            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T), key);
+            using var scope = resolver.container.BeginLifetimeScope();
             return scope.ResolveNamed<T>(key,
                                         new NamedParameter(parameters[0], arg1),
                                         new NamedParameter(parameters[1], arg2)
@@ -192,8 +193,8 @@ namespace Topelab.Core.Resolver.Autofac
         /// <param name="arg3">Param 3 for constructor</param>
         public T Get<T, T1, T2, T3>(string key, T1 arg1, T2 arg2, T3 arg3)
         {
-            var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
-            using var scope = FindContainerWithKey(typeof(T), key).BeginLifetimeScope();
+            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T), key);
+            using var scope = resolver.container.BeginLifetimeScope();
             return scope.ResolveNamed<T>(key,
                                         new NamedParameter(parameters[0], arg1),
                                         new NamedParameter(parameters[1], arg2),
@@ -217,8 +218,8 @@ namespace Topelab.Core.Resolver.Autofac
         /// <param name="arg4">Param 4 for constructor</param>
         public T Get<T, T1, T2, T3, T4>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
-            using var scope = FindContainerWithKey(typeof(T), key).BeginLifetimeScope();
+            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T), key);
+            using var scope = resolver.container.BeginLifetimeScope();
             return scope.ResolveNamed<T>(key,
                                         new NamedParameter(parameters[0], arg1),
                                         new NamedParameter(parameters[1], arg2),
@@ -245,8 +246,8 @@ namespace Topelab.Core.Resolver.Autofac
         /// <param name="arg5">Param 5 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
-            var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
-            using var scope = FindContainerWithKey(typeof(T), key).BeginLifetimeScope();
+            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T), key);
+            using var scope = resolver.container.BeginLifetimeScope();
             return scope.ResolveNamed<T>(key,
                                         new NamedParameter(parameters[0], arg1),
                                         new NamedParameter(parameters[1], arg2),
@@ -276,8 +277,8 @@ namespace Topelab.Core.Resolver.Autofac
         /// <param name="arg6">Param 6 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5, T6>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
-            var parameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
-            using var scope = FindContainerWithKey(typeof(T), key).BeginLifetimeScope();
+            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T), key);
+            using var scope = resolver.container.BeginLifetimeScope();
             return scope.ResolveNamed<T>(key,
                                         new NamedParameter(parameters[0], arg1),
                                         new NamedParameter(parameters[1], arg2),
@@ -288,12 +289,44 @@ namespace Topelab.Core.Resolver.Autofac
                                         );
         }
 
+        private (Resolver Resolver, string[] Parameters, string Key) GetParametersWithThisSubKey(Type type, string key)
+        {
+            var resultKey = key;
+            var resultResolver = this;
+            var resultParameters = Array.Empty<string>();
+
+            var container = FindContainerWithKey(type, key);
+
+            if (container == null)
+            {
+                foreach (var resolver in resolvers.Reverse<Resolver>())
+                {
+                    var keys = resolver.constructorsByKey.Keys.Where(k => $"|{k}|".Contains(key));
+                    if (keys.Any())
+                    {
+                        resultKey = keys.OrderBy(k => k.Split('|').Length).First();
+                        resultResolver = resolver;
+                        break;
+                    }
+                }
+                var originalKeys = $"|{key}|";
+                resultParameters = resultResolver.constructorsByKey[resultKey].GetParameters().Where(p => originalKeys.Contains(p.ParameterType.Name)).Select(p => p.Name).ToArray();
+            }
+            else
+            {
+                resultParameters = constructorsByKey[key].GetParameters().Select(p => p.Name).ToArray();
+            }
+
+            return (resultResolver, resultParameters, resultKey);
+        }
+
+
         private IContainer FindContainerWithKey(Type type, string key)
         {
             var result = container.IsRegisteredWithName(key, type)
                 ? container
-                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.container.IsRegisteredWithName(key, type)).Select(r => r.container).FirstOrDefault() ??
-                    throw new InvalidOperationException($"Registered name {key} not found in any container");
+                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.container.IsRegisteredWithName(key, type)).Select(r => r.container).FirstOrDefault();
+
             return result;
         }
 
