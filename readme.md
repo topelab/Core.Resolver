@@ -6,6 +6,11 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.4.10
+
+- Upgrade Microsoft.Extensions.Hosting to 7.0.1
+- Upgrade Microsoft.NET.Test.Sdk to 17.5.0
+
 ### 1.4.9
 
 - Unified Resolver.Get<> with parameters. Fixed getting instance with constructor parameters not passed that are resolved on the fly.
