@@ -6,6 +6,10 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.4.12
+
+- Upgrade Microsoft.NET.Test.Sdk to 17.6.0
+
 ### 1.4.10
 
 - Upgrade Microsoft.Extensions.Hosting to 7.0.1
