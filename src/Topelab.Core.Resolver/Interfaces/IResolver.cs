@@ -1,3 +1,5 @@
+using System;
+
 namespace Topelab.Core.Resolver.Interfaces
 {
     /// <summary>
@@ -5,6 +7,12 @@ namespace Topelab.Core.Resolver.Interfaces
     /// </summary>
     public interface IResolver
     {
+        /// <summary>
+        /// Resolve an instance of type <paramref name="type"/>
+        /// </summary>
+        /// <param name="type">Type of instance to resolve</param>
+        object Get(Type type);
+
         /// <summary>
         /// Resolve an instance of type <typeparamref name="T"/>
         /// </summary>
@@ -102,6 +110,13 @@ namespace Topelab.Core.Resolver.Interfaces
         T Get<T>(string key);
 
         /// <summary>
+        /// Resolve a named instance of type <paramref name="typeFrom"/>
+        /// </summary>
+        /// <param name="typeFrom">Type to resolve</param>
+        /// <param name="key">Key name to resolve</param>
+        object Get(Type typeFrom, string key);
+
+        /// <summary>
         /// Resolve a named instance of type <typeparamref name="T"/> using constructor with param type <typeparamref name="T1"/>
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
@@ -135,6 +150,7 @@ namespace Topelab.Core.Resolver.Interfaces
         /// <param name="arg2">Param 2 for constructor</param>
         /// <param name="arg3">Param 3 for constructor</param>
         T Get<T, T1, T2, T3>(string key, T1 arg1, T2 arg2, T3 arg3);
+
         /// <summary>
         /// Resolve a named instance of type <typeparamref name="T"/> using constructor with param types <typeparamref name="T1"/>, 
         /// <typeparamref name="T2"/>, <typeparamref name="T3"/> and <typeparamref name="T4"/>
@@ -188,5 +204,20 @@ namespace Topelab.Core.Resolver.Interfaces
         /// <param name="arg5">Param 5 for constructor</param>
         /// <param name="arg6">Param 6 for constructor</param>
         T Get<T, T1, T2, T3, T4, T5, T6>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
+
+        /// <summary>
+        /// Resolve an instance of type <typeparamref name="T"/> using constructor params array <paramref name="args"/>
+        /// </summary>
+        /// <typeparam name="T">Type of instance to get</typeparam>
+        /// <param name="args">Params used to construct instance</param>
+        T Get<T>(params object[] args);
+
+        /// <summary>
+        /// Resolve a named instance of type <typeparamref name="T"/> using constructor params array <paramref name="args"/>
+        /// </summary>
+        /// <param name="key">Key name to resolve</param>
+        /// <typeparam name="T">Type of instance to get</typeparam>
+        /// <param name="args">Params used to construct instance</param>
+        T Get<T>(string key, params object[] args);
     }
 }

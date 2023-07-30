@@ -6,6 +6,12 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.4.15
+
+- Added new methods to `IResolver`:
+    - `object Get(Type type)`
+    - `object Get(Type typeFrom, string key)`
+
 ### 1.4.12
 
 - Upgrade Microsoft.NET.Test.Sdk to 17.6.0

@@ -23,6 +23,21 @@ namespace Topelab.Core.Resolver.Autofac
             this.constructorsByKey = constructorsByKey ?? throw new ArgumentNullException(nameof(constructorsByKey));
             resolvers.Add(this);
         }
+
+        /// <summary>
+        /// Resolve an instance of type <paramref name="type"/>
+        /// </summary>
+        /// <param name="type">Type of instance to resolve</param>
+        public object Get(Type type)
+        {
+            if (container.IsRegistered(type))
+            {
+                return Resolve(container, type);
+            }
+            var resolver = resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.container.IsRegistered(type)).FirstOrDefault();
+            return resolver == null ? default : Resolve(resolver.container, type);
+        }
+
         /// <summary>
         /// Resolve an instance of type <typeparamref name="T"/>
         /// </summary>
@@ -41,6 +56,12 @@ namespace Topelab.Core.Resolver.Autofac
         {
             using var scope = container.BeginLifetimeScope();
             return scope.Resolve<T>();
+        }
+
+        private object Resolve(IContainer container, Type type)
+        {
+            using var scope = container.BeginLifetimeScope();
+            return scope.Resolve(type);
         }
 
         /// <summary>
@@ -137,10 +158,17 @@ namespace Topelab.Core.Resolver.Autofac
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
         /// <param name="key">Key name to resolve</param>
-        public T Get<T>(string key)
+        public T Get<T>(string key) => (T)Get(typeof(T), key);
+
+        /// <summary>
+        /// Resolve a named instance of type <paramref name="typeFrom"/>
+        /// </summary>
+        /// <param name="typeFrom">Type to resolve</param>
+        /// <param name="key">Key name to resolve</param>
+        public object Get(Type typeFrom, string key)
         {
-            using var scope = FindContainerWithKey(typeof(T), key).BeginLifetimeScope();
-            return scope.ResolveNamed<T>(key);
+            using var scope = FindContainerWithKey(typeFrom, key).BeginLifetimeScope();
+            return scope.ResolveNamed(key, typeFrom);
         }
 
         /// <summary>
@@ -289,6 +317,36 @@ namespace Topelab.Core.Resolver.Autofac
                                         );
         }
 
+        /// <summary>
+        /// Resolve an instance of type <typeparamref name="T"/> using constructor params array <paramref name="args"/>
+        /// </summary>
+        /// <typeparam name="T">Type of instance to get</typeparam>
+        /// <param name="args">Params used to construct instance</param>
+        public T Get<T>(params object[] args)
+        {
+            var types = args.Select(a => a.GetType()).ToArray();
+            var key = ResolverKeyFactory.Create(types);
+            return Get<T>(key, args);
+        }
+
+        /// <summary>
+        /// Resolve a named instance of type <typeparamref name="T"/> using constructor params array <paramref name="args"/>
+        /// </summary>
+        /// <param name="key">Key name to resolve</param>
+        /// <typeparam name="T">Type of instance to get</typeparam>
+        /// <param name="args">Params used to construct instance</param>
+        public T Get<T>(string key, params object[] args)
+        {
+            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T), key);
+            using var scope = resolver.container.BeginLifetimeScope();
+            List<NamedParameter> namedParameters = new List<NamedParameter>();
+            for (int i = 0; i < args.Length; i++)
+            {
+                namedParameters.Add(new NamedParameter(parameters[i], args[i]));
+            }
+            return scope.ResolveNamed<T>(key, namedParameters);
+        }
+
         private (Resolver Resolver, string[] Parameters, string Key) GetParametersWithThisSubKey(Type type, string key)
         {
             var resultKey = key;
@@ -329,6 +387,5 @@ namespace Topelab.Core.Resolver.Autofac
 
             return result;
         }
-
     }
 }

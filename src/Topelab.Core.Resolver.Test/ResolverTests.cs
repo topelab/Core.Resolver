@@ -26,6 +26,21 @@ namespace Topelab.Core.Resolver.Test
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void GetSimple_NotGeneric(ResolverFactoryCase ResolverFactory)
+        {
+            // Arrange
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                );
+
+            // Act
+            var result = (IClaseTest)resolver.Get(typeof(IClaseTest));
+
+            // Assert
+            Assert.AreEqual(new SimpleClaseTest().GiveMe(), result.GiveMe());
+        }
+
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
         public void GetSimpleWithNames(ResolverFactoryCase ResolverFactory)
         {
             // Arrange
@@ -36,6 +51,23 @@ namespace Topelab.Core.Resolver.Test
 
             // Act
             var result = resolver.Get<IClaseTest>();
+            var result2 = resolver.Get<IClaseTest>(nameof(SimpleClaseTest2));
+
+            // Assert
+            Assert.AreNotEqual(result, result2);
+        }
+
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void GetSimpleWithNames_NotGeneric(ResolverFactoryCase ResolverFactory)
+        {
+            // Arrange
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
+                );
+
+            // Act
+            var result = (IClaseTest)resolver.Get(typeof(IClaseTest));
             var result2 = resolver.Get<IClaseTest>(nameof(SimpleClaseTest2));
 
             // Assert
