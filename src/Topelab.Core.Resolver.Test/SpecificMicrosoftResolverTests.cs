@@ -32,8 +32,8 @@ namespace Topelab.Core.Resolver.Test
             var resultDos = resolver.Get<IClaseTest>("dos");
 
             // Assert
-            Assert.AreEqual(goodResult.GiveMe(), result.GiveMe());
-            Assert.AreEqual(goodResultDos.GiveMe(), resultDos.GiveMe());
+            Assert.That(goodResult.GiveMe(), Is.EqualTo(result.GiveMe()));
+            Assert.That(goodResultDos.GiveMe(), Is.EqualTo(resultDos.GiveMe()));
         }
 
         [Test]
@@ -54,10 +54,10 @@ namespace Topelab.Core.Resolver.Test
             var resolver = provider.GetService<IResolver>();
 
             // Assert
-            Assert.NotNull(resolver);
-            Assert.AreSame(resolver.Get<IClaseTest>(), provider.GetService<IClaseTest>());
-            Assert.AreEqual(resolver.Get<IGeremuDbContext>().Id, provider.GetService<IGeremuDbContext>().Id);
-            Assert.NotNull(resolver.Get<IClaseTest2>());
+            Assert.That(resolver, Is.Not.Null);
+            Assert.That(resolver.Get<IClaseTest>(), Is.EqualTo(provider.GetService<IClaseTest>()));
+            Assert.That(resolver.Get<IGeremuDbContext>().Id, Is.EqualTo(provider.GetService<IGeremuDbContext>().Id));
+            Assert.That(resolver.Get<IClaseTest2>(), Is.Not.Null);
         }
 
     }

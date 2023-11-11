@@ -23,7 +23,7 @@ namespace Topelab.Core.Resolver.Test
             var result = resolver.Get<IClaseTest>();
 
             // Assert
-            Assert.AreEqual(new SimpleClaseTest().GiveMe(), result.GiveMe());
+            Assert.That(new SimpleClaseTest().GiveMe(), Is.EqualTo(result.GiveMe()));
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
@@ -42,7 +42,7 @@ namespace Topelab.Core.Resolver.Test
             var result = resolver2.Get<IClaseTest>();
 
             // Assert
-            Assert.AreEqual(new SimpleClaseTest().GiveMe(), result.GiveMe());
+            Assert.That(new SimpleClaseTest().GiveMe(), Is.EqualTo(result.GiveMe()));
         }
 
     }
