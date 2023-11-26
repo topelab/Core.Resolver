@@ -6,6 +6,11 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.5.1
+
+- Upgrade to .NET 8.0
+- Possibility to use `Resolve<T>()`, `Resolve<T>(params)`, `Resolve<T>(key)` or `Resolve<T>(key, params)` if define `global using static Topelab.Core.Resolver.(Autofact | Microsoft | Unity).ResolverFactory`
+
 ### 1.4.15
 
 - Added new methods to `IResolver`:

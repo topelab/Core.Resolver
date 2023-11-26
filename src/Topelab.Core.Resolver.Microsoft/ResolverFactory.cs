@@ -73,6 +73,34 @@ namespace Topelab.Core.Resolver.Microsoft
         /// </summary>
         public static IResolver GetResolver() => rootResolver;
 
+        /// <summary>
+        /// Resolve type <typeparamref name="T"/>
+        /// </summary>
+        /// <typeparam name="T">Type to resolve</typeparam>
+        public static T Resolve<T>() where T : class => rootResolver.Get<T>();
+
+        /// <summary>
+        /// Resolve type <typeparamref name="T"/> using key and params
+        /// </summary>
+        /// <typeparam name="T">Type to resolve</typeparam>
+        /// <param name="args">Params to ctor</param>
+        public static T Resolve<T>(params object[] args) where T : class => rootResolver.Get<T>(args);
+
+        /// <summary>
+        /// Resolve type <typeparamref name="T"/> using key
+        /// </summary>
+        /// <typeparam name="T">Type to resolve</typeparam>
+        /// <param name="key">Key to resolve</param>
+        public static T Resolve<T>(string key) where T : class => rootResolver.Get<T>(key);
+
+        /// <summary>
+        /// Resolve type <typeparamref name="T"/> using key and params
+        /// </summary>
+        /// <typeparam name="T">Type to resolve</typeparam>
+        /// <param name="key">Key to resolve</param>
+        /// <param name="args">Params to ctor</param>
+        public static T Resolve<T>(string key, params object[] args) where T : class => rootResolver.Get<T>(key, args);
+
         private static IResolver GetResolverImpl(IServiceProvider serviceProvider, IEnumerable<ResolveInfo> resolveInfoCollection, IDictionary<string, IResolver> globalResolvers, Dictionary<Type, Dictionary<string, Type>> namedResolutions)
         {
             var resolver = new Resolver(serviceProvider, DefaultKey, globalResolvers, namedResolutions);
