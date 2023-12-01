@@ -6,6 +6,10 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.5.2
+
+- Added `AddLazyTransient<TFrom, TTo>()` to `ResolveInfoCollection` so you can use in constructor `Lazy<TFrom> lazyTypeToResove`
+
 ### 1.5.1
 
 - Upgrade to .NET 8.0

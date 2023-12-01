@@ -100,10 +100,37 @@ namespace Topelab.Core.Resolver.Entities
         /// </summary>
         /// <typeparam name="TFrom">Type from (Interface)</typeparam>
         /// <typeparam name="TTo">Type to (Implementation)</typeparam>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        public ResolveInfoCollection AddLazyTransient<TFrom, TTo>(params Type[] constructorParamTypes)
+        {
+            Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Transient, null, constructorParamTypes);
+            AddFactory(r => new Lazy<TFrom>(() => r.Get<TFrom>()), ResolveLifeCycleEnum.Transient);
+            return this;
+        }
+
+        /// <summary>
+        /// Add type from, type to, and optionally, constructor param types for type <typeparamref name="TTo"/>
+        /// </summary>
+        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
+        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
         /// <param name="key">Key to resolve</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection AddTransient<TFrom, TTo>(string key, params Type[] constructorParamTypes)
             => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Transient, key, constructorParamTypes);
+
+        /// <summary>
+        /// Add type from, type to, and optionally, constructor param types for type <typeparamref name="TTo"/>
+        /// </summary>
+        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
+        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
+        /// <param name="key">Key to resolve</param>
+        /// <param name="constructorParamTypes">Constructor param types</param>
+        public ResolveInfoCollection AddLazyTransient<TFrom, TTo>(string key, params Type[] constructorParamTypes)
+        {
+            Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Transient, key, constructorParamTypes);
+            AddFactory(key, r => new Lazy<TFrom>(() => r.Get<TFrom>()), ResolveLifeCycleEnum.Transient);
+            return this;
+        }
 
         /// <summary>
         /// Add types from with instance
