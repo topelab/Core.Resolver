@@ -6,9 +6,9 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
-### 1.5.2
+### 1.5.3
 
-- Added `AddLazyTransient<TFrom, TTo>()` to `ResolveInfoCollection` so you can use in constructor `Lazy<TFrom> lazyTypeToResove`
+- Added `AddLazy(Transient|Scoped|Singleton)<TFrom, TTo>()` to `ResolveInfoCollection` so you can resolve `Lazy<TFrom> lazyTypeToResove`
 
 ### 1.5.1
 

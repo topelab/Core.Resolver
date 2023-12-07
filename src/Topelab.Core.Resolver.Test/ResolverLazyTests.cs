@@ -25,5 +25,37 @@ namespace Topelab.Core.Resolver.Test
             Assert.That(new SimpleClaseTest().GiveMe(), Is.EqualTo(result.Value.GiveMe()));
 
         }
+
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void ResolveInfoCollection_OnAddLazyScoped_ThenLazyInstantCreated(ResolverFactoryCase ResolverFactory)
+        {
+            // Arrange
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
+                .AddLazyScoped<IClaseTest, SimpleClaseTest>()
+                );
+
+            // Act
+            var result = resolver.Get<Lazy<IClaseTest>>();
+
+            // Assert
+            Assert.That(new SimpleClaseTest().GiveMe(), Is.EqualTo(result.Value.GiveMe()));
+
+        }
+
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void ResolveInfoCollection_OnAddLazySingleton_ThenLazyInstantCreated(ResolverFactoryCase ResolverFactory)
+        {
+            // Arrange
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
+                .AddLazySingleton<IClaseTest, SimpleClaseTest>()
+                );
+
+            // Act
+            var result = resolver.Get<Lazy<IClaseTest>>();
+
+            // Assert
+            Assert.That(new SimpleClaseTest().GiveMe(), Is.EqualTo(result.Value.GiveMe()));
+
+        }
     }
 }

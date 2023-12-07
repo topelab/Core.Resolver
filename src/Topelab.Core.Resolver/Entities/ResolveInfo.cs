@@ -7,27 +7,36 @@ namespace Topelab.Core.Resolver.Entities
     /// <summary>
     /// Resolve info
     /// </summary>
-    public class ResolveInfo
+    /// <remarks>
+    /// Constructor
+    /// </remarks>
+    /// <param name="typeFrom">Type from</param>
+    /// <param name="typeTo">Type to</param>
+    /// <param name="resolveMode">Resolve mode</param>
+    /// <param name="resolveLifeCycle">Resolve life cycle enumerator</param>
+    /// <param name="key"></param>
+    /// <param name="constructorParamTypes">Constructor param types</param>
+    public class ResolveInfo(Type typeFrom, Type typeTo, ResolveModeEnum resolveMode = ResolveModeEnum.None, ResolveLifeCycleEnum resolveLifeCycle = ResolveLifeCycleEnum.Transient, string key = null, Type[] constructorParamTypes = null)
     {
         /// <summary>
         /// Type from
         /// </summary>
-        public Type TypeFrom { get; set; }
+        public Type TypeFrom { get; set; } = typeFrom;
 
         /// <summary>
         /// Typo to
         /// </summary>
-        public Type TypeTo { get; set; }
+        public Type TypeTo { get; set; } = typeTo;
 
         /// <summary>
         /// Resolve type
         /// </summary>
-        public ResolveLifeCycleEnum ResolveLifeCycle { get; set; }
+        public ResolveLifeCycleEnum ResolveLifeCycle { get; set; } = resolveLifeCycle;
 
         /// <summary>
         /// Resolve mode.
         /// </summary>
-        public ResolveModeEnum ResolveMode { get; set; }
+        public ResolveModeEnum ResolveMode { get; set; } = resolveMode;
 
         /// <summary>
         /// Instance
@@ -42,30 +51,11 @@ namespace Topelab.Core.Resolver.Entities
         /// <summary>
         /// Key
         /// </summary>
-        public string Key { get; set; }
+        public string Key { get; set; } = key ?? ResolverKeyFactory.Create(constructorParamTypes);
 
         /// <summary>
         /// Constructors param types
         /// </summary>
-        public Type[] ConstructorParamTypes { get; set; }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="typeFrom">Type from</param>
-        /// <param name="typeTo">Type to</param>
-        /// <param name="resolveMode">Resolve mode</param>
-        /// <param name="resolveLifeCycle">Resolve life cycle enumerator</param>
-        /// <param name="key"></param>
-        /// <param name="constructorParamTypes">Constructor param types</param>
-        public ResolveInfo(Type typeFrom, Type typeTo, ResolveModeEnum resolveMode = ResolveModeEnum.None, ResolveLifeCycleEnum resolveLifeCycle = ResolveLifeCycleEnum.Transient, string key = null, Type[] constructorParamTypes = null)
-        {
-            TypeFrom = typeFrom;
-            TypeTo = typeTo;
-            ResolveLifeCycle = resolveLifeCycle;
-            ResolveMode = resolveMode;
-            Key = key ?? ResolverKeyFactory.Create(constructorParamTypes);
-            ConstructorParamTypes = constructorParamTypes;
-        }
+        public Type[] ConstructorParamTypes { get; set; } = constructorParamTypes ?? [];
     }
 }
