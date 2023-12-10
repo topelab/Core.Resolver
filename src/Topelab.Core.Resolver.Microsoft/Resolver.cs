@@ -38,13 +38,15 @@ namespace Topelab.Core.Resolver.Microsoft
         /// Resolve an instance of type <typeparamref name="T"/>
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
-        public T Get<T>()
+        public T Get<T>() => (T)Get(typeof(T));
+
+        public object Get(Type type)
         {
-            var result = serviceProvider.GetService<T>() ??
+            var result = serviceProvider.GetService(type) ??
                 resolvers
                     .Where(r => !r.Equals(this))
                     .Reverse()
-                    .Select(r => r.serviceProvider.GetService<T>())
+                    .Select(r => r.serviceProvider.GetService(type))
                     .FirstOrDefault(r => r != null);
 
             return result;
@@ -164,16 +166,26 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="key">Key name to resolve</param>
         public T Get<T>(string key)
         {
-            T result;
-            Type type = FindTypeWithKey(typeof(T), key);
+            return (T)Get(typeof(T), key);
+        }
+
+        /// <summary>
+        /// Resolve a named instance of type <paramref name="typeFrom"/>
+        /// </summary>
+        /// <param name="typeFrom">Type to resolve</param>
+        /// <param name="key">Key name to resolve</param>
+        public object Get(Type typeFrom, string key)
+        {
+            object result;
+            Type type = FindTypeWithKey(typeFrom, key);
             if (type == null)
             {
-                Resolver resolver = FindResolverWithKey(key);
-                result = resolver.serviceProvider.GetService<T>();
+                var resolver = FindResolverWithKey(key);
+                result = resolver.serviceProvider.GetService(typeFrom);
             }
             else
             {
-                result = (T)serviceProvider.GetService(type);
+                result = serviceProvider.GetService(type);
             }
             return result;
         }
@@ -285,11 +297,39 @@ namespace Topelab.Core.Resolver.Microsoft
             return GetImpl<T>(key, arg1, arg2, arg3, arg4, arg5, arg6);
         }
 
+        public T Get<T>(params object[] args)
+        {
+            var types = args.Select(a => a.GetType()).ToArray();
+            var key = ResolverKeyFactory.Create(types);
+            return GetImpl<T>(key, args);
+        }
+
+        public T Get<T>(string key, params object[] args) => GetImpl<T>(key, args);
+
         private T GetImpl<T>(string key, params object[] args)
         {
-            Resolver resolver = FindResolverWithKey(key) ?? FindResolverWithPartialKey(key);
-            var lookup = resolver.serviceProvider.GetService<IService<T>>();
-            return (T)ActivatorUtilities.CreateInstance(serviceProvider, lookup.Type(), args);
+            var fullKey = key;
+            var resolver = FindResolverWithKey(key);
+            if (resolver == null)
+            {
+                (resolver, fullKey) = FindResolverWithPartialKey(key);
+            }
+            Type type = GetTypeFromNamedResolution(resolver, fullKey, typeof(T));
+            return (T)ActivatorUtilities.CreateInstance(serviceProvider, type, args);
+        }
+
+        private Type GetTypeFromNamedResolution(Resolver resolver, string key, Type type)
+        {
+            Type result = type;
+            if (resolver.namedResolutions.TryGetValue(type, out var typesByName))
+            {
+                if (typesByName.TryGetValue(key, out var foundType))
+                {
+                    result = foundType;
+                }
+            }
+
+            return result;
         }
 
         private Type FindTypeWithKey(Type typeFrom, string key)
@@ -314,15 +354,15 @@ namespace Topelab.Core.Resolver.Microsoft
             return resolver;
         }
 
-        private Resolver FindResolverWithPartialKey(string key)
+        private (Resolver resolver, string key) FindResolverWithPartialKey(string key)
         {
             return resolvers
                 .Reverse<Resolver>()
                 .SelectMany(r => r.globalResolvers)
                 .Where(gr => $"|{gr.Key}|".Contains(key))
-                .Select(gr => new { Index = gr.Key.Split('|').Length, Value = (Resolver)gr.Value })
+                .Select(gr => new { Index = gr.Key.Split('|').Length, Value = (Resolver)gr.Value, Key = gr.Key })
                 .OrderBy(k => k.Index)
-                .Select(k => k.Value)
+                .Select(k => (k.Value, k.Key))
                 .FirstOrDefault();
         }
     }

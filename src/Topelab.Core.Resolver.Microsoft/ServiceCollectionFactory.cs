@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Collections.Generic;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Enums;
@@ -21,12 +20,8 @@ namespace Topelab.Core.Resolver.Microsoft
         {
             var collection = currentServices ?? new ServiceCollection();
 
-            collection.TryAddSingleton<IService<IResolver>, Service<IResolver, Resolver>>();
-
             foreach (var resolveInfo in resolveInfoCollection)
             {
-                collection.AddSingleton(typeof(IService<>).MakeGenericType(resolveInfo.TypeFrom), typeof(Service<,>).MakeGenericType(resolveInfo.TypeFrom, resolveInfo.TypeTo));
-
                 switch (resolveInfo.ResolveMode)
                 {
                     case ResolveModeEnum.Initializer:

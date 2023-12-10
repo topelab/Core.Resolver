@@ -22,7 +22,22 @@ namespace Topelab.Core.Resolver.Test
             var result = resolver.Get<IClaseTest>();
 
             // Assert
-            Assert.AreEqual(new SimpleClaseTest().GiveMe(), result.GiveMe());
+            Assert.That(new SimpleClaseTest().GiveMe(), Is.EqualTo(result.GiveMe()));
+        }
+
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void GetSimple_NotGeneric(ResolverFactoryCase ResolverFactory)
+        {
+            // Arrange
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                );
+
+            // Act
+            var result = (IClaseTest)resolver.Get(typeof(IClaseTest));
+
+            // Assert
+            Assert.That(new SimpleClaseTest().GiveMe(), Is.EqualTo(result.GiveMe()));
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
@@ -39,7 +54,24 @@ namespace Topelab.Core.Resolver.Test
             var result2 = resolver.Get<IClaseTest>(nameof(SimpleClaseTest2));
 
             // Assert
-            Assert.AreNotEqual(result, result2);
+            Assert.That(result, Is.Not.EqualTo(result2));
+        }
+
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void GetSimpleWithNames_NotGeneric(ResolverFactoryCase ResolverFactory)
+        {
+            // Arrange
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
+                );
+
+            // Act
+            var result = (IClaseTest)resolver.Get(typeof(IClaseTest));
+            var result2 = resolver.Get<IClaseTest>(nameof(SimpleClaseTest2));
+
+            // Assert
+            Assert.That(result, Is.Not.EqualTo(result2));
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
@@ -60,9 +92,9 @@ namespace Topelab.Core.Resolver.Test
             var simple = resolver.Get<IClaseTest>();
 
             // Assert
-            Assert.IsTrue(result2.GiveMe().StartsWith($"{param} (") && result2.GiveMe().EndsWith("2"));
-            Assert.IsTrue(result0.GiveMe().StartsWith($"{param} (") && result0.GiveMe().EndsWith("0"));
-            Assert.IsTrue(simple.GiveMe().Equals("Simple class"));
+            Assert.That(result2.GiveMe().StartsWith($"{param} (") && result2.GiveMe().EndsWith("2"));
+            Assert.That(result0.GiveMe().StartsWith($"{param} (") && result0.GiveMe().EndsWith("0"));
+            Assert.That(simple.GiveMe().Equals("Simple class"));
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
@@ -80,7 +112,7 @@ namespace Topelab.Core.Resolver.Test
             var result2 = resolver.Get<IClaseTest>(nameof(SimpleClaseTest2));
 
             // Assert
-            Assert.AreNotSame(result, result2);
+            Assert.That(result, Is.Not.EqualTo(result2));
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
@@ -108,11 +140,11 @@ namespace Topelab.Core.Resolver.Test
             var result3 = resolver.Get<IClaseTest2>();
 
             // Assert
-            Assert.AreNotSame(result, result2);
-            Assert.AreNotSame(result20, result202);
-            Assert.AreNotSame(result, result20);
-            Assert.AreNotSame(result2, result202);
-            Assert.IsNotNull(result3);
+            Assert.That(result, Is.Not.EqualTo(result2));
+            Assert.That(result20,Is.Not.EqualTo(result202));
+            Assert.That(result, Is.Not.EqualTo(result20));
+            Assert.That(result2, Is.Not.EqualTo(result202));
+            Assert.That(result3, Is.Not.Null);
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
@@ -131,8 +163,8 @@ namespace Topelab.Core.Resolver.Test
             var claseTest = resolver.Get<IClaseTest, IClaseTest, IClaseTest>(simpleClaseTest, simpleClaseTest2);
 
             // Assert
-            Assert.AreNotSame(simpleClaseTest, simpleClaseTest2);
-            Assert.AreEqual($"{simpleClaseTest.GiveMe()} - {simpleClaseTest2.GiveMe()}", claseTest.GiveMe());
+            Assert.That(simpleClaseTest, Is.Not.EqualTo(simpleClaseTest2));
+            Assert.That($"{simpleClaseTest.GiveMe()} - {simpleClaseTest2.GiveMe()}", Is.EqualTo(claseTest.GiveMe()));
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
@@ -149,7 +181,7 @@ namespace Topelab.Core.Resolver.Test
             var geremuDbContext = resolver.Get<IGeremuDbContext>();
 
             // Assert
-            Assert.AreEqual($"Hello, I'm instance {geremuDbContext.Id} with claseTest: {simpleClaseTest.GiveMe()}", ((IClaseTest)geremuDbContext).GiveMe());
+            Assert.That($"Hello, I'm instance {geremuDbContext.Id} with claseTest: {simpleClaseTest.GiveMe()}", Is.EqualTo(((IClaseTest)geremuDbContext).GiveMe()));
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
@@ -164,7 +196,7 @@ namespace Topelab.Core.Resolver.Test
             var result = resolver.Get<IFactoryTest<SimpleClaseTest>>();
 
             // Assert
-            Assert.AreEqual(new SimpleClaseTest().GiveMe(), result.Create().GiveMe());
+            Assert.That(new SimpleClaseTest().GiveMe(), Is.EqualTo(result.Create().GiveMe()));
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
@@ -182,7 +214,7 @@ namespace Topelab.Core.Resolver.Test
             var result = resolver.Get<IClaseTest>("1");
 
             // Assert
-            Assert.IsTrue(result.GiveMe().StartsWith("ClaseTest1 with"));
+            Assert.That(result.GiveMe().StartsWith("ClaseTest1 with"));
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
@@ -199,7 +231,7 @@ namespace Topelab.Core.Resolver.Test
             var result = "tets_".GetInfo();
 
             // Assert
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(expectedResult, Is.EqualTo(result));
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
@@ -219,7 +251,7 @@ namespace Topelab.Core.Resolver.Test
             var result = resolver.Get<IClaseTest, string, int>(text, num).GiveMe();
 
             // Assert 
-            Assert.AreEqual(expected, result);
+            Assert.That(expected, Is.EqualTo(result));
         }
     }
 }

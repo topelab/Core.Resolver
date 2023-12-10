@@ -29,8 +29,8 @@ namespace Topelab.Core.Resolver.Test
             var resultDos = resolver.Get<IClaseTest>("dos");
 
             // Assert
-            Assert.AreEqual(goodResult.GiveMe(), result.GiveMe());
-            Assert.AreEqual(goodResultDos.GiveMe(), resultDos.GiveMe());
+            Assert.That(goodResult.GiveMe(), Is.EqualTo(result.GiveMe()));
+            Assert.That(goodResultDos.GiveMe(), Is.EqualTo(resultDos.GiveMe()));
         }
     }
 

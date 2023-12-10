@@ -6,6 +6,7 @@ using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Interfaces;
 using Unity;
 using Unity.Resolution;
+using Unity.Strategies;
 
 namespace Topelab.Core.Resolver.Unity
 {
@@ -28,6 +29,21 @@ namespace Topelab.Core.Resolver.Unity
             this.container = container ?? throw new ArgumentNullException(nameof(container));
             this.constructorsByKey = constructorsByKey ?? throw new ArgumentNullException(nameof(constructorsByKey));
             resolvers.Add(this);
+        }
+
+        /// <summary>
+        /// Resolve an instance of type <paramref name="type"/>
+        /// </summary>
+        /// <param name="type">Type of instance to resolve</param>
+        public object Get(Type type)
+        {
+            if (IsRegistered(type, container))
+            {
+                return container.Resolve(type);
+            }
+
+            var resolver = resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && IsRegistered(type, r.container)).FirstOrDefault();
+            return resolver == null ? default : resolver.container.Resolve(type);
         }
 
         /// <summary>
@@ -157,10 +173,17 @@ namespace Topelab.Core.Resolver.Unity
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
         /// <param name="key">Key name to resolve</param>
-        public T Get<T>(string key)
+        public T Get<T>(string key) => (T)Get(typeof(T), key);
+
+        /// <summary>
+        /// Resolve a named instance of type <paramref name="typeFrom"/>
+        /// </summary>
+        /// <param name="typeFrom">Type to resolve</param>
+        /// <param name="key">Key name to resolve</param>
+        public object Get(Type typeFrom, string key)
         {
-            var container = FindContainerWithKey(typeof(T), key);
-            return container.Resolve<T>(key);
+            var container = FindContainerWithKey(typeFrom, key);
+            return container.Resolve(typeFrom, key);
         }
 
         /// <summary>
@@ -302,6 +325,37 @@ namespace Topelab.Core.Resolver.Unity
                                                  new ParameterOverride(typeof(T5), parameters[4], arg5),
                                                  new ParameterOverride(typeof(T6), parameters[5], arg6));
         }
+
+        /// <summary>
+        /// Resolve an instance of type <typeparamref name="T"/> using constructor params array <paramref name="args"/>
+        /// </summary>
+        /// <typeparam name="T">Type of instance to get</typeparam>
+        /// <param name="args">Params used to construct instance</param>
+        public T Get<T>(params object[] args)
+        {
+            var types = args.Select(a => a.GetType()).ToArray();
+            var key = ResolverKeyFactory.Create(types);
+            return Get<T>(key, args);
+        }
+
+        /// <summary>
+        /// Resolve a named instance of type <typeparamref name="T"/> using constructor params array <paramref name="args"/>
+        /// </summary>
+        /// <param name="key">Key name to resolve</param>
+        /// <typeparam name="T">Type of instance to get</typeparam>
+        /// <param name="args">Params used to construct instance</param>
+        public T Get<T>(string key, params object[] args)
+        {
+            var types = args.Select(a => a.GetType()).ToArray();
+            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T), key);
+            List<ParameterOverride> parameterList = new List<ParameterOverride>();
+            for (int i = 0; i < args.Length; i++)
+            {
+                parameterList.Add(new ParameterOverride(types[i], parameters[i], args[i]));
+            }
+            return resolver.container.Resolve<T>(key, parameterList.ToArray());
+        }
+
 
         private (Resolver Resolver, string[] Parameters, string Key) GetParametersWithThisSubKey(Type type, string key)
         {

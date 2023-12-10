@@ -6,6 +6,21 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.5.3
+
+- Added `AddLazy(Transient|Scoped|Singleton)<TFrom, TTo>()` to `ResolveInfoCollection` so you can resolve `Lazy<TFrom> lazyTypeToResove`
+
+### 1.5.1
+
+- Upgrade to .NET 8.0
+- Possibility to use `Resolve<T>()`, `Resolve<T>(params)`, `Resolve<T>(key)` or `Resolve<T>(key, params)` if define `global using static Topelab.Core.Resolver.(Autofact | Microsoft | Unity).ResolverFactory`
+
+### 1.4.15
+
+- Added new methods to `IResolver`:
+    - `object Get(Type type)`
+    - `object Get(Type typeFrom, string key)`
+
 ### 1.4.12
 
 - Upgrade Microsoft.NET.Test.Sdk to 17.6.0
