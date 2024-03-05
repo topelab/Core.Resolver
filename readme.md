@@ -6,6 +6,10 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.5.5
+
+- Update NUnit to 4.1.0
+
 ### 1.5.3
 
 - Added `AddLazy(Transient|Scoped|Singleton)<TFrom, TTo>()` to `ResolveInfoCollection` so you can resolve `Lazy<TFrom> lazyTypeToResove`
