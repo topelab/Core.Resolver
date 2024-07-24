@@ -6,6 +6,10 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.6.1
+
+- Upgrade Microsoft.NET.Test.Sdk to 17.10.0
+
 ### 1.6.0
 
 - **Breaking changes**:  AddLazy not necessary and removed. With `Add(Transient|Scoped|Singleton)<T>` you can resolve `<Lazy<T>`
