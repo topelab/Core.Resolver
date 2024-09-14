@@ -17,8 +17,9 @@ namespace Topelab.Core.Resolver.Autofac
         /// Creates an IResolver based on the specified resolve info collection.
         /// </summary>
         /// <param name="resolveInfoCollection">The resolve info collection.</param>
-        public static IResolver Create(ResolveInfoCollection resolveInfoCollection)
+        public static IResolver Create(ResolveInfoCollection resolveInfoCollection, Scope scope = null)
         {
+            scope ??= Scope.Default;
             Dictionary<string, ConstructorInfo> constructorsByKey = new();
 
             ContainerBuilder builder = new();
@@ -27,7 +28,7 @@ namespace Topelab.Core.Resolver.Autofac
                 builder.RegisterAutofac(resolveInfoCollection, constructorsByKey);
             }
 
-            var resolver = new Resolver();
+            var resolver = new Resolver(scope);
             builder.RegisterInstance((IResolver)resolver);
             var container = builder.Build();
             resolver.Initialize(container, constructorsByKey);
@@ -39,7 +40,7 @@ namespace Topelab.Core.Resolver.Autofac
         /// <summary>
         /// Get current resolver
         /// </summary>
-        public static IResolver GetResolver() => rootResolver;
+        public static IResolver GetResolver(Scope scope = null) => (scope ?? Scope.Default).Resolver;
 
         /// <summary>
         /// Resolve type <typeparamref name="T"/>

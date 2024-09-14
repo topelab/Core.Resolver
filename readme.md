@@ -6,6 +6,10 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.7.0
+
+- **New** scoped resolvers: When creating a resolver, is possible to pass a Scope and then use this scope to resolve.
+
 ### 1.6.2
 
 - Upgrade packages

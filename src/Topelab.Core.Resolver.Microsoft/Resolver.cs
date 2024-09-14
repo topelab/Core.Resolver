@@ -12,26 +12,37 @@ namespace Topelab.Core.Resolver.Microsoft
     /// </summary>
     public class Resolver : IResolver
     {
-        private readonly IServiceProvider serviceProvider;
-        private readonly IDictionary<string, IResolver> globalResolvers;
-        private readonly Dictionary<Type, Dictionary<string, Type>> namedResolutions;
 
-        private static readonly List<Resolver> resolvers = new();
+        private readonly ResolverKey resolverKey;
+        private readonly IServiceProvider serviceProvider;
+        private readonly Dictionary<Type, Dictionary<string, Type>> namedResolutions;
+        private readonly Scope scope;
+        private readonly Dictionary<ResolverKey, IResolver> globalResolvers = [];
+
+        private static readonly List<Resolver> resolvers = [];
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="serviceProvider">Service provider</param>
         /// <param name="key">Key to have different resolvers</param>
-        /// <param name="globalResolvers">Global resolvers indexed by key</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public Resolver(IServiceProvider serviceProvider, string key, IDictionary<string, IResolver> globalResolvers, Dictionary<Type, Dictionary<string, Type>> namedResolutions)
+        internal Resolver(IServiceProvider serviceProvider, string key, Dictionary<Type, Dictionary<string, Type>> namedResolutions, Scope scope = null)
         {
+            this.scope = scope ?? Scope.Default;
+            this.scope.Add(this);
+
+            resolverKey = new(this.scope, key);
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-            this.globalResolvers = globalResolvers ?? throw new ArgumentNullException(nameof(globalResolvers));
             this.namedResolutions = namedResolutions ?? throw new ArgumentNullException(nameof(namedResolutions));
-            this.globalResolvers[key] = this;
+            globalResolvers[resolverKey] = this;
             resolvers.Add(this);
+        }
+
+        public static IResolver GetResolver(Scope scope = null)
+        {
+            scope ??= Scope.Default;
+            return resolvers.FirstOrDefault(r => r.scope == scope);
         }
 
         /// <summary>
@@ -347,9 +358,11 @@ namespace Topelab.Core.Resolver.Microsoft
 
         private Resolver FindResolverWithKey(string key)
         {
-            var resolver = globalResolvers.ContainsKey(key)
-                ? (Resolver)globalResolvers[key]
-                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.globalResolvers.ContainsKey(key)).FirstOrDefault();
+            ResolverKey otherKey = resolverKey with { Key = key };
+
+            var resolver = globalResolvers.ContainsKey(otherKey)
+                ? (Resolver)globalResolvers[otherKey]
+                : resolvers.Reverse<Resolver>().FirstOrDefault(r => !r.Equals(this) && r.globalResolvers.ContainsKey(otherKey));
 
             return resolver;
         }
@@ -359,8 +372,9 @@ namespace Topelab.Core.Resolver.Microsoft
             return resolvers
                 .Reverse<Resolver>()
                 .SelectMany(r => r.globalResolvers)
-                .Where(gr => $"|{gr.Key}|".Contains(key))
-                .Select(gr => new { Index = gr.Key.Split('|').Length, Value = (Resolver)gr.Value, Key = gr.Key })
+                .Where(r => r.Key.Scope == resolverKey.Scope)
+                .Where(gr => $"|{gr.Key.Key}|".Contains(key))
+                .Select(gr => new { Index = gr.Key.Key.Split('|').Length, Value = (Resolver)gr.Value, gr.Key.Key })
                 .OrderBy(k => k.Index)
                 .Select(k => (k.Value, k.Key))
                 .FirstOrDefault();

@@ -17,8 +17,9 @@ namespace Topelab.Core.Resolver.Unity
         /// Creates an IResolver based on the specified resolve info collection.
         /// </summary>
         /// <param name="resolveInfoCollection">The resolve info collection.</param>
-        public static IResolver Create(ResolveInfoCollection resolveInfoCollection)
+        public static IResolver Create(ResolveInfoCollection resolveInfoCollection, Scope scope = null)
         {
+            scope ??= Scope.Default;
             Dictionary<string, ConstructorInfo> constructorsByKey = new();
 
             UnityContainer container = new();
@@ -27,7 +28,7 @@ namespace Topelab.Core.Resolver.Unity
                 container.Register(resolveInfoCollection, constructorsByKey);
             }
 
-            Resolver resolver = new(container, constructorsByKey);
+            Resolver resolver = new(container, constructorsByKey, scope);
             resolveInfoCollection.InitializeIntializers(resolver);
             rootResolver ??= resolver;
             container.RegisterInstance<IResolver>(resolver);
@@ -38,7 +39,7 @@ namespace Topelab.Core.Resolver.Unity
         /// <summary>
         /// Get current resolver
         /// </summary>
-        public static IResolver GetResolver() => rootResolver;
+        public static IResolver GetResolver(Scope scope = null) => (scope ?? Scope.Default).Resolver;
 
         /// <summary>
         /// Resolve type <typeparamref name="T"/>

@@ -6,7 +6,6 @@ using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Interfaces;
 using Unity;
 using Unity.Resolution;
-using Unity.Strategies;
 
 namespace Topelab.Core.Resolver.Unity
 {
@@ -17,15 +16,17 @@ namespace Topelab.Core.Resolver.Unity
     {
         private readonly IUnityContainer container;
         private readonly Dictionary<string, ConstructorInfo> constructorsByKey;
-        private static readonly List<Resolver> resolvers = new();
+        private static readonly List<Resolver> resolvers = [];
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="container">Unity container</param>
         /// <param name="constructorsByKey">Constructors dictionary by key</param>
-        public Resolver(IUnityContainer container, Dictionary<string, ConstructorInfo> constructorsByKey)
+        public Resolver(IUnityContainer container, Dictionary<string, ConstructorInfo> constructorsByKey, Scope scope = null)
         {
+            scope ??= Scope.Default;
+            scope.Add(this);
             this.container = container ?? throw new ArgumentNullException(nameof(container));
             this.constructorsByKey = constructorsByKey ?? throw new ArgumentNullException(nameof(constructorsByKey));
             resolvers.Add(this);
@@ -315,7 +316,7 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="arg6">Param 6 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5, T6>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
-            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T),key);
+            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T), key);
 
             return resolver.container.Resolve<T>(key,
                                                  new ParameterOverride(typeof(T1), parameters[0], arg1),
