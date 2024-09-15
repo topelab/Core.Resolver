@@ -14,9 +14,13 @@ namespace Topelab.Core.Resolver.Unity
     /// </summary>
     public class Resolver : IResolver
     {
+        private static readonly List<Resolver> resolvers = [];
+        private static int globalId = 0;
+
         private readonly IUnityContainer container;
         private readonly Dictionary<string, ConstructorInfo> constructorsByKey;
-        private static readonly List<Resolver> resolvers = [];
+
+        public int Id { get; private set; }
 
         /// <summary>
         /// Constructor
@@ -25,6 +29,7 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="constructorsByKey">Constructors dictionary by key</param>
         public Resolver(IUnityContainer container, Dictionary<string, ConstructorInfo> constructorsByKey, Scope scope = null)
         {
+            Id = globalId++;
             scope ??= Scope.Default;
             scope.Add(this);
             this.container = container ?? throw new ArgumentNullException(nameof(container));

@@ -13,14 +13,20 @@ namespace Topelab.Core.Resolver.Autofac
     /// </summary>
     public class Resolver : IResolver
     {
+        private static readonly List<Resolver> resolvers = [];
+        private static int globalId = 0;
+
         private IContainer container;
         private Dictionary<string, ConstructorInfo> constructorsByKey;
-        private static readonly List<Resolver> resolvers = [];
+        private readonly Scope scope;
 
-        public Resolver(Scope scope = null)
+        public int Id { get; private set; }
+
+        internal Resolver(Scope scope = null)
         {
-            scope ??= Scope.Default;
-            scope.Add(this);
+            Id = globalId++;
+            this.scope = scope ?? Scope.Default;
+            this.scope.Add(this);
         }
 
         public void Initialize(IContainer container, Dictionary<string, ConstructorInfo> constructorsByKey)

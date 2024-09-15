@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using System.Collections;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Test.Cases;
 using Topelab.Core.Resolver.Test.Entities;
@@ -141,7 +140,7 @@ namespace Topelab.Core.Resolver.Test
 
             // Assert
             Assert.That(result, Is.Not.EqualTo(result2));
-            Assert.That(result20,Is.Not.EqualTo(result202));
+            Assert.That(result20, Is.Not.EqualTo(result202));
             Assert.That(result, Is.Not.EqualTo(result20));
             Assert.That(result2, Is.Not.EqualTo(result202));
             Assert.That(result3, Is.Not.Null);

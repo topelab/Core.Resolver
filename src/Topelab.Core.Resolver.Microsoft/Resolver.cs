@@ -12,6 +12,8 @@ namespace Topelab.Core.Resolver.Microsoft
     /// </summary>
     public class Resolver : IResolver
     {
+        private static readonly List<Resolver> resolvers = [];
+        private static int globalId = 0;
 
         private readonly ResolverKey resolverKey;
         private readonly IServiceProvider serviceProvider;
@@ -19,7 +21,7 @@ namespace Topelab.Core.Resolver.Microsoft
         private readonly Scope scope;
         private readonly Dictionary<ResolverKey, IResolver> globalResolvers = [];
 
-        private static readonly List<Resolver> resolvers = [];
+        public int Id { get; private set; }
 
         /// <summary>
         /// Constructor
@@ -29,6 +31,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <exception cref="ArgumentNullException"></exception>
         internal Resolver(IServiceProvider serviceProvider, string key, Dictionary<Type, Dictionary<string, Type>> namedResolutions, Scope scope = null)
         {
+            Id = globalId++;
             this.scope = scope ?? Scope.Default;
             this.scope.Add(this);
 

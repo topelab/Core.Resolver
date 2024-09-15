@@ -3,19 +3,19 @@ using Topelab.Core.Resolver.Interfaces;
 
 namespace Topelab.Core.Resolver.Entities
 {
-    public class Scope(string defaultScope)
+    public class Scope(string tag)
     {
-        public const string DEFAULT_SCOPE = ".";
+        public const string DEFAULT_TAG = ".";
 
-        private string value = defaultScope;
-        private static readonly Scope defaultInstance = new(DEFAULT_SCOPE);
+        private string tag = tag;
+        private static readonly Scope defaultInstance = new(DEFAULT_TAG);
         private IResolver rootResolver;
         private readonly List<IResolver> resolvers = [];
 
-        public string Value
+        public string Tag
         {
-            get { return @value; }
-            set { this.@value = value; }
+            get => tag ?? DEFAULT_TAG;
+            set => tag = value ?? DEFAULT_TAG;
         }
 
         public void Add(IResolver resolver)

@@ -7,6 +7,8 @@ namespace Topelab.Core.Resolver.Interfaces
     /// </summary>
     public interface IResolver
     {
+        int Id { get; }
+
         /// <summary>
         /// Resolve an instance of type <paramref name="type"/>
         /// </summary>

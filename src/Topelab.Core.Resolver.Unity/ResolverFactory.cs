@@ -11,7 +11,8 @@ namespace Topelab.Core.Resolver.Unity
     /// </summary>
     public static class ResolverFactory
     {
-        private static Resolver rootResolver;
+        private static IResolver rootResolver;
+        private static IResolver currentResolver;
 
         /// <summary>
         /// Creates an IResolver based on the specified resolve info collection.
@@ -31,6 +32,7 @@ namespace Topelab.Core.Resolver.Unity
             Resolver resolver = new(container, constructorsByKey, scope);
             resolveInfoCollection.InitializeIntializers(resolver);
             rootResolver ??= resolver;
+            currentResolver = resolver;
             container.RegisterInstance<IResolver>(resolver);
 
             return resolver;
@@ -42,24 +44,38 @@ namespace Topelab.Core.Resolver.Unity
         public static IResolver GetResolver(Scope scope = null) => (scope ?? Scope.Default).Resolver;
 
         /// <summary>
+        /// Select new scope and change currentResolver
+        /// </summary>
+        /// <param name="scope">New scope to select</param>
+        public static void SelectScope(Scope scope = null)
+        {
+            scope ??= Scope.Default;
+            if (scope.Resolver == null)
+            {
+                throw new System.Exception($"Scope {scope.Tag} doesn't have a resolver. Create a resolver with this scope");
+            }
+            currentResolver = (scope ?? Scope.Default).Resolver;
+        }
+
+        /// <summary>
         /// Resolve type <typeparamref name="T"/>
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
-        public static T Resolve<T>() where T : class => rootResolver.Get<T>();
+        public static T Resolve<T>() where T : class => currentResolver.Get<T>();
 
         /// <summary>
         /// Resolve type <typeparamref name="T"/> using key and params
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
         /// <param name="args">Params to ctor</param>
-        public static T Resolve<T>(params object[] args) where T : class => rootResolver.Get<T>(args);
+        public static T Resolve<T>(params object[] args) where T : class => currentResolver.Get<T>(args);
 
         /// <summary>
         /// Resolve type <typeparamref name="T"/> using key
         /// </summary>
         /// <typeparam name="T">Type to resolve</typeparam>
         /// <param name="key">Key to resolve</param>
-        public static T Resolve<T>(string key) where T : class => rootResolver.Get<T>(key);
+        public static T Resolve<T>(string key) where T : class => currentResolver.Get<T>(key);
 
         /// <summary>
         /// Resolve type <typeparamref name="T"/> using key and params
@@ -67,6 +83,6 @@ namespace Topelab.Core.Resolver.Unity
         /// <typeparam name="T">Type to resolve</typeparam>
         /// <param name="key">Key to resolve</param>
         /// <param name="args">Params to ctor</param>
-        public static T Resolve<T>(string key, params object[] args) where T : class => rootResolver.Get<T>(key, args);
+        public static T Resolve<T>(string key, params object[] args) where T : class => currentResolver.Get<T>(key, args);
     }
 }

@@ -12,7 +12,7 @@ namespace Topelab.Core.Resolver.Test
     public class SpecificUnityResolverTests
     {
         [Test]
-        public void GetFactory()
+        public void ResolverFactory_CreateResolver_ReturnsResolverThatResolvesInstances()
         {
             // Arrange
             var number = 99;
