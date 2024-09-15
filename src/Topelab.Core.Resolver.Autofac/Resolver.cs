@@ -46,7 +46,7 @@ namespace Topelab.Core.Resolver.Autofac
             {
                 return Resolve(container, type);
             }
-            var resolver = resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.container.IsRegistered(type)).FirstOrDefault();
+            var resolver = GetResolverExcludingThisWithRegisteredType(type);
             return resolver == null ? default : Resolve(resolver.container, type);
         }
 
@@ -60,7 +60,7 @@ namespace Topelab.Core.Resolver.Autofac
             {
                 return Resolve<T>(container);
             }
-            var resolver = resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.container.IsRegistered(typeof(T))).FirstOrDefault();
+            var resolver = GetResolverExcludingThisWithRegisteredType(typeof(T));
             return resolver == null ? default : Resolve<T>(resolver.container);
         }
 
@@ -369,7 +369,7 @@ namespace Topelab.Core.Resolver.Autofac
 
             if (container == null)
             {
-                foreach (var resolver in resolvers.Reverse<Resolver>())
+                foreach (var resolver in GetResolvers())
                 {
                     var keys = resolver.constructorsByKey.Keys.Where(k => $"|{k}|".Contains(key));
                     if (keys.Any())
@@ -395,9 +395,12 @@ namespace Topelab.Core.Resolver.Autofac
         {
             var result = container.IsRegisteredWithName(key, type)
                 ? container
-                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && r.container.IsRegisteredWithName(key, type)).Select(r => r.container).FirstOrDefault();
+                : GetResolvers().Where(r => !r.Equals(this) && r.container.IsRegisteredWithName(key, type)).Select(r => r.container).FirstOrDefault();
 
             return result;
         }
+
+        private IEnumerable<Resolver> GetResolvers() => resolvers.Where(r => r.scope == scope).Reverse();
+        private Resolver GetResolverExcludingThisWithRegisteredType(Type type) => GetResolvers().Where(r => !r.Equals(this) && r.container.IsRegistered(type)).FirstOrDefault();
     }
 }

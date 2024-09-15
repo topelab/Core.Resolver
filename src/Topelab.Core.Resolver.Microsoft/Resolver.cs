@@ -42,12 +42,6 @@ namespace Topelab.Core.Resolver.Microsoft
             resolvers.Add(this);
         }
 
-        public static IResolver GetResolver(Scope scope = null)
-        {
-            scope ??= Scope.Default;
-            return resolvers.FirstOrDefault(r => r.scope == scope);
-        }
-
         /// <summary>
         /// Resolve an instance of type <typeparamref name="T"/>
         /// </summary>
@@ -56,12 +50,10 @@ namespace Topelab.Core.Resolver.Microsoft
 
         public object Get(Type type)
         {
-            var result = serviceProvider.GetService(type) ??
-                resolvers
-                    .Where(r => !r.Equals(this))
-                    .Reverse()
-                    .Select(r => r.serviceProvider.GetService(type))
-                    .FirstOrDefault(r => r != null);
+            var result = serviceProvider.GetService(type) ?? GetResolvers()
+                .Where(r => !r.Equals(this))
+                .Select(r => r.serviceProvider.GetService(type))
+                .FirstOrDefault(r => r != null);
 
             return result;
         }
@@ -365,22 +357,22 @@ namespace Topelab.Core.Resolver.Microsoft
 
             var resolver = globalResolvers.ContainsKey(otherKey)
                 ? (Resolver)globalResolvers[otherKey]
-                : resolvers.Reverse<Resolver>().FirstOrDefault(r => !r.Equals(this) && r.globalResolvers.ContainsKey(otherKey));
+                : GetResolvers().FirstOrDefault(r => !r.Equals(this) && r.globalResolvers.ContainsKey(otherKey));
 
             return resolver;
         }
 
         private (Resolver resolver, string key) FindResolverWithPartialKey(string key)
         {
-            return resolvers
-                .Reverse<Resolver>()
+            return GetResolvers()
                 .SelectMany(r => r.globalResolvers)
-                .Where(r => r.Key.Scope == resolverKey.Scope)
                 .Where(gr => $"|{gr.Key.Key}|".Contains(key))
                 .Select(gr => new { Index = gr.Key.Key.Split('|').Length, Value = (Resolver)gr.Value, gr.Key.Key })
                 .OrderBy(k => k.Index)
                 .Select(k => (k.Value, k.Key))
                 .FirstOrDefault();
         }
+
+        private IEnumerable<Resolver> GetResolvers() => resolvers.Where(r => r.scope == scope).Reverse();
     }
 }
