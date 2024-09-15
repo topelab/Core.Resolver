@@ -47,27 +47,6 @@ namespace Topelab.Core.Resolver.Entities
             => Add(typeof(TFrom), typeof(TTo), resolveType, key, constructorParamTypes);
 
         /// <summary>
-        /// Add type from, type to, and optionally, constructor param types for type <typeparamref name="TTo"/>
-        /// </summary>
-        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
-        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
-        /// <param name="constructorParamTypes">Constructor param types</param>
-        [Obsolete("This method is deprecated, please use AddTransient instead")]
-        public ResolveInfoCollection Add<TFrom, TTo>(params Type[] constructorParamTypes)
-            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Transient, null, constructorParamTypes);
-
-        /// <summary>
-        /// Add type from, type to, and optionally, constructor param types for type <typeparamref name="TTo"/>
-        /// </summary>
-        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
-        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
-        /// <param name="key">Key to resolve</param>
-        /// <param name="constructorParamTypes">Constructor param types</param>
-        [Obsolete("This method is deprecated, please use AddTransient instead")]
-        public ResolveInfoCollection Add<TFrom, TTo>(string key, params Type[] constructorParamTypes)
-            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Transient, key, constructorParamTypes);
-
-        /// <summary>
         /// Add transient type from, type to, and optionally, constructor param types for type <paramref name="typeFrom"/>
         /// </summary>
         /// <param name="typeFrom">Type from (Interface)</param>
@@ -93,14 +72,9 @@ namespace Topelab.Core.Resolver.Entities
         /// <typeparam name="TTo">Type to (Implementation)</typeparam>
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection AddTransient<TFrom, TTo>(params Type[] constructorParamTypes)
-            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Transient, null, constructorParamTypes);
+            => constructorParamTypes.Length == 0 ? AddLazyTransient<TFrom, TTo>() : Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Transient, null, constructorParamTypes);
 
-        /// <summary>
-        /// Add type and his lazy transient from, type to, and optionally, constructor param types for type <typeparamref name="TTo"/>
-        /// </summary>
-        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
-        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
-        public ResolveInfoCollection AddLazyTransient<TFrom, TTo>()
+        private ResolveInfoCollection AddLazyTransient<TFrom, TTo>()
         {
             Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Transient, null, []);
             AddFactory(r => new Lazy<TFrom>(() => r.Get<TFrom>()), ResolveLifeCycleEnum.Transient);
@@ -115,15 +89,9 @@ namespace Topelab.Core.Resolver.Entities
         /// <param name="key">Key to resolve</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection AddTransient<TFrom, TTo>(string key, params Type[] constructorParamTypes)
-            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Transient, key, constructorParamTypes);
+            => constructorParamTypes.Length == 0 ? AddLazyTransient<TFrom, TTo>(key) : Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Transient, key, constructorParamTypes);
 
-        /// <summary>
-        /// Add type and his lazy transient from, type to, key and optionally, constructor param types for type <typeparamref name="TTo"/>
-        /// </summary>
-        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
-        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
-        /// <param name="key">Key to resolve</param>
-        public ResolveInfoCollection AddLazyTransient<TFrom, TTo>(string key)
+        private ResolveInfoCollection AddLazyTransient<TFrom, TTo>(string key)
         {
             Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Transient, key, []);
             AddFactory(key, r => new Lazy<TFrom>(() => r.Get<TFrom>()), ResolveLifeCycleEnum.Transient);
@@ -221,15 +189,9 @@ namespace Topelab.Core.Resolver.Entities
         /// <typeparam name="TTo">Type to (Implementation)</typeparam>
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection AddScoped<TFrom, TTo>(params Type[] constructorParamTypes)
-            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Scoped, null, constructorParamTypes);
+            => constructorParamTypes.Length == 0 ? AddLazyScoped<TFrom, TTo>() : Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Scoped, null, constructorParamTypes);
 
-        /// <summary>
-        /// Add scoped and his lazy scoped type from, type to, and optionally, constructor param types for type <typeparamref name="TTo"/>
-        /// </summary>
-        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
-        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
-        /// <param name="constructorParamTypes">Constructor param types</param>
-        public ResolveInfoCollection AddLazyScoped<TFrom, TTo>()
+        private ResolveInfoCollection AddLazyScoped<TFrom, TTo>()
         {
             Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Scoped, null, []);
             AddFactory(r => new Lazy<TFrom>(() => r.Get<TFrom>()), ResolveLifeCycleEnum.Scoped);
@@ -244,16 +206,9 @@ namespace Topelab.Core.Resolver.Entities
         /// <param name="key">Key to resolve</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection AddScoped<TFrom, TTo>(string key, params Type[] constructorParamTypes)
-            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Scoped, key, constructorParamTypes);
+            => constructorParamTypes.Length == 0 ? AddLazyScoped<TFrom, TTo>(key) : Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Scoped, key, constructorParamTypes);
 
-        /// <summary>
-        /// Add scoped and his lazy scoped type from, type to, key, and optionally, constructor param types for type <typeparamref name="TTo"/>
-        /// </summary>
-        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
-        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
-        /// <param name="key">Key to resolve</param>
-        /// <param name="constructorParamTypes">Constructor param types</param>
-        public ResolveInfoCollection AddLazyScoped<TFrom, TTo>(string key)
+        private ResolveInfoCollection AddLazyScoped<TFrom, TTo>(string key)
         {
             Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Scoped, key, []);
             AddFactory(key, r => new Lazy<TFrom>(() => r.Get<TFrom>()), ResolveLifeCycleEnum.Scoped);
@@ -286,14 +241,9 @@ namespace Topelab.Core.Resolver.Entities
         /// <typeparam name="TTo">Type to (Implementation)</typeparam>
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection AddSingleton<TFrom, TTo>(params Type[] constructorParamTypes)
-            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Singleton, null, constructorParamTypes);
+            => constructorParamTypes.Length == 0 ? AddLazySingleton<TFrom, TTo>() : Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Singleton, null, constructorParamTypes);
 
-        /// <summary>
-        /// Add Singleton and his lazy singleton type from, type to, and optionally, constructor param types for type <typeparamref name="TTo"/>
-        /// </summary>
-        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
-        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
-        public ResolveInfoCollection AddLazySingleton<TFrom, TTo>()
+        private ResolveInfoCollection AddLazySingleton<TFrom, TTo>()
         {
             Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Singleton, null, []);
             AddFactory(r => new Lazy<TFrom>(() => r.Get<TFrom>()), ResolveLifeCycleEnum.Singleton);
@@ -308,15 +258,9 @@ namespace Topelab.Core.Resolver.Entities
         /// <param name="key">Key to resolve</param>
         /// <param name="constructorParamTypes">Constructor param types</param>
         public ResolveInfoCollection AddSingleton<TFrom, TTo>(string key, params Type[] constructorParamTypes)
-            => Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Singleton, key, constructorParamTypes);
+            => constructorParamTypes.Length == 0 ? AddLazySingleton<TFrom, TTo>(key) : Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Singleton, key, constructorParamTypes);
 
-        /// <summary>
-        /// Add Singleton type from, type to, and optionally, constructor param types for type <typeparamref name="TTo"/>
-        /// </summary>
-        /// <typeparam name="TFrom">Type from (Interface)</typeparam>
-        /// <typeparam name="TTo">Type to (Implementation)</typeparam>
-        /// <param name="key">Key to resolve</param>
-        public ResolveInfoCollection AddLazySingleton<TFrom, TTo>(string key)
+        private ResolveInfoCollection AddLazySingleton<TFrom, TTo>(string key)
         {
             Add(typeof(TFrom), typeof(TTo), ResolveLifeCycleEnum.Singleton, key, []);
             AddFactory(key, r => new Lazy<TFrom>(() => r.Get<TFrom>()), ResolveLifeCycleEnum.Singleton);

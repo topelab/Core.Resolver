@@ -15,7 +15,7 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
-                .AddLazyTransient<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
                 );
 
             // Act
@@ -31,7 +31,7 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
-                .AddLazyScoped<IClaseTest, SimpleClaseTest>()
+                .AddScoped<IClaseTest, SimpleClaseTest>()
                 );
 
             // Act
@@ -47,7 +47,7 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
-                .AddLazySingleton<IClaseTest, SimpleClaseTest>()
+                .AddSingleton<IClaseTest, SimpleClaseTest>()
                 );
 
             // Act

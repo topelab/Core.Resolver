@@ -26,7 +26,7 @@ namespace Topelab.Core.Resolver.Test
             var result = resolveInfoCollection.AddCollection(resolveInfoCollection2);
 
             // Assert
-            Assert.That(result.Count == 6);
+            Assert.That(result.Count == 12);
         }
     }
 }
