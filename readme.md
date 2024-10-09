@@ -6,6 +6,12 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.7.1
+
+- Upgrade Microsoft.Extensions.DependencyInjection to 8.0.1
+- Upgrade Microsoft.Extensions.Hosting to 8.0.1
+- Upgrade Autofac to 8.1.1
+
 ### 1.7.0
 
 - **New** scoped resolvers: When creating a resolver, is possible to pass a Scope and then use this scope to resolve.
