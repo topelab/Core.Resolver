@@ -1,19 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Version>1.7.1</Version>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>Joan López</Authors>
-    <Description>Core Resolver Unity is a simple wrapper for use under a Clean Architecture solution, to resolve DI references using Unity</Description>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>IoC DI UnityContainer dependency resolver</PackageTags>
-    <RepositoryUrl>https://github.com/topelab/Core.Resolver</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/topelab/Core.Resolver</PackageProjectUrl>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Unity" Version="5.11.10" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Topelab.Core.Resolver\Topelab.Core.Resolver.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+        <Version>1.8.0</Version>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Authors>Joan López</Authors>
+        <Description>Core Resolver Unity is a simple wrapper for use under a Clean Architecture solution, to resolve DI references using Unity</Description>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>IoC DI UnityContainer dependency resolver</PackageTags>
+        <RepositoryUrl>https://github.com/topelab/Core.Resolver</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/topelab/Core.Resolver</PackageProjectUrl>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Unity" Version="5.11.10" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Topelab.Core.Resolver\Topelab.Core.Resolver.csproj" />
+    </ItemGroup>
 </Project>

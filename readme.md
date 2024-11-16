@@ -6,6 +6,10 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.8.0
+
+- Upgrade to .NET 9.0
+
 ### 1.7.1
 
 - Upgrade Microsoft.Extensions.DependencyInjection to 8.0.1
