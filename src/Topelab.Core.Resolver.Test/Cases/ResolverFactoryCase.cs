@@ -6,13 +6,16 @@ namespace Topelab.Core.Resolver.Test.Cases
 {
     public class ResolverFactoryCase
     {
-        public ResolverFactoryCase(Func<ResolveInfoCollection, IResolver> create, Func<IResolver> getResolver)
+        private readonly Func<ResolveInfoCollection, Scope, IResolver> createFunc;
+        private readonly Func<Scope, IResolver> getResolverFunc;
+        public ResolverFactoryCase(Func<ResolveInfoCollection, Scope, IResolver> create, Func<Scope, IResolver> getResolver)
         {
-            Create = create;
-            GetResolver = getResolver;
+            createFunc = create;
+            getResolverFunc = getResolver;
         }
 
-        public Func<ResolveInfoCollection, IResolver> Create { get; }
-        public Func<IResolver> GetResolver { get; }
+
+        public IResolver Create(ResolveInfoCollection resolveInfoColection, Scope scope = null) => createFunc(resolveInfoColection, scope);
+        public IResolver GetResolver(Scope scope = null) => getResolverFunc(scope);
     }
 }

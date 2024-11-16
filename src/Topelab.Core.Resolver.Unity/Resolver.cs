@@ -6,7 +6,6 @@ using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Interfaces;
 using Unity;
 using Unity.Resolution;
-using Unity.Strategies;
 
 namespace Topelab.Core.Resolver.Unity
 {
@@ -15,17 +14,25 @@ namespace Topelab.Core.Resolver.Unity
     /// </summary>
     public class Resolver : IResolver
     {
+        private static readonly List<Resolver> resolvers = [];
+        private static int globalId = 0;
+
         private readonly IUnityContainer container;
         private readonly Dictionary<string, ConstructorInfo> constructorsByKey;
-        private static readonly List<Resolver> resolvers = new();
+        private readonly Scope scope;
+
+        public int Id { get; private set; }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="container">Unity container</param>
         /// <param name="constructorsByKey">Constructors dictionary by key</param>
-        public Resolver(IUnityContainer container, Dictionary<string, ConstructorInfo> constructorsByKey)
+        public Resolver(IUnityContainer container, Dictionary<string, ConstructorInfo> constructorsByKey, Scope scope = null)
         {
+            Id = globalId++;
+            this.scope = scope ?? Scope.Default;
+            this.scope.Add(this);
             this.container = container ?? throw new ArgumentNullException(nameof(container));
             this.constructorsByKey = constructorsByKey ?? throw new ArgumentNullException(nameof(constructorsByKey));
             resolvers.Add(this);
@@ -42,7 +49,7 @@ namespace Topelab.Core.Resolver.Unity
                 return container.Resolve(type);
             }
 
-            var resolver = resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && IsRegistered(type, r.container)).FirstOrDefault();
+            var resolver = GetResolvers().Where(r => !r.Equals(this) && IsRegistered(type, r.container)).FirstOrDefault();
             return resolver == null ? default : resolver.container.Resolve(type);
         }
 
@@ -57,7 +64,7 @@ namespace Topelab.Core.Resolver.Unity
                 return container.Resolve<T>();
             }
 
-            var resolver = resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && IsRegistered(typeof(T), r.container)).FirstOrDefault();
+            var resolver = GetResolvers().Where(r => !r.Equals(this) && IsRegistered(typeof(T), r.container)).FirstOrDefault();
             return resolver == null ? default : resolver.container.Resolve<T>();
         }
 
@@ -315,7 +322,7 @@ namespace Topelab.Core.Resolver.Unity
         /// <param name="arg6">Param 6 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5, T6>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
-            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T),key);
+            (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T), key);
 
             return resolver.container.Resolve<T>(key,
                                                  new ParameterOverride(typeof(T1), parameters[0], arg1),
@@ -348,12 +355,12 @@ namespace Topelab.Core.Resolver.Unity
         {
             var types = args.Select(a => a.GetType()).ToArray();
             (var resolver, var parameters, key) = GetParametersWithThisSubKey(typeof(T), key);
-            List<ParameterOverride> parameterList = new List<ParameterOverride>();
-            for (int i = 0; i < args.Length; i++)
+            List<ParameterOverride> parameterList = [];
+            for (var i = 0; i < args.Length; i++)
             {
                 parameterList.Add(new ParameterOverride(types[i], parameters[i], args[i]));
             }
-            return resolver.container.Resolve<T>(key, parameterList.ToArray());
+            return resolver.container.Resolve<T>(key, [.. parameterList]);
         }
 
 
@@ -367,7 +374,7 @@ namespace Topelab.Core.Resolver.Unity
 
             if (container == null)
             {
-                foreach (var resolver in resolvers.Reverse<Resolver>())
+                foreach (var resolver in GetResolvers())
                 {
                     var keys = resolver.constructorsByKey.Keys.Where(k => $"|{k}|".Contains(key));
                     if (keys.Any())
@@ -392,9 +399,10 @@ namespace Topelab.Core.Resolver.Unity
         {
             var result = container.IsRegistered(type, key)
                 ? container
-                : resolvers.Reverse<Resolver>().Where(r => !r.Equals(this) && IsRegistered(type, r.container, key)).Select(r => r.container).FirstOrDefault();
-
+                : GetResolvers().Where(r => !r.Equals(this) && IsRegistered(type, r.container, key)).Select(r => r.container).FirstOrDefault();
             return result;
         }
+
+        private IEnumerable<Resolver> GetResolvers() => resolvers.Where(r => r.scope == scope).Reverse();
     }
 }

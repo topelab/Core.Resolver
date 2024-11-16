@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using System.Collections;
+using System.Globalization;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Test.Cases;
 using Topelab.Core.Resolver.Test.Entities;
@@ -141,7 +141,7 @@ namespace Topelab.Core.Resolver.Test
 
             // Assert
             Assert.That(result, Is.Not.EqualTo(result2));
-            Assert.That(result20,Is.Not.EqualTo(result202));
+            Assert.That(result20, Is.Not.EqualTo(result202));
             Assert.That(result, Is.Not.EqualTo(result20));
             Assert.That(result2, Is.Not.EqualTo(result202));
             Assert.That(result3, Is.Not.Null);
@@ -197,6 +197,22 @@ namespace Topelab.Core.Resolver.Test
 
             // Assert
             Assert.That(new SimpleClaseTest().GiveMe(), Is.EqualTo(result.Create().GiveMe()));
+        }
+
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        public void GetGenericsWithSpecificCase(ResolverFactoryCase ResolverFactory)
+        {
+            // Arrange
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
+                .AddTransient(typeof(IFactoryTest<>), typeof(FactoryTest<>))
+                .AddTransient<IFactoryTest<SimpleClaseTest>, SimpleClaseTestFactoryTest>()
+                );
+
+            // Act
+            var result = resolver.Get<IFactoryTest<SimpleClaseTest>>();
+
+            // Assert
+            Assert.That(new SimpleClaseTest().ItsTrue, Is.Not.EqualTo(result.Create().ItsTrue));
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]

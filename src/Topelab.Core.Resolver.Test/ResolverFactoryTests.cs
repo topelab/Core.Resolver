@@ -27,7 +27,7 @@ namespace Topelab.Core.Resolver.Test
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
-        public void Get_UsingVurrentResolver(ResolverFactoryCase ResolverFactory)
+        public void Get_UsingCurrentResolver(ResolverFactoryCase ResolverFactory)
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
@@ -36,6 +36,11 @@ namespace Topelab.Core.Resolver.Test
                 .AddFactory<IClaseTest>(r => r.Get<SimpleClaseTest>("named"))
                 );
 
+            var otherResolver = ResolverFactory.Create(new ResolveInfoCollection()
+                .AddSelf<ClaseTest>()
+                .AddSelf<ClaseTest>("named")
+                .AddFactory<IClaseTest>(r => r.Get<ClaseTest>("named"))
+                );
 
             // Act
             var resolver2 = ResolverFactory.GetResolver();

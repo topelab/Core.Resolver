@@ -11,7 +11,7 @@ namespace Topelab.Core.Resolver.Test
     internal class ResolverLazyTests
     {
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
-        public void ResolveInfoCollection_OnAddLazyTransient_ThenLazyInstantCreated(ResolverFactoryCase ResolverFactory)
+        public void ResolveInfoCollection_OnAddTransient_ThenLazyInstantCreatedToo(ResolverFactoryCase ResolverFactory)
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
@@ -27,7 +27,7 @@ namespace Topelab.Core.Resolver.Test
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
-        public void ResolveInfoCollection_OnAddLazyScoped_ThenLazyInstantCreated(ResolverFactoryCase ResolverFactory)
+        public void ResolveInfoCollection_OnAddScoped_ThenLazyInstantCreatedToo(ResolverFactoryCase ResolverFactory)
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
@@ -43,7 +43,7 @@ namespace Topelab.Core.Resolver.Test
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
-        public void ResolveInfoCollection_OnAddLazySingleton_ThenLazyInstantCreated(ResolverFactoryCase ResolverFactory)
+        public void ResolveInfoCollection_OnAddSingleton_ThenLazyInstantCreatedToo(ResolverFactoryCase ResolverFactory)
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()

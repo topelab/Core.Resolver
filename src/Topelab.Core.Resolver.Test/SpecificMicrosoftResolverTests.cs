@@ -15,7 +15,7 @@ namespace Topelab.Core.Resolver.Test
     public class SpecificMicrosoftResolverTests
     {
         [Test]
-        public void GetFactory()
+        public void ResolverFactory_CreateResolver_ReturnsResolverThatResolvesInstances()
         {
             // Arrange
             var number = 99;
@@ -37,7 +37,7 @@ namespace Topelab.Core.Resolver.Test
         }
 
         [Test]
-        public void AddResolver_IntialitzingServiceCollection_ResolverCollectionOK()
+        public void AddResolver_InitializingServiceCollection_ResolverCollectionOK()
         {
             // Arrange
             var resolveInfoCollection = new ResolveInfoCollection()
@@ -58,6 +58,55 @@ namespace Topelab.Core.Resolver.Test
             Assert.That(resolver.Get<IClaseTest>(), Is.EqualTo(provider.GetService<IClaseTest>()));
             Assert.That(resolver.Get<IGeremuDbContext>().Id, Is.EqualTo(provider.GetService<IGeremuDbContext>().Id));
             Assert.That(resolver.Get<IClaseTest2>(), Is.Not.Null);
+        }
+
+        [Test]
+        public void Resolve_WithCurrentResolver_ResolvesSameInstance()
+        {
+            // Arrange
+            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IClaseTest2, SimpleClaseTest2>()
+                .AddTransient<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
+                );
+
+            var resolver2 = ResolverFactory.Create(new ResolveInfoCollection()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IClaseTest2, SimpleClaseTest2>()
+                .AddTransient<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
+                );
+
+            // Act
+            var result1_1 = resolver.Get<IClaseTest>();
+            var result1_2 = resolver2.Get<IClaseTest>();
+            var result2_1 = resolver.Get<IClaseTest2>();
+            var result2_2 = resolver2.Get<IClaseTest2>();
+            var result3_1 = resolver.Get<IClaseTest>(nameof(SimpleClaseTest2));
+            var result3_2 = resolver2.Get<IClaseTest>(nameof(SimpleClaseTest2));
+
+            // Assert
+            Assert.That(result1_1, Is.Not.EqualTo(result1_2));
+            Assert.That(result2_1, Is.Not.EqualTo(result2_2));
+            Assert.That(result3_1, Is.Not.EqualTo(result3_2));
+
+        }
+
+        [Test]
+        public void ResolveFactoryCreate_Create2Resolvers_ResolversAreDifferent()
+        {
+            // Arrange
+            var collection = new ResolveInfoCollection()
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IClaseTest2, SimpleClaseTest2>()
+                .AddTransient<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2));
+
+            // Act
+            var resolver = ResolverFactory.Create(collection);
+            var resolver2 = ResolverFactory.Create(collection);
+
+            // Assert
+            Assert.That(resolver, Is.Not.EqualTo(resolver2));
+
         }
 
     }

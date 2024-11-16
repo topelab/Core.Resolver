@@ -13,28 +13,98 @@ namespace Topelab.Core.Resolver.Microsoft
     public static class ResolverFactory
     {
         private const string DefaultKey = "__NULL__";
-        private static Resolver rootResolver;
+        private static IResolver rootResolver;
+        private static IResolver currentResolver;
 
         /// <summary>
         /// Adds the resolver to service collection.
         /// </summary>
         /// <param name="services">The services.</param>
         /// <param name="resolveInfoCollection">The resolve information collection.</param>
-        public static IServiceCollection AddResolver(this IServiceCollection services, ResolveInfoCollection resolveInfoCollection)
+        public static IServiceCollection AddResolver(this IServiceCollection services, ResolveInfoCollection resolveInfoCollection, Scope scope = null)
         {
-            if (resolveInfoCollection is null)
-            {
-                throw new ArgumentNullException(nameof(resolveInfoCollection));
-            }
-            IDictionary<string, IResolver> globalResolvers = new Dictionary<string, IResolver>();
-            Dictionary<Type, Dictionary<string, Type>> namedResolutions = new();
+            ArgumentNullException.ThrowIfNull(resolveInfoCollection);
+
+            scope ??= Scope.Default;
+            Dictionary<Type, Dictionary<string, Type>> namedResolutions = [];
             FillNamedResolutions(resolveInfoCollection, namedResolutions);
-            var standardResolveInfoCollection = resolveInfoCollection.Where(r => IsStandard(r));
+            var standardResolveInfoCollection = resolveInfoCollection.Where(IsStandard);
 
             var collection = ServiceCollectionFactory.Create(standardResolveInfoCollection, services);
-            collection.AddSingleton(s => GetResolverImpl(s, resolveInfoCollection.Except(standardResolveInfoCollection), globalResolvers, namedResolutions));
+            collection.AddSingleton(s => GetResolverImpl(s, resolveInfoCollection.Except(standardResolveInfoCollection), namedResolutions, scope));
             return services;
         }
+
+        /// <summary>
+        /// Creates an IResolver based on the specified resolve info collection.
+        /// </summary>
+        /// <param name="resolveInfoCollection">The resolve info collection.</param>
+        public static IResolver Create(ResolveInfoCollection resolveInfoCollection, Scope scope = null)
+        {
+            ArgumentNullException.ThrowIfNull(resolveInfoCollection);
+
+            scope ??= Scope.Default;
+            Dictionary<Type, Dictionary<string, Type>> namedResolutions = [];
+            FillNamedResolutions(resolveInfoCollection, namedResolutions);
+            var standardResolveInfoCollection = resolveInfoCollection.Where(IsStandard);
+
+            var collection = ServiceCollectionFactory.Create(standardResolveInfoCollection);
+            collection.AddSingleton(s => GetResolverImpl(s, resolveInfoCollection.Except(standardResolveInfoCollection), namedResolutions, scope));
+
+            var serviceProvider = collection.BuildServiceProvider();
+            Resolver resolver = (Resolver)serviceProvider.GetService<IResolver>();
+            resolveInfoCollection.InitializeIntializers(resolver);
+            rootResolver ??= resolver;
+            currentResolver = resolver;
+            return resolver;
+        }
+
+        /// <summary>
+        /// Get current resolver
+        /// </summary>
+        public static IResolver GetResolver(Scope scope = null) => (scope ?? Scope.Default).Resolver;
+
+        /// <summary>
+        /// Select new scope and change currentResolver
+        /// </summary>
+        /// <param name="scope">New scope to select</param>
+        public static void SelectScope(Scope scope = null)
+        {
+            scope ??= Scope.Default;
+            if (scope.Resolver == null)
+            {
+                throw new System.Exception($"Scope {scope.Tag} doesn't have a resolver. Create a resolver with this scope");
+            }
+            currentResolver = (scope ?? Scope.Default).Resolver;
+        }
+
+        /// <summary>
+        /// Resolve type <typeparamref name="T"/>
+        /// </summary>
+        /// <typeparam name="T">Type to resolve</typeparam>
+        public static T Resolve<T>() where T : class => currentResolver.Get<T>();
+
+        /// <summary>
+        /// Resolve type <typeparamref name="T"/> using key and params
+        /// </summary>
+        /// <typeparam name="T">Type to resolve</typeparam>
+        /// <param name="args">Params to ctor</param>
+        public static T Resolve<T>(params object[] args) where T : class => currentResolver.Get<T>(args);
+
+        /// <summary>
+        /// Resolve type <typeparamref name="T"/> using key
+        /// </summary>
+        /// <typeparam name="T">Type to resolve</typeparam>
+        /// <param name="key">Key to resolve</param>
+        public static T Resolve<T>(string key) where T : class => currentResolver.Get<T>(key);
+
+        /// <summary>
+        /// Resolve type <typeparamref name="T"/> using key and params
+        /// </summary>
+        /// <typeparam name="T">Type to resolve</typeparam>
+        /// <param name="key">Key to resolve</param>
+        /// <param name="args">Params to ctor</param>
+        public static T Resolve<T>(string key, params object[] args) where T : class => currentResolver.Get<T>(key, args);
 
         private static bool IsStandard(ResolveInfo r)
         {
@@ -43,79 +113,21 @@ namespace Topelab.Core.Resolver.Microsoft
                 && (r.ConstructorParamTypes == null || r.ConstructorParamTypes.Length == 0);
         }
 
-        /// <summary>
-        /// Creates an IResolver based on the specified resolve info collection.
-        /// </summary>
-        /// <param name="resolveInfoCollection">The resolve info collection.</param>
-        public static IResolver Create(ResolveInfoCollection resolveInfoCollection)
+        private static IResolver GetResolverImpl(IServiceProvider serviceProvider, IEnumerable<ResolveInfo> resolveInfoCollection, Dictionary<Type, Dictionary<string, Type>> namedResolutions, Scope scope)
         {
-            if (resolveInfoCollection is null)
-            {
-                throw new ArgumentNullException(nameof(resolveInfoCollection));
-            }
-            IDictionary<string, IResolver> globalResolvers = new Dictionary<string, IResolver>();
-            Dictionary<Type, Dictionary<string, Type>> namedResolutions = new();
-            FillNamedResolutions(resolveInfoCollection, namedResolutions);
-            var standardResolveInfoCollection = resolveInfoCollection.Where(r => IsStandard(r));
-
-            var collection = ServiceCollectionFactory.Create(standardResolveInfoCollection);
-            collection.AddSingleton(s => GetResolverImpl(s, resolveInfoCollection.Except(standardResolveInfoCollection), globalResolvers, namedResolutions));
-
-            var serviceProvider = collection.BuildServiceProvider();
-            Resolver resolver = (Resolver)serviceProvider.GetService<IResolver>();
-            resolveInfoCollection.InitializeIntializers(resolver);
-            rootResolver ??= resolver;
-            return resolver;
-        }
-
-        /// <summary>
-        /// Get current resolver
-        /// </summary>
-        public static IResolver GetResolver() => rootResolver;
-
-        /// <summary>
-        /// Resolve type <typeparamref name="T"/>
-        /// </summary>
-        /// <typeparam name="T">Type to resolve</typeparam>
-        public static T Resolve<T>() where T : class => rootResolver.Get<T>();
-
-        /// <summary>
-        /// Resolve type <typeparamref name="T"/> using key and params
-        /// </summary>
-        /// <typeparam name="T">Type to resolve</typeparam>
-        /// <param name="args">Params to ctor</param>
-        public static T Resolve<T>(params object[] args) where T : class => rootResolver.Get<T>(args);
-
-        /// <summary>
-        /// Resolve type <typeparamref name="T"/> using key
-        /// </summary>
-        /// <typeparam name="T">Type to resolve</typeparam>
-        /// <param name="key">Key to resolve</param>
-        public static T Resolve<T>(string key) where T : class => rootResolver.Get<T>(key);
-
-        /// <summary>
-        /// Resolve type <typeparamref name="T"/> using key and params
-        /// </summary>
-        /// <typeparam name="T">Type to resolve</typeparam>
-        /// <param name="key">Key to resolve</param>
-        /// <param name="args">Params to ctor</param>
-        public static T Resolve<T>(string key, params object[] args) where T : class => rootResolver.Get<T>(key, args);
-
-        private static IResolver GetResolverImpl(IServiceProvider serviceProvider, IEnumerable<ResolveInfo> resolveInfoCollection, IDictionary<string, IResolver> globalResolvers, Dictionary<Type, Dictionary<string, Type>> namedResolutions)
-        {
-            var resolver = new Resolver(serviceProvider, DefaultKey, globalResolvers, namedResolutions);
+            Resolver resolver = new(serviceProvider, DefaultKey, namedResolutions, scope);
             List<string> otherKeys = resolveInfoCollection.Select(r => r.Key ?? DefaultKey).Where(k => k != DefaultKey).Distinct().ToList();
-            otherKeys.ForEach(key => Create(key, resolveInfoCollection, globalResolvers, namedResolutions));
+            otherKeys.ForEach(key => Create(key, resolveInfoCollection, namedResolutions, scope));
             return resolver;
         }
 
-        private static IResolver Create(string key, IEnumerable<ResolveInfo> resolveInfoCollection, IDictionary<string, IResolver> globalResolvers, Dictionary<Type, Dictionary<string, Type>> namedResolutions)
+        private static Resolver Create(string key, IEnumerable<ResolveInfo> resolveInfoCollection, Dictionary<Type, Dictionary<string, Type>> namedResolutions, Scope scope)
         {
             var resolveInfoCollectionWithKey = resolveInfoCollection.Where(r => (r.Key ?? DefaultKey) == key);
             var collection = ServiceCollectionFactory.Create(resolveInfoCollectionWithKey);
 
             var serviceProvider = collection.BuildServiceProvider();
-            var resolver = new Resolver(serviceProvider, key, globalResolvers, namedResolutions);
+            Resolver resolver = new(serviceProvider, key, namedResolutions, scope);
             return resolver;
         }
 
@@ -124,11 +136,13 @@ namespace Topelab.Core.Resolver.Microsoft
             var resolveInfoCollecionWithKey = resolveInfoCollection.Where(r => r.ResolveMode == Enums.ResolveModeEnum.None).Where(r => (r.Key ?? DefaultKey) != DefaultKey);
             foreach (var resolveInfo in resolveInfoCollecionWithKey)
             {
-                if (!namedResolutions.ContainsKey(resolveInfo.TypeFrom))
+                if (!namedResolutions.TryGetValue(resolveInfo.TypeFrom, out var value))
                 {
-                    namedResolutions[resolveInfo.TypeFrom] = new();
+                    value = [];
+                    namedResolutions[resolveInfo.TypeFrom] = value;
                 }
-                namedResolutions[resolveInfo.TypeFrom][resolveInfo.Key] = resolveInfo.TypeTo;
+
+                value[resolveInfo.Key] = resolveInfo.TypeTo;
             }
         }
     }
