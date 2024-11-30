@@ -6,6 +6,10 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.8.1
+
+- Upgrade Microsoft.NET.Test.Sdk to 17.12.0
+
 ### 1.8.0
 
 - Upgrade to .NET 9.0
