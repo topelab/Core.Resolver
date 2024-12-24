@@ -6,6 +6,11 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.8.2
+
+- Upgrade Autofac to 8.2.0
+- Upgrade NUnit to 4.3.1
+
 ### 1.8.1
 
 - Upgrade Microsoft.NET.Test.Sdk to 17.12.0
