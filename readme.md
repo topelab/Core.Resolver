@@ -6,6 +6,12 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.8.3
+
+- Upgrade NUnit to 4.3.2
+- Upgrade Microsoft.Extensions.DependencyInjection to 9.0.1
+- Upgrade Microsoft.Extensions.Hosting to 9.0.1
+
 ### 1.8.2
 
 - Upgrade Autofac to 8.2.0
