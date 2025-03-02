@@ -1,10 +1,17 @@
-# Topelab Core Resolver
+﻿# Topelab Core Resolver
 
 Unified layer resolver to different DI services.
 
 At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and Autofac are unified with this layer.
 
 ## Changes
+
+### 1.8.4
+
+- Upgrade NUnit3TestAdapter to 5.0.0
+- Upgrade Microsoft.NET.Test.Sdk to 17.13.0
+- Upgrade Microsoft.Extensions.DependencyInjection to 9.0.2
+- Upgrade Microsoft.Extensions.Hosting to 9.0.2
 
 ### 1.8.3
 
