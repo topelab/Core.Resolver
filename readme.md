@@ -6,6 +6,11 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.8.5
+
+- Upgrade Microsoft.Extensions.DependencyInjection to 9.0.3
+- Upgrade Microsoft.Extensions.Hosting to 9.0.3
+
 ### 1.8.4
 
 - Upgrade NUnit3TestAdapter to 5.0.0
