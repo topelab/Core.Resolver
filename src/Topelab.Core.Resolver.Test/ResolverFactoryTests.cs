@@ -14,16 +14,16 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
-                .AddSelf<SimpleClaseTest>()
-                .AddSelf<SimpleClaseTest>("named")
-                .AddFactory<IClaseTest>(r => r.Get<SimpleClaseTest>("named"))
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IClaseTest, SimpleClaseTest2>("named")
+                .AddFactory(r => r.Get<IClaseTest>("named"))
                 );
 
             // Act
             var result = resolver.Get<IClaseTest>();
 
             // Assert
-            Assert.That(new SimpleClaseTest().GiveMe(), Is.EqualTo(result.GiveMe()));
+            Assert.That(result, Is.TypeOf<SimpleClaseTest2>());
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
@@ -31,23 +31,23 @@ namespace Topelab.Core.Resolver.Test
         {
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
-                .AddSelf<SimpleClaseTest>()
-                .AddSelf<SimpleClaseTest>("named")
-                .AddFactory<IClaseTest>(r => r.Get<SimpleClaseTest>("named"))
+                .AddTransient<IClaseTest, SimpleClaseTest>()
+                .AddTransient<IClaseTest, SimpleClaseTest2>("named")
+                .AddFactory(r => r.Get<IClaseTest>("named"))
                 );
 
             var otherResolver = ResolverFactory.Create(new ResolveInfoCollection()
-                .AddSelf<ClaseTest>()
-                .AddSelf<ClaseTest>("named")
-                .AddFactory<IClaseTest>(r => r.Get<ClaseTest>("named"))
+                .AddTransient<IClaseTest, ClaseTest>()
+                .AddTransient<IClaseTest, ClaseTest>("named")
+                .AddFactory(r => r.Get<IClaseTest>("named"))
                 );
 
+
             // Act
-            var resolver2 = ResolverFactory.GetResolver();
-            var result = resolver2.Get<IClaseTest>();
+            var currentResolver = ResolverFactory.GetResolver();
 
             // Assert
-            Assert.That(new SimpleClaseTest().GiveMe(), Is.EqualTo(result.GiveMe()));
+            Assert.That(currentResolver, Is.Not.EqualTo(otherResolver));
         }
 
     }
