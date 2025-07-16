@@ -27,64 +27,95 @@ namespace Topelab.Core.Resolver.Microsoft
                     case ResolveModeEnum.Initializer:
                         break;
                     case ResolveModeEnum.Instance:
-                        collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.Instance);
+                        if (resolveInfo.Key != null)
+                        {
+                            collection.AddKeyedSingleton(resolveInfo.TypeFrom, resolveInfo.Key, resolveInfo.Instance);
+                        }
+                        else
+                        {
+                            collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.Instance);
+                        }
                         break;
                     case ResolveModeEnum.Factory:
                         switch (resolveInfo.ResolveLifeCycle)
                         {
                             case ResolveLifeCycleEnum.Transient:
-                                collection.AddTransient(resolveInfo.TypeFrom, s => resolveInfo.Factory.Invoke(s.GetService<IResolver>()));
+                                if (resolveInfo.Key != null)
+                                {
+                                    collection.AddKeyedTransient(resolveInfo.TypeFrom, resolveInfo.Key, (s, key) => resolveInfo.Factory.Invoke(s.GetService<IResolver>()));
+                                }
+                                else
+                                {
+                                    collection.AddTransient(resolveInfo.TypeFrom, s => resolveInfo.Factory.Invoke(s.GetService<IResolver>()));
+                                }
                                 break;
                             case ResolveLifeCycleEnum.Scoped:
-                                collection.AddScoped(resolveInfo.TypeFrom, s => resolveInfo.Factory.Invoke(s.GetService<IResolver>()));
+                                if (resolveInfo.Key != null)
+                                {
+                                    collection.AddKeyedScoped(resolveInfo.TypeFrom, resolveInfo.Key, (s, key) => resolveInfo.Factory.Invoke(s.GetService<IResolver>()));
+                                }
+                                else
+                                {
+                                    collection.AddScoped(resolveInfo.TypeFrom, s => resolveInfo.Factory.Invoke(s.GetService<IResolver>()));
+                                }
                                 break;
                             case ResolveLifeCycleEnum.Singleton:
-                                collection.AddSingleton(resolveInfo.TypeFrom, s => resolveInfo.Factory.Invoke(s.GetService<IResolver>()));
+                                if (resolveInfo.Key != null)
+                                {
+                                    collection.AddKeyedSingleton(resolveInfo.TypeFrom, resolveInfo.Key, (s, key) => resolveInfo.Factory.Invoke(s.GetService<IResolver>()));
+                                }
+                                else
+                                {
+                                    collection.AddSingleton(resolveInfo.TypeFrom, s => resolveInfo.Factory.Invoke(s.GetService<IResolver>()));
+                                }
                                 break;
                             default:
                                 break;
                         }
                         break;
-                    default:
+                    case ResolveModeEnum.None:
+                        if (resolveInfo.ConstructorParamTypes != null && resolveInfo.ConstructorParamTypes.Length > 0)
+                        {
+                            if (resolveInfo.Key != null)
+                            {
+                                resolveInfo.Key = string.Concat(resolveInfo.Key, "|", ResolverKeyFactory.Create(resolveInfo.ConstructorParamTypes));
+                            }
+                            else
+                            {
+                                resolveInfo.Key = ResolverKeyFactory.Create(resolveInfo.ConstructorParamTypes);
+                            }
+                            break;
+                        }
                         switch (resolveInfo.ResolveLifeCycle)
                         {
                             case ResolveLifeCycleEnum.Singleton:
-                                if (resolveInfo.ConstructorParamTypes.Length == 0)
+                                if (resolveInfo.Key != null)
                                 {
-                                    if (resolveInfo.Key != null)
-                                    {
-                                        collection.AddSingleton(resolveInfo.TypeTo);
-                                    }
-                                    else
-                                    {
-                                        collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.TypeTo);
-                                    }
+                                    collection.AddKeyedSingleton(resolveInfo.TypeFrom, resolveInfo.Key, resolveInfo.TypeTo);
+                                }
+                                else
+                                {
+                                    collection.AddSingleton(resolveInfo.TypeFrom, resolveInfo.TypeTo);
                                 }
                                 break;
                             case ResolveLifeCycleEnum.Scoped:
-                                if (resolveInfo.ConstructorParamTypes.Length == 0)
+                                if (resolveInfo.Key != null)
                                 {
-                                    if (resolveInfo.Key != null)
-                                    {
-                                        collection.AddScoped(resolveInfo.TypeTo);
-                                    }
-                                    else
-                                    {
-                                        collection.AddScoped(resolveInfo.TypeFrom, resolveInfo.TypeTo);
-                                    }
+                                    collection.AddKeyedScoped(resolveInfo.TypeFrom, resolveInfo.Key, resolveInfo.TypeTo);
+                                }
+                                else
+                                {
+                                    collection.AddScoped(resolveInfo.TypeFrom, resolveInfo.TypeTo);
                                 }
                                 break;
                             default:
-                                if (resolveInfo.ConstructorParamTypes.Length == 0)
+                                if (resolveInfo.Key != null)
                                 {
-                                    if (resolveInfo.Key != null)
-                                    {
-                                        collection.AddTransient(resolveInfo.TypeTo);
-                                    }
-                                    else
-                                    {
-                                        collection.AddTransient(resolveInfo.TypeFrom, resolveInfo.TypeTo);
-                                    }
+                                    collection.AddKeyedSingleton(resolveInfo.TypeFrom, resolveInfo.Key, resolveInfo.TypeTo);
+                                }
+                                else
+                                {
+                                    collection.AddTransient(resolveInfo.TypeFrom, resolveInfo.TypeTo);
                                 }
                                 break;
                         }

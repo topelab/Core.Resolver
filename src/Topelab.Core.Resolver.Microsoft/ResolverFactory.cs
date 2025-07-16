@@ -12,7 +12,6 @@ namespace Topelab.Core.Resolver.Microsoft
     /// </summary>
     public static class ResolverFactory
     {
-        private const string DefaultKey = "__NULL__";
         private static IResolver rootResolver;
         private static IResolver currentResolver;
 
@@ -28,10 +27,8 @@ namespace Topelab.Core.Resolver.Microsoft
             scope ??= Scope.Default;
             Dictionary<Type, Dictionary<string, Type>> namedResolutions = [];
             FillNamedResolutions(resolveInfoCollection, namedResolutions);
-            var standardResolveInfoCollection = resolveInfoCollection.Where(IsStandard);
-
-            var collection = ServiceCollectionFactory.Create(standardResolveInfoCollection, services);
-            collection.AddSingleton(s => GetResolverImpl(s, resolveInfoCollection.Except(standardResolveInfoCollection), namedResolutions, scope));
+            var collection = ServiceCollectionFactory.Create(resolveInfoCollection, services);
+            collection.AddSingleton<IResolver>(s => GetResolverImpl(s, resolveInfoCollection, namedResolutions, scope));
             return services;
         }
 
@@ -46,14 +43,11 @@ namespace Topelab.Core.Resolver.Microsoft
             scope ??= Scope.Default;
             Dictionary<Type, Dictionary<string, Type>> namedResolutions = [];
             FillNamedResolutions(resolveInfoCollection, namedResolutions);
-            var standardResolveInfoCollection = resolveInfoCollection.Where(IsStandard);
-
-            var collection = ServiceCollectionFactory.Create(standardResolveInfoCollection);
-            collection.AddSingleton(s => GetResolverImpl(s, resolveInfoCollection.Except(standardResolveInfoCollection), namedResolutions, scope));
+            var collection = ServiceCollectionFactory.Create(resolveInfoCollection);
+            collection.AddSingleton(s => GetResolverImpl(s, resolveInfoCollection, namedResolutions, scope));
 
             var serviceProvider = collection.BuildServiceProvider();
             Resolver resolver = (Resolver)serviceProvider.GetService<IResolver>();
-            resolveInfoCollection.InitializeIntializers(resolver);
             rootResolver ??= resolver;
             currentResolver = resolver;
             return resolver;
@@ -108,32 +102,20 @@ namespace Topelab.Core.Resolver.Microsoft
 
         private static bool IsStandard(ResolveInfo r)
         {
-            return (r.ResolveMode == Enums.ResolveModeEnum.None
-                || (r.ResolveMode != Enums.ResolveModeEnum.None && (r.Key ?? DefaultKey) == DefaultKey))
-                && (r.ConstructorParamTypes == null || r.ConstructorParamTypes.Length == 0);
+            return r.ConstructorParamTypes == null || r.ConstructorParamTypes.Length == 0;
         }
 
-        private static IResolver GetResolverImpl(IServiceProvider serviceProvider, IEnumerable<ResolveInfo> resolveInfoCollection, Dictionary<Type, Dictionary<string, Type>> namedResolutions, Scope scope)
+        private static IResolver GetResolverImpl(IServiceProvider serviceProvider, ResolveInfoCollection resolveInfoCollection, Dictionary<Type, Dictionary<string, Type>> namedResolutions, Scope scope)
         {
-            Resolver resolver = new(serviceProvider, DefaultKey, namedResolutions, scope);
-            List<string> otherKeys = resolveInfoCollection.Select(r => r.Key ?? DefaultKey).Where(k => k != DefaultKey).Distinct().ToList();
-            otherKeys.ForEach(key => Create(key, resolveInfoCollection, namedResolutions, scope));
+            Resolver resolver = new(serviceProvider, namedResolutions, scope);
+            resolveInfoCollection.InitializeIntializers(resolver);
             return resolver;
         }
 
-        private static Resolver Create(string key, IEnumerable<ResolveInfo> resolveInfoCollection, Dictionary<Type, Dictionary<string, Type>> namedResolutions, Scope scope)
-        {
-            var resolveInfoCollectionWithKey = resolveInfoCollection.Where(r => (r.Key ?? DefaultKey) == key);
-            var collection = ServiceCollectionFactory.Create(resolveInfoCollectionWithKey);
-
-            var serviceProvider = collection.BuildServiceProvider();
-            Resolver resolver = new(serviceProvider, key, namedResolutions, scope);
-            return resolver;
-        }
 
         private static void FillNamedResolutions(ResolveInfoCollection resolveInfoCollection, Dictionary<Type, Dictionary<string, Type>> namedResolutions)
         {
-            var resolveInfoCollecionWithKey = resolveInfoCollection.Where(r => r.ResolveMode == Enums.ResolveModeEnum.None).Where(r => (r.Key ?? DefaultKey) != DefaultKey);
+            var resolveInfoCollecionWithKey = resolveInfoCollection.Where(r => !IsStandard(r));
             foreach (var resolveInfo in resolveInfoCollecionWithKey)
             {
                 if (!namedResolutions.TryGetValue(resolveInfo.TypeFrom, out var value))

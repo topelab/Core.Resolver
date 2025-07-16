@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using System.Globalization;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Test.Cases;
 using Topelab.Core.Resolver.Test.Entities;
@@ -34,7 +33,7 @@ namespace Topelab.Core.Resolver.Test
                 );
 
             // Act
-            var result = (IClaseTest)resolver.Get(typeof(IClaseTest));
+            IClaseTest result = (IClaseTest)resolver.Get(typeof(IClaseTest));
 
             // Assert
             Assert.That(new SimpleClaseTest().GiveMe(), Is.EqualTo(result.GiveMe()));
@@ -67,7 +66,7 @@ namespace Topelab.Core.Resolver.Test
                 );
 
             // Act
-            var result = (IClaseTest)resolver.Get(typeof(IClaseTest));
+            IClaseTest result = (IClaseTest)resolver.Get(typeof(IClaseTest));
             var result2 = resolver.Get<IClaseTest>(nameof(SimpleClaseTest2));
 
             // Assert
@@ -144,7 +143,7 @@ namespace Topelab.Core.Resolver.Test
             Assert.That(result20, Is.Not.EqualTo(result202));
             Assert.That(result, Is.Not.EqualTo(result20));
             Assert.That(result2, Is.Not.EqualTo(result202));
-            Assert.That(result3, Is.Not.Null);
+            Assert.That(result3, Is.Null);
         }
 
         [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
@@ -259,7 +258,7 @@ namespace Topelab.Core.Resolver.Test
                 .AddTransient<IGeremuDbContext, GeremuDbContext>()
                 );
             var text = "hello";
-            int num = 1;
+            var num = 1;
             var context = resolver.Get<IGeremuDbContext>();
             var expected = new ClaseTest(context, text, num).GiveMe();
 

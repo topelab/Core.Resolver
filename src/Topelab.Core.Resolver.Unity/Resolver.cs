@@ -49,8 +49,7 @@ namespace Topelab.Core.Resolver.Unity
                 return container.Resolve(type);
             }
 
-            var resolver = GetResolvers().Where(r => !r.Equals(this) && IsRegistered(type, r.container)).FirstOrDefault();
-            return resolver == null ? default : resolver.container.Resolve(type);
+            return null;
         }
 
         /// <summary>
@@ -64,8 +63,7 @@ namespace Topelab.Core.Resolver.Unity
                 return container.Resolve<T>();
             }
 
-            var resolver = GetResolvers().Where(r => !r.Equals(this) && IsRegistered(typeof(T), r.container)).FirstOrDefault();
-            return resolver == null ? default : resolver.container.Resolve<T>();
+            return default;
         }
 
         private bool IsRegistered(Type type, IUnityContainer container, string key = null)

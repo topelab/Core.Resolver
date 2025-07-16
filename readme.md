@@ -6,6 +6,11 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.8.10
+
+- Refactor for better performance and memory usage with Topelab.Core.Resolver.Microsoft.
+- Used true keyed registration for Microsoft.Extensions.DependencyInjection.
+
 ### 1.8.6
 
 - Upgrade Autofac to 8.2.1

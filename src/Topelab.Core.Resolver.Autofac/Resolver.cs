@@ -46,8 +46,7 @@ namespace Topelab.Core.Resolver.Autofac
             {
                 return Resolve(container, type);
             }
-            var resolver = GetResolverExcludingThisWithRegisteredType(type);
-            return resolver == null ? default : Resolve(resolver.container, type);
+            return null;
         }
 
         /// <summary>
@@ -60,8 +59,7 @@ namespace Topelab.Core.Resolver.Autofac
             {
                 return Resolve<T>(container);
             }
-            var resolver = GetResolverExcludingThisWithRegisteredType(typeof(T));
-            return resolver == null ? default : Resolve<T>(resolver.container);
+            return default;
         }
 
         private T Resolve<T>(IContainer container)

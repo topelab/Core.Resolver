@@ -15,7 +15,6 @@ namespace Topelab.Core.Resolver.Microsoft
         private static readonly List<Resolver> resolvers = [];
         private static int globalId = 0;
 
-        private readonly ResolverKey resolverKey;
         private readonly IServiceProvider serviceProvider;
         private readonly Dictionary<Type, Dictionary<string, Type>> namedResolutions;
         private readonly Scope scope;
@@ -27,18 +26,15 @@ namespace Topelab.Core.Resolver.Microsoft
         /// Constructor
         /// </summary>
         /// <param name="serviceProvider">Service provider</param>
-        /// <param name="key">Key to have different resolvers</param>
+        /// <param name="scope">Scope for this resolver</param>
         /// <exception cref="ArgumentNullException"></exception>
-        internal Resolver(IServiceProvider serviceProvider, string key, Dictionary<Type, Dictionary<string, Type>> namedResolutions, Scope scope = null)
+        internal Resolver(IServiceProvider serviceProvider, Dictionary<Type, Dictionary<string, Type>> namedResolutions, Scope scope = null)
         {
             Id = globalId++;
             this.scope = scope ?? Scope.Default;
             this.scope.Add(this);
-
-            resolverKey = new(this.scope, key);
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             this.namedResolutions = namedResolutions ?? throw new ArgumentNullException(nameof(namedResolutions));
-            globalResolvers[resolverKey] = this;
             resolvers.Add(this);
         }
 
@@ -50,11 +46,7 @@ namespace Topelab.Core.Resolver.Microsoft
 
         public object Get(Type type)
         {
-            var result = serviceProvider.GetService(type) ?? GetResolvers()
-                .Where(r => !r.Equals(this))
-                .Select(r => r.serviceProvider.GetService(type))
-                .FirstOrDefault(r => r != null);
-
+            var result = serviceProvider.GetService(type);
             return result;
         }
 
@@ -67,7 +59,7 @@ namespace Topelab.Core.Resolver.Microsoft
         public T Get<T, T1>(T1 arg1)
         {
             var key = ResolverKeyFactory.Create(typeof(T1));
-            return Get<T, T1>(key, arg1);
+            return GetImpl<T>(key, arg1);
         }
 
         /// <summary>
@@ -82,7 +74,7 @@ namespace Topelab.Core.Resolver.Microsoft
         public T Get<T, T1, T2>(T1 arg1, T2 arg2)
         {
             var key = ResolverKeyFactory.Create(typeof(T1), typeof(T2));
-            return Get<T, T1, T2>(key, arg1, arg2);
+            return GetImpl<T>(key, arg1, arg2);
         }
 
         /// <summary>
@@ -99,7 +91,7 @@ namespace Topelab.Core.Resolver.Microsoft
         public T Get<T, T1, T2, T3>(T1 arg1, T2 arg2, T3 arg3)
         {
             var key = ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3));
-            return Get<T, T1, T2, T3>(key, arg1, arg2, arg3);
+            return GetImpl<T>(key, arg1, arg2, arg3);
         }
 
         /// <summary>
@@ -118,7 +110,7 @@ namespace Topelab.Core.Resolver.Microsoft
         public T Get<T, T1, T2, T3, T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
             var key = ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3), typeof(T4));
-            return Get<T, T1, T2, T3, T4>(key, arg1, arg2, arg3, arg4);
+            return GetImpl<T>(key, arg1, arg2, arg3, arg4);
         }
 
         /// <summary>
@@ -139,7 +131,7 @@ namespace Topelab.Core.Resolver.Microsoft
         public T Get<T, T1, T2, T3, T4, T5>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
             var key = ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
-            return Get<T, T1, T2, T3, T4, T5>(key, arg1, arg2, arg3, arg4, arg5);
+            return GetImpl<T>(key, arg1, arg2, arg3, arg4, arg5);
         }
 
         /// <summary>
@@ -162,7 +154,7 @@ namespace Topelab.Core.Resolver.Microsoft
         public T Get<T, T1, T2, T3, T4, T5, T6>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
             var key = ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
-            return Get<T, T1, T2, T3, T4, T5, T6>(key, arg1, arg2, arg3, arg4, arg5, arg6);
+            return GetImpl<T>(key, arg1, arg2, arg3, arg4, arg5, arg6);
         }
 
         /// <summary>
@@ -172,7 +164,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="key">Key name to resolve</param>
         public T Get<T>(string key)
         {
-            return (T)Get(typeof(T), key);
+            return serviceProvider.GetKeyedService<T>(key);
         }
 
         /// <summary>
@@ -182,18 +174,7 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="key">Key name to resolve</param>
         public object Get(Type typeFrom, string key)
         {
-            object result;
-            Type type = FindTypeWithKey(typeFrom, key);
-            if (type == null)
-            {
-                var resolver = FindResolverWithKey(key);
-                result = resolver.serviceProvider.GetService(typeFrom);
-            }
-            else
-            {
-                result = serviceProvider.GetService(type);
-            }
-            return result;
+            return serviceProvider.GetKeyedServices(typeFrom, key).FirstOrDefault();
         }
 
         /// <summary>
@@ -205,7 +186,8 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg1">Param 1 for constructor</param>
         public T Get<T, T1>(string key, T1 arg1)
         {
-            return GetImpl<T>(key, arg1);
+            string fullKey = string.Concat(key, "|", ResolverKeyFactory.Create(typeof(T1)));
+            return GetImpl<T>(fullKey, arg1);
         }
 
         /// <summary>
@@ -220,7 +202,8 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg2">Param 2 for constructor</param>
         public T Get<T, T1, T2>(string key, T1 arg1, T2 arg2)
         {
-            return GetImpl<T>(key, arg1, arg2);
+            string fullKey = string.Concat(key, "|", ResolverKeyFactory.Create(typeof(T1), typeof(T2)));
+            return GetImpl<T>(fullKey, arg1, arg2);
         }
 
         /// <summary>
@@ -237,7 +220,8 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg3">Param 3 for constructor</param>
         public T Get<T, T1, T2, T3>(string key, T1 arg1, T2 arg2, T3 arg3)
         {
-            return GetImpl<T>(key, arg1, arg2, arg3);
+            string fullKey = string.Concat(key, "|", ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3)));
+            return GetImpl<T>(fullKey, arg1, arg2, arg3);
         }
 
         /// <summary>
@@ -256,7 +240,8 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg4">Param 4 for constructor</param>
         public T Get<T, T1, T2, T3, T4>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            return GetImpl<T>(key, arg1, arg2, arg3, arg4);
+            string fullKey = string.Concat(key, "|", ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3), typeof(T4)));
+            return GetImpl<T>(fullKey, arg1, arg2, arg3, arg4);
         }
 
         /// <summary>
@@ -277,7 +262,8 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg5">Param 5 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
-            return GetImpl<T>(key, arg1, arg2, arg3, arg4, arg5);
+            string fullKey = string.Concat(key, "|", ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5)));
+            return GetImpl<T>(fullKey, arg1, arg2, arg3, arg4, arg5);
         }
 
         /// <summary>
@@ -300,7 +286,8 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="arg6">Param 6 for constructor</param>
         public T Get<T, T1, T2, T3, T4, T5, T6>(string key, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
-            return GetImpl<T>(key, arg1, arg2, arg3, arg4, arg5, arg6);
+            string fullKey = string.Concat(key, "|", ResolverKeyFactory.Create(typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6)));
+            return GetImpl<T>(fullKey, arg1, arg2, arg3, arg4, arg5, arg6);
         }
 
         public T Get<T>(params object[] args)
@@ -314,65 +301,28 @@ namespace Topelab.Core.Resolver.Microsoft
 
         private T GetImpl<T>(string key, params object[] args)
         {
-            var fullKey = key;
-            var resolver = FindResolverWithKey(key);
-            if (resolver == null)
-            {
-                (resolver, fullKey) = FindResolverWithPartialKey(key);
-            }
-            Type type = GetTypeFromNamedResolution(resolver, fullKey, typeof(T));
-            return (T)ActivatorUtilities.CreateInstance(serviceProvider, type, args);
+            var type = GetTypeFromNamedResolution(key, typeof(T));
+            return type is null ? default : (T)ActivatorUtilities.CreateInstance(serviceProvider, type, args);
         }
 
-        private Type GetTypeFromNamedResolution(Resolver resolver, string key, Type type)
+        private Type GetTypeFromNamedResolution(string key, Type type)
         {
-            Type result = type;
-            if (resolver.namedResolutions.TryGetValue(type, out var typesByName))
+            var result = type;
+            if (namedResolutions.TryGetValue(type, out var typesByName))
             {
-                if (typesByName.TryGetValue(key, out var foundType))
+                if (typesByName.Count == 1)
                 {
+                    result = typesByName.Values.First();
+                }
+                else
+                {
+                    var keys = key.Split('|');
+                    var foundType = typesByName.Where(p => p.Key.Contains(key)).OrderByDescending(r => r.Key.Length).Select(r => r.Value).FirstOrDefault();
                     result = foundType;
                 }
             }
 
             return result;
         }
-
-        private Type FindTypeWithKey(Type typeFrom, string key)
-        {
-            Type result = null;
-            if (namedResolutions.TryGetValue(typeFrom, out var types))
-            {
-                if (types.TryGetValue(key, out var type))
-                {
-                    result = type;
-                }
-            }
-            return result;
-        }
-
-        private Resolver FindResolverWithKey(string key)
-        {
-            ResolverKey otherKey = resolverKey with { Key = key };
-
-            var resolver = globalResolvers.ContainsKey(otherKey)
-                ? (Resolver)globalResolvers[otherKey]
-                : GetResolvers().FirstOrDefault(r => !r.Equals(this) && r.globalResolvers.ContainsKey(otherKey));
-
-            return resolver;
-        }
-
-        private (Resolver resolver, string key) FindResolverWithPartialKey(string key)
-        {
-            return GetResolvers()
-                .SelectMany(r => r.globalResolvers)
-                .Where(gr => $"|{gr.Key.Key}|".Contains(key))
-                .Select(gr => new { Index = gr.Key.Key.Split('|').Length, Value = (Resolver)gr.Value, gr.Key.Key })
-                .OrderBy(k => k.Index)
-                .Select(k => (k.Value, k.Key))
-                .FirstOrDefault();
-        }
-
-        private IEnumerable<Resolver> GetResolvers() => resolvers.Where(r => r.scope == scope).Reverse();
     }
 }
