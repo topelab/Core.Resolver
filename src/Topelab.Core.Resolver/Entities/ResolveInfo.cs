@@ -21,22 +21,22 @@ namespace Topelab.Core.Resolver.Entities
         /// <summary>
         /// Type from
         /// </summary>
-        public Type TypeFrom { get; set; } = typeFrom;
+        public Type TypeFrom { get; } = typeFrom;
 
         /// <summary>
         /// Typo to
         /// </summary>
-        public Type TypeTo { get; set; } = typeTo;
+        public Type TypeTo { get; } = typeTo;
 
         /// <summary>
         /// Resolve type
         /// </summary>
-        public ResolveLifeCycleEnum ResolveLifeCycle { get; set; } = resolveLifeCycle;
+        public ResolveLifeCycleEnum ResolveLifeCycle { get; } = resolveLifeCycle;
 
         /// <summary>
         /// Resolve mode.
         /// </summary>
-        public ResolveModeEnum ResolveMode { get; set; } = resolveMode;
+        public ResolveModeEnum ResolveMode { get; } = resolveMode;
 
         /// <summary>
         /// Instance
@@ -51,11 +51,16 @@ namespace Topelab.Core.Resolver.Entities
         /// <summary>
         /// Key
         /// </summary>
-        public string Key { get; set; } = key ?? ResolverKeyFactory.Create(constructorParamTypes);
+        public string Key { get; } = ResolverKeyFactory.Create(key, constructorParamTypes);
+
+        /// <summary>
+        /// Gets the original key associated with the current instance.
+        /// </summary>
+        public string OriginalKey => key ?? ResolverKeyFactory.Create(constructorParamTypes);
 
         /// <summary>
         /// Constructors param types
         /// </summary>
-        public Type[] ConstructorParamTypes { get; set; } = constructorParamTypes ?? [];
+        public Type[] ConstructorParamTypes { get; } = constructorParamTypes ?? [];
     }
 }

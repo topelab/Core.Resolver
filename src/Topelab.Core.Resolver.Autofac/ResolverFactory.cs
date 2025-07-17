@@ -21,7 +21,7 @@ namespace Topelab.Core.Resolver.Autofac
         public static IResolver Create(ResolveInfoCollection resolveInfoCollection, Scope scope = null)
         {
             scope ??= Scope.Default;
-            Dictionary<string, ConstructorInfo> constructorsByKey = new();
+            Dictionary<string, ConstructorInfo> constructorsByKey = [];
 
             ContainerBuilder builder = new();
             if (resolveInfoCollection != null)

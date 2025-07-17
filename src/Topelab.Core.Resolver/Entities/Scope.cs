@@ -10,7 +10,7 @@ namespace Topelab.Core.Resolver.Entities
         private string tag = tag;
         private static readonly Scope defaultInstance = new(DEFAULT_TAG);
         private IResolver rootResolver;
-        private readonly List<IResolver> resolvers = [];
+        private readonly HashSet<IResolver> resolvers = [];
 
         public string Tag
         {
@@ -21,10 +21,7 @@ namespace Topelab.Core.Resolver.Entities
         public void Add(IResolver resolver)
         {
             rootResolver ??= resolver;
-            if (!resolvers.Contains(resolver))
-            {
-                resolvers.Add(resolver);
-            }
+            resolvers.Add(resolver);
         }
 
         public IResolver Resolver => rootResolver;

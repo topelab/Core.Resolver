@@ -22,7 +22,7 @@ namespace Topelab.Core.Resolver.Autofac
         {
             resolveInfoCollection.ForEach(resolveInfo =>
             {
-                var key = ResolverKeyFactory.Create(resolveInfo);
+                var key = resolveInfo.OriginalKey;
                 var constructorInfo = GetConstructorInfo(resolveInfo);
 
                 if (constructorInfo != null && key != null)

@@ -74,18 +74,6 @@ namespace Topelab.Core.Resolver.Microsoft
                         }
                         break;
                     case ResolveModeEnum.None:
-                        if (resolveInfo.ConstructorParamTypes != null && resolveInfo.ConstructorParamTypes.Length > 0)
-                        {
-                            if (resolveInfo.Key != null)
-                            {
-                                resolveInfo.Key = string.Concat(resolveInfo.Key, "|", ResolverKeyFactory.Create(resolveInfo.ConstructorParamTypes));
-                            }
-                            else
-                            {
-                                resolveInfo.Key = ResolverKeyFactory.Create(resolveInfo.ConstructorParamTypes);
-                            }
-                            break;
-                        }
                         switch (resolveInfo.ResolveLifeCycle)
                         {
                             case ResolveLifeCycleEnum.Singleton:

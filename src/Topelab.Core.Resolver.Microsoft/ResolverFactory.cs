@@ -28,7 +28,7 @@ namespace Topelab.Core.Resolver.Microsoft
             Dictionary<Type, Dictionary<string, Type>> namedResolutions = [];
             FillNamedResolutions(resolveInfoCollection, namedResolutions);
             var collection = ServiceCollectionFactory.Create(resolveInfoCollection, services);
-            collection.AddSingleton<IResolver>(s => GetResolverImpl(s, resolveInfoCollection, namedResolutions, scope));
+            collection.AddSingleton(s => GetResolverImpl(s, resolveInfoCollection, namedResolutions, scope));
             return services;
         }
 
