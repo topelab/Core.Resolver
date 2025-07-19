@@ -6,7 +6,7 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
-### 1.8.10
+### 1.9.0
 
 - Refactor for better performance and memory usage with Topelab.Core.Resolver.Microsoft.
 - Used true keyed registration for Microsoft.Extensions.DependencyInjection.
