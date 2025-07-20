@@ -100,11 +100,6 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="args">Params to ctor</param>
         public static T Resolve<T>(string key, params object[] args) where T : class => currentResolver.Get<T>(key, args);
 
-        private static bool IsStandard(ResolveInfo r)
-        {
-            return r.ConstructorParamTypes == null || r.ConstructorParamTypes.Length == 0;
-        }
-
         private static IResolver GetResolverImpl(IServiceProvider serviceProvider, ResolveInfoCollection resolveInfoCollection, Dictionary<Type, Dictionary<string, Type>> namedResolutions, Scope scope)
         {
             Resolver resolver = new(serviceProvider, namedResolutions, scope);
@@ -115,8 +110,7 @@ namespace Topelab.Core.Resolver.Microsoft
 
         private static void FillNamedResolutions(ResolveInfoCollection resolveInfoCollection, Dictionary<Type, Dictionary<string, Type>> namedResolutions)
         {
-            var resolveInfoCollecionWithKey = resolveInfoCollection.Where(r => !IsStandard(r));
-            foreach (var resolveInfo in resolveInfoCollecionWithKey)
+            foreach (var resolveInfo in resolveInfoCollection)
             {
                 if (!namedResolutions.TryGetValue(resolveInfo.TypeFrom, out var value))
                 {
@@ -124,7 +118,8 @@ namespace Topelab.Core.Resolver.Microsoft
                     namedResolutions[resolveInfo.TypeFrom] = value;
                 }
 
-                value[resolveInfo.Key] = resolveInfo.TypeTo;
+                var key = resolveInfo.Key ?? string.Empty;
+                value[key] = resolveInfo.TypeTo;
             }
         }
     }
