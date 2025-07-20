@@ -28,7 +28,7 @@ namespace Topelab.Core.Resolver.Test.Entities
 
         public string GiveMe()
         {
-            return $"{test} ({context?.Id}) with number {number}";
+            return $"{test} with number {number}";
         }
     }
 

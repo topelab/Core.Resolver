@@ -91,8 +91,8 @@ namespace Topelab.Core.Resolver.Test
             var simple = resolver.Get<IClaseTest>();
 
             // Assert
-            Assert.That(result2.GiveMe().StartsWith($"{param} (") && result2.GiveMe().EndsWith("2"));
-            Assert.That(result0.GiveMe().StartsWith($"{param} (") && result0.GiveMe().EndsWith("0"));
+            Assert.That(result2.GiveMe().StartsWith($"{param} ") && result2.GiveMe().EndsWith("2"));
+            Assert.That(result0.GiveMe().StartsWith($"{param} ") && result0.GiveMe().EndsWith("0"));
             Assert.That(simple.GiveMe().Equals("Simple class"));
         }
 
@@ -255,18 +255,18 @@ namespace Topelab.Core.Resolver.Test
             // Arrange
             var resolver = ResolverFactory.Create(new ResolveInfoCollection()
                 .AddTransient<IClaseTest, ClaseTest>(typeof(IGeremuDbContext), typeof(string), typeof(int))
+                .AddTransient<IClaseTest, SimpleClaseTest>()
                 .AddTransient<IGeremuDbContext, GeremuDbContext>()
                 );
             var text = "hello";
             var num = 1;
-            var context = resolver.Get<IGeremuDbContext>();
-            var expected = new ClaseTest(context, text, num).GiveMe();
 
             // Act
-            var result = resolver.Get<IClaseTest, string, int>(text, num).GiveMe();
+            var result = resolver.Get<IClaseTest, string, int>(text, num);
 
             // Assert 
-            Assert.That(expected, Is.EqualTo(result));
+            Assert.That(result, Is.InstanceOf<ClaseTest>());
+            Assert.That(result.GiveMe(), Is.EqualTo($"{text} with number {num}"));
         }
     }
 }

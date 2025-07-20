@@ -322,7 +322,7 @@ namespace Topelab.Core.Resolver.Microsoft
                     }
                     else
                     {
-                        foundType = typesByName.Where(p => p.Key.StartsWith(key)).OrderByDescending(r => r.Key.Length).Select(r => r.Value).FirstOrDefault();
+                        foundType = typesByName.Where(p => p.Key.Contains(key[1..])).OrderByDescending(r => r.Key.Length).Select(r => r.Value).FirstOrDefault();
                         if (foundType is not null)
                         {
                             result = foundType;
