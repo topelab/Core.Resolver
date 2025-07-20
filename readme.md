@@ -6,6 +6,12 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 1.8.12
+
+- Upgrade Microsoft.Extensions.DependencyInjection to 9.0.7
+- Upgrade Microsoft.Extensions.Hosting to 9.0.7
+- Rollback some keyed services
+
 ### 1.8.6
 
 - Upgrade Autofac to 8.2.1

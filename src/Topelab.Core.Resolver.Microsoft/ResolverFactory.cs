@@ -49,7 +49,7 @@ namespace Topelab.Core.Resolver.Microsoft
             var standardResolveInfoCollection = resolveInfoCollection.Where(IsStandard);
 
             var collection = ServiceCollectionFactory.Create(standardResolveInfoCollection);
-            collection.AddSingleton(s => GetResolverImpl(s, resolveInfoCollection.Except(standardResolveInfoCollection), namedResolutions, scope));
+            collection.AddSingleton(s => GetResolverImpl(s, resolveInfoCollection, namedResolutions, scope));
 
             var serviceProvider = collection.BuildServiceProvider();
             Resolver resolver = (Resolver)serviceProvider.GetService<IResolver>();
