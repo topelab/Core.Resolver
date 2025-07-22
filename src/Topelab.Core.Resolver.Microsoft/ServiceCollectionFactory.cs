@@ -99,7 +99,7 @@ namespace Topelab.Core.Resolver.Microsoft
                             default:
                                 if (resolveInfo.Key != null)
                                 {
-                                    collection.AddKeyedSingleton(resolveInfo.TypeFrom, resolveInfo.Key, resolveInfo.TypeTo);
+                                    collection.AddKeyedTransient(resolveInfo.TypeFrom, resolveInfo.Key, resolveInfo.TypeTo);
                                 }
                                 else
                                 {
