@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/_info/">
+    <File Path="../readme.md" />
+    <File Path="version.txt" />
+  </Folder>
+  <Project Path="Topelab.Core.Resolver.Autofac/Topelab.Core.Resolver.Autofac.csproj" />
+  <Project Path="Topelab.Core.Resolver.Microsoft/Topelab.Core.Resolver.Microsoft.csproj" />
+  <Project Path="Topelab.Core.Resolver.Test/Topelab.Core.Resolver.Test.csproj" />
+  <Project Path="Topelab.Core.Resolver.Unity/Topelab.Core.Resolver.Unity.csproj" />
+  <Project Path="Topelab.Core.Resolver/Topelab.Core.Resolver.csproj" />
+</Solution>
