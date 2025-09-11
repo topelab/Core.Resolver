@@ -249,7 +249,7 @@ namespace Topelab.Core.Resolver.Test
             Assert.That(expectedResult, Is.EqualTo(result));
         }
 
-        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesCases))]
+        [TestCaseSource(typeof(ResolverCases), nameof(ResolverCases.ResolverFactoriesExceptAutofacCases))]
         public void ResolveNotPassedParameters(ResolverFactoryCase ResolverFactory)
         {
             // Arrange

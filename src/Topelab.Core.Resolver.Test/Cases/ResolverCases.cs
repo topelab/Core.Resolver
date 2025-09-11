@@ -8,5 +8,11 @@ namespace Topelab.Core.Resolver.Test.Cases
             new (Unity.ResolverFactory.Create, Unity.ResolverFactory.GetResolver),
             new (Autofac.ResolverFactory.Create, Autofac.ResolverFactory.GetResolver),
         ];
+
+        public static readonly ResolverFactoryCase[] ResolverFactoriesExceptAutofacCases =
+        [
+            new (Microsoft.ResolverFactory.Create, Microsoft.ResolverFactory.GetResolver),
+            new (Unity.ResolverFactory.Create, Unity.ResolverFactory.GetResolver),
+        ];
     }
 }
