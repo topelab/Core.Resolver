@@ -6,6 +6,10 @@ At the moment, only Microsoft.Extensions.DependencyInjection, UnityContainer and
 
 ## Changes
 
+### 2.0.0-rc1
+
+- Preparing upgrade to .NET 10.0
+
 ### 1.9.0
 
 - Refactor for better performance and memory usage with Topelab.Core.Resolver.Microsoft.
