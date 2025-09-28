@@ -1,0 +1,5 @@
+<Project>
+    <PropertyGroup>
+        <ResolverVersion>2.0.0-rc2</ResolverVersion>
+    </PropertyGroup>
+</Project>

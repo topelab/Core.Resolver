@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net10.0</TargetFrameworks>
-    <Version>2.0.0-rc1</Version>
+    <Version>$(ResolverVersion)</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Joan López</Authors>
     <Description>Core Resolver Unity is a simple wrapper for use under a Clean Architecture solution, to resolve DI references using Unity</Description>
