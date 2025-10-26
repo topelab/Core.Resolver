@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net9.0</TargetFrameworks>
-    <Version>1.9.2</Version>
+    <TargetFrameworks>netstandard2.0;net9.0</TargetFrameworks>
+    <LangVersion>Latest</LangVersion>
+    <Version>1.9.3</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Joan López</Authors>
     <Description>Core Resolver is a simple wrapper for use under a Clean Architecture solution, to resolve DI references</Description>

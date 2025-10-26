@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/_info/">
     <File Path="../readme.md" />
+    <File Path="changes.md" />
     <File Path="version.txt" />
   </Folder>
   <Project Path="Topelab.Core.Resolver.Autofac/Topelab.Core.Resolver.Autofac.csproj" />
