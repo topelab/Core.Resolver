@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net9.0</TargetFrameworks>
-    <Version>1.9.3</Version>
+    <Version>1.9.4</Version>
     <LangVersion>Latest</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Joan López</Authors>

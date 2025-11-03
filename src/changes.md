@@ -1,3 +1,7 @@
+## 1.9.4
+
+- Adding support for .NETStandard 2.0 for Topelab.Core.Resolver.Microsoft
+
 ## 1.9.3
 
 - Adding support for .NETStandard 2.0

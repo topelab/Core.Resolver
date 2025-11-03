@@ -322,7 +322,13 @@ namespace Topelab.Core.Resolver.Microsoft
                     }
                     else
                     {
-                        foundType = typesByName.Where(p => p.Key.Contains(key[1..])).OrderByDescending(r => r.Key.Length).Select(r => r.Value).FirstOrDefault();
+                        // Replace key[1..] (range operator) with key.Substring(1)
+                        var keySubstring = key.Length > 1 ? key.Substring(1) : string.Empty;
+                        foundType = typesByName
+                            .Where(p => p.Key.Contains(keySubstring))
+                            .OrderByDescending(r => r.Key.Length)
+                            .Select(r => r.Value)
+                            .FirstOrDefault();
                         if (foundType is not null)
                         {
                             result = foundType;

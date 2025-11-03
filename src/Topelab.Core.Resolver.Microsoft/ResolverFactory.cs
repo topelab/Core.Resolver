@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Interfaces;
 
@@ -22,8 +21,6 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="resolveInfoCollection">The resolve information collection.</param>
         public static IServiceCollection AddResolver(this IServiceCollection services, ResolveInfoCollection resolveInfoCollection, Scope scope = null)
         {
-            ArgumentNullException.ThrowIfNull(resolveInfoCollection);
-
             scope ??= Scope.Default;
             Dictionary<Type, Dictionary<string, Type>> namedResolutions = [];
             FillNamedResolutions(resolveInfoCollection, namedResolutions);
@@ -38,8 +35,6 @@ namespace Topelab.Core.Resolver.Microsoft
         /// <param name="resolveInfoCollection">The resolve info collection.</param>
         public static IResolver Create(ResolveInfoCollection resolveInfoCollection, Scope scope = null)
         {
-            ArgumentNullException.ThrowIfNull(resolveInfoCollection);
-
             scope ??= Scope.Default;
             Dictionary<Type, Dictionary<string, Type>> namedResolutions = [];
             FillNamedResolutions(resolveInfoCollection, namedResolutions);
