@@ -1,3 +1,7 @@
+### 2.0.0
+
+- Final release for .NET 10.0
+
 ### 2.0.0-rc1
 
 - Preparing upgrade to .NET 10.0
