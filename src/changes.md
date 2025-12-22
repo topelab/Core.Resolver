@@ -1,3 +1,10 @@
+### 2.0.1
+
+- Updating Autofac to 9.0.0
+- Updating NUnit3TestAdapter to 6.0.0
+- Updating Microsoft.Extensions.DependencyInjection to 10.0.1
+- Updating Microsoft.Extensions.Hosting to 10.0.1
+
 ### 2.0.0
 
 - Final release for .NET 10.0
