@@ -1,3 +1,10 @@
+### 2.0.2
+
+- Updating NUnit3TestAdapter to 6.1.0
+- Updating Microsoft.Extensions.DependencyInjection to 10.0.2
+- Updating Microsoft.Extensions.Hosting to 10.0.2
+
+
 ### 2.0.1
 
 - Updating Autofac to 9.0.0
