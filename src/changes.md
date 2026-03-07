@@ -1,6 +1,7 @@
 ### 2.0.4
 
 - Only one root resolver can be created with `ResolverFactory.Create`, additional resolvers will need a scope.
+- Updating NUnit to 4.5.1
 
 ### 2.0.3
 
