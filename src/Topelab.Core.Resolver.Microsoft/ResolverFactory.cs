@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Interfaces;
 
@@ -39,6 +38,10 @@ namespace Topelab.Core.Resolver.Microsoft
         public static IResolver Create(ResolveInfoCollection resolveInfoCollection, Scope scope = null)
         {
             ArgumentNullException.ThrowIfNull(resolveInfoCollection);
+            if (rootResolver != null && scope == null)
+            {
+                throw new Exception("Root resolver is already created. You can't create another root resolver without specifying scope");
+            }
 
             scope ??= Scope.Default;
             Dictionary<Type, Dictionary<string, Type>> namedResolutions = [];

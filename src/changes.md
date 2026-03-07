@@ -1,3 +1,7 @@
+### 2.0.4
+
+- Only one root resolver can be created with `ResolverFactory.Create`, additional resolvers will need a scope.
+
 ### 2.0.3
 
 - Updating Microsoft.NET.Test.Sdk to 18.3.0

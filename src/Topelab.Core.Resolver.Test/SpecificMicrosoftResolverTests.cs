@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using System;
+using System.Runtime.CompilerServices;
 using Topelab.Core.Resolver.Entities;
 using Topelab.Core.Resolver.Interfaces;
 using Topelab.Core.Resolver.Microsoft;
@@ -20,7 +21,7 @@ namespace Topelab.Core.Resolver.Test
             // Arrange
             var number = 99;
             var dateTime = DateTime.Now;
-            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
+            var resolver = CreateNewResolver(new ResolveInfoCollection()
                 .AddFactory(s => (IClaseTest)Activator.CreateInstance(typeof(ClaseTest), number, dateTime))
                 .AddFactory("dos", s => (IClaseTest)Activator.CreateInstance(typeof(ClaseTest), number * 2, dateTime))
                 );
@@ -65,13 +66,13 @@ namespace Topelab.Core.Resolver.Test
         public void Resolve_WithCurrentResolver_ResolvesSameInstance()
         {
             // Arrange
-            var resolver = ResolverFactory.Create(new ResolveInfoCollection()
+            var resolver = CreateNewResolver(new ResolveInfoCollection()
                 .AddTransient<IClaseTest, SimpleClaseTest>()
                 .AddTransient<IClaseTest2, SimpleClaseTest2>()
                 .AddTransient<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
                 );
 
-            var resolver2 = ResolverFactory.Create(new ResolveInfoCollection()
+            var resolver2 = CreateNewResolver(new ResolveInfoCollection()
                 .AddTransient<IClaseTest, SimpleClaseTest>()
                 .AddTransient<IClaseTest2, SimpleClaseTest2>()
                 .AddTransient<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2))
@@ -102,13 +103,15 @@ namespace Topelab.Core.Resolver.Test
                 .AddTransient<IClaseTest, SimpleClaseTest2>(nameof(SimpleClaseTest2));
 
             // Act
-            var resolver = ResolverFactory.Create(collection);
-            var resolver2 = ResolverFactory.Create(collection);
+            var resolver = CreateNewResolver(collection);
+            var resolver2 = CreateNewResolver(collection);
 
             // Assert
             Assert.That(resolver, Is.Not.EqualTo(resolver2));
 
         }
+
+        private IResolver CreateNewResolver(ResolveInfoCollection collection, [CallerMemberName] string scope = null) => ResolverFactory.Create(collection, new Scope(scope));
 
     }
 
