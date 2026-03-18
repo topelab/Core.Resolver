@@ -1,3 +1,9 @@
+### 2.0.5
+
+- Updating Autofac to 9.1.0
+- Updating Microsoft.Extensions.DependencyInjection to 10.0.5
+- Updating Microsoft.Extensions.Hosting to 10.0.5
+
 ### 2.0.4
 
 - Only one root resolver can be created with `ResolverFactory.Create`, additional resolvers will need a scope.
