@@ -1,3 +1,10 @@
+### 2.0.6
+
+- Upgrade NUnit3TestAdapter to 6.2.0
+- Upgrade Microsoft.NET.Test.Sdk to 18.4.0
+- Upgrade Microsoft.Extensions.DependencyInjection to 10.0.6
+- Upgrade Microsoft.Extensions.Hosting to 10.0.6
+
 ### 2.0.5
 
 - Updating Autofac to 9.1.0
