@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net10.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <Version>$(ResolverVersion)</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Joan López</Authors>
