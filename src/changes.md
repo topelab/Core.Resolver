@@ -1,3 +1,10 @@
+### 2.0.7
+
+- Upgrade Microsoft.NET.Test.Sdk to 18.5.1
+- Upgrade NUnit to 4.6.0
+- Upgrade Microsoft.Extensions.DependencyInjection to 10.0.8
+- Upgrade Microsoft.Extensions.Hosting to 10.0.8
+
 ### 2.0.6
 
 - Upgrade NUnit3TestAdapter to 6.2.0
