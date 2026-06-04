@@ -1,3 +1,8 @@
+### 2.0.8
+
+- Upgrade Microsoft.NET.Test.Sdk to 18.6.0
+- Upgrade NUnit to 4.6.1
+
 ### 2.0.7
 
 - Upgrade Microsoft.NET.Test.Sdk to 18.5.1
