@@ -11,7 +11,7 @@
     <PackageProjectUrl>https://github.com/topelab/Core.Resolver</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="9.1.0" />
+    <PackageReference Include="Autofac" Version="9.2.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Topelab.Core.Resolver\Topelab.Core.Resolver.csproj" />

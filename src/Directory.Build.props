@@ -1,5 +1,5 @@
 <Project>
-    <PropertyGroup>
-        <ResolverVersion>2.0.8</ResolverVersion>
-    </PropertyGroup>
+  <PropertyGroup>
+    <ResolverVersion>2.0.9</ResolverVersion>
+  </PropertyGroup>
 </Project>
