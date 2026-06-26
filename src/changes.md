@@ -1,3 +1,8 @@
+## Version 2.0.10
+
+- Updating Autofac to 9.3.0
+- Updating Microsoft.NET.Test.Sdk to 18.7.0
+
 ## Version 2.0.9 (Topelab.Core.Resolver), 2.0.9 (Topelab.Core.Resolver.Autofac), 2.0.9 (Topelab.Core.Resolver.Microsoft), 2.0.9 (Topelab.Core.Resolver.Test), 2.0.9 (Topelab.Core.Resolver.Unity)
 
 - Updating Autofac to 9.2.0
