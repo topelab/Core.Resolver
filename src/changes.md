@@ -1,3 +1,7 @@
+## Version 2.0.11
+
+- Updating Autofac to 9.3.1
+
 ## Version 2.0.10
 
 - Updating Autofac to 9.3.0
