@@ -1,3 +1,9 @@
+## Version 2.0.12
+
+- Updating Microsoft.NET.Test.Sdk to 18.8.1
+- Updating Microsoft.Extensions.DependencyInjection to 10.0.10
+- Updating Microsoft.Extensions.Hosting to 10.0.10
+
 ## Version 2.0.11
 
 - Updating Autofac to 9.3.1
