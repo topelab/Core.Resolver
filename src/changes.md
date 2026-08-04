@@ -1,3 +1,8 @@
+## Version 2.0.13
+
+- Updated Autofac  9.3.1 -> 9.3.2
+- Updated Autofac  9.3.1 -> 9.3.2
+
 ## Version 2.0.12
 
 - Updating Microsoft.NET.Test.Sdk to 18.8.1
