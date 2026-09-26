@@ -1,3 +1,13 @@
+## Version 2.0.14
+
+- Updated Autofac  9.3.2 -> 9.3.4
+- Updated Autofac  9.3.2 -> 9.3.4
+- Updated Microsoft.Extensions.DependencyInjection  10.0.10 -> 10.0.12
+- Updated Microsoft.Extensions.DependencyInjection  10.0.10 -> 10.0.12
+- Updated Microsoft.Extensions.Hosting  10.0.10 -> 10.0.12
+- Updated Microsoft.NET.Test.Sdk        18.8.1  -> 18.10.1
+- Updated NUnit3TestAdapter             6.2.0   -> 6.3.0  
+
 ## Version 2.0.13
 
 - Updated Autofac  9.3.1 -> 9.3.2
